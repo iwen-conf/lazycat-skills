@@ -1,6 +1,6 @@
 ---
 name: lazycat:ship-app
-description: 面向懒猫应用上架的端到端交付 skill。只要用户提到 Lazycat、懒猫、developer.lazycat.cloud、懒猫开发者中心、lpk、lzc-cli、应用简介、应用截图、提审、审核、上架、发布、版本更新、官方源、商店资料、发布后核验等相关请求，就必须使用此 skill。覆盖从 idea/scoping、应用创建与配置整理、lpk 打包和上传、元数据和截图准备、自测和安装验证、提审与审核跟进，到正式发布后的可见性和安装检查。
+description: 面向懒猫应用上架的端到端交付 skill。只要用户提到 Lazycat、懒猫、developer.lazycat.cloud、懒猫开发者中心、lpk、lzc-cli、应用简介、应用截图、应用图标、提审、审核、上架、发布、版本更新、官方源、商店资料、发布后核验等相关请求，就必须使用此 skill。覆盖从 idea/scoping、应用创建与配置整理、lpk 打包和上传、元数据、图标和截图准备、自测和安装验证、提审与审核跟进，到正式发布后的可见性和安装检查。
 compatibility:
   tools:
     - shell
@@ -26,8 +26,8 @@ compatibility:
 
 ## Quick Contract
 
-- **Trigger**: 用户提到 Lazycat、懒猫开发者中心、`developer.lazycat.cloud`、`lpk`、提审、上架、版本发布、官方源、审核打回、商店截图、应用简介等任一信号
-- **Inputs**: 代码仓库或项目目录、目标版本、交付类型、开发者中心访问权限、商店资料现状、可验证环境
+- **Trigger**: 用户提到 Lazycat、懒猫开发者中心、`developer.lazycat.cloud`、`lpk`、提审、上架、版本发布、官方源、审核打回、商店截图、应用简介、应用图标等任一信号
+- **Inputs**: 代码仓库或项目目录、目标版本、交付类型、开发者中心访问权限、商店资料现状、图标与截图状态、可验证环境
 - **Outputs**: 发布摘要、证据链、缺口与风险、当前执行动作、下一步计划，以及必要时的提审包与发布后核验结论
 - **Quality Gate**: 本地源数据、商店资料、打包产物、测试结果、开发者中心页面状态五项必须能互相对上
 - **Decision Tree**: 先判断是首发 / 更新 / 打回重提 / 资料补齐，再判断交付物是官方发布、独立 `.lpk`、开发者中心提审，还是发布后核验
@@ -74,6 +74,7 @@ compatibility:
 | `repo_or_project_path` | string | 推荐 | 仓库或项目目录；如果用户没给，先从当前工作区、构建脚本、README 中查找 |
 | `version_goal` | string | 可选 | 目标版本号、发布日期或本次迭代范围 |
 | `store_assets_state` | enum(`齐全`/`部分缺失`/`几乎没有`) | 可选 | 说明应用名、简介、icon、截图、多语言、changelog 是否完备 |
+| `icon_generation_mode` | enum(`已有可用图标`/`需要生成新图标`/`需要升级旧图标`) | 可选 | 如果图标需要交给外部 AI 生成或升级，在资料阶段切换到 `lazycat:prepare-icon` 输出 prompt |
 | `developer_access` | enum(`已登录并有权限`/`有账号待验证`/`未知`) | 可选 | 判断是否能直接推进开发者中心操作 |
 | `verification_env` | enum(`Lazycat 真机`/`标准测试环境`/`仅模拟检查`) | 可选 | 说明测试结论能达到什么可信度，哪些仍待实机验证 |
 
@@ -170,6 +171,13 @@ Lazycat 商店资料既包含从本地配置自动带出的字段，也可能包
 - 去掉调试标记、测试脚本残留、敏感数据、无效 banner、报错 toast
 - 如果开发者中心对截图张数、尺寸、宽高比有要求，必须以当前页面实际要求为准，并在提交说明里记录下来
 
+准备图标时：
+
+- 先检查本地项目、商店资料和当前 UI 是否已经有可用 icon
+- 如果图标缺失、质量不够或明显不适合 App Store 展示，使用 `lazycat:prepare-icon`
+- `lazycat:prepare-icon` 的职责是给用户一份可直接发给外部图像模型的英文 prompt，不要假装 PNG 已经生成
+- 等用户把生成后的 PNG 带回后，再继续检查尺寸、背景、圆角、文字和功能表达是否合规
+
 复杂的商店资料工作先读 [references/store-assets.md](./references/store-assets.md)。
 
 ### 5. 测试与提审前验收
@@ -245,6 +253,7 @@ Lazycat 商店资料既包含从本地配置自动带出的字段，也可能包
 
 - 复杂的上架核对和提审前复核，先读 [references/shipping-checklist.md](./references/shipping-checklist.md)
 - 复杂的应用简介、截图、资料包整理，先读 [references/store-assets.md](./references/store-assets.md)
+- 如果资料阶段缺正式图标，切到 `lazycat:prepare-icon`
 
 ## Example Triggers
 
