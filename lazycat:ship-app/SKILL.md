@@ -1,6 +1,6 @@
 ---
 name: lazycat:ship-app
-description: 面向懒猫应用上架的端到端交付 skill。只要用户提到 Lazycat、懒猫、developer.lazycat.cloud、懒猫开发者中心、lpk、lzc-cli、应用简介、应用截图、应用图标、提审、审核、上架、发布、版本更新、官方源、商店资料、发布后核验等相关请求，就必须使用此 skill。覆盖从 idea/scoping、应用创建与配置整理、lpk 打包和上传、元数据、图标和截图准备、自测和安装验证、提审与审核跟进，到正式发布后的可见性和安装检查。
+description: 面向懒猫应用上架的端到端交付 skill。只要用户提到 Lazycat、懒猫、developer.lazycat.cloud、懒猫开发者中心、lpk、lzc-cli、应用简介、应用截图、应用图标、项目创建、Go、Vue、Element Plus、登录、注册、access_token、refresh_token、提审、审核、上架、发布、版本更新、官方源、商店资料、发布后核验等相关请求，就必须使用此 skill。覆盖从 idea/scoping、应用创建与配置整理、技术栈与认证基线、lpk 打包和上传、元数据、图标和截图准备、自测和安装验证、提审与审核跟进，到正式发布后的可见性和安装检查。
 compatibility:
   tools:
     - shell
@@ -26,8 +26,8 @@ compatibility:
 
 ## Quick Contract
 
-- **Trigger**: 用户提到 Lazycat、懒猫开发者中心、`developer.lazycat.cloud`、`lpk`、提审、上架、版本发布、官方源、审核打回、商店截图、应用简介、应用图标等任一信号
-- **Inputs**: 代码仓库或项目目录、目标版本、交付类型、开发者中心访问权限、商店资料现状、图标与截图状态、可验证环境
+- **Trigger**: 用户提到 Lazycat、懒猫开发者中心、`developer.lazycat.cloud`、`lpk`、提审、上架、版本发布、官方源、审核打回、商店截图、应用简介、应用图标、项目创建、登录注册、双 token 等任一信号
+- **Inputs**: 代码仓库或项目目录、目标版本、交付类型、开发者中心访问权限、商店资料现状、图标与截图状态、技术栈与认证基线现状、可验证环境
 - **Outputs**: 发布摘要、证据链、缺口与风险、当前执行动作、下一步计划，以及必要时的提审包与发布后核验结论
 - **Quality Gate**: 本地源数据、商店资料、打包产物、测试结果、开发者中心页面状态五项必须能互相对上
 - **Decision Tree**: 先判断是首发 / 更新 / 打回重提 / 资料补齐，再判断交付物是官方发布、独立 `.lpk`、开发者中心提审，还是发布后核验
@@ -75,6 +75,7 @@ compatibility:
 | `version_goal` | string | 可选 | 目标版本号、发布日期或本次迭代范围 |
 | `store_assets_state` | enum(`齐全`/`部分缺失`/`几乎没有`) | 可选 | 说明应用名、简介、icon、截图、多语言、changelog 是否完备 |
 | `icon_generation_mode` | enum(`已有可用图标`/`需要生成新图标`/`需要升级旧图标`) | 可选 | 如果图标需要交给外部 AI 生成或升级，在资料阶段切换到 `lazycat:prepare-icon` 输出 prompt |
+| `project_baseline_state` | enum(`未创建`/`结构不统一`/`缺认证`/`已具备标准基线`) | 可选 | 如果项目还处在创建或补基线阶段，切换到 `lazycat:create-app` 统一 Go + Vue + Element Plus 与认证规范 |
 | `developer_access` | enum(`已登录并有权限`/`有账号待验证`/`未知`) | 可选 | 判断是否能直接推进开发者中心操作 |
 | `verification_env` | enum(`Lazycat 真机`/`标准测试环境`/`仅模拟检查`) | 可选 | 说明测试结论能达到什么可信度，哪些仍待实机验证 |
 
@@ -123,6 +124,8 @@ compatibility:
 
 如果是从 idea 开始，先把应用创建到可构建、可安装、可描述的状态；如果已经有仓库，就把发布相关内容梳理完整：
 
+- 如果当前还在项目创建期，或缺少统一技术栈与认证基线，先使用 `lazycat:create-app`
+- `lazycat:create-app` 默认把项目收敛到 Go 后端、Vue + Element Plus 前端、登录 / 注册、`access_token + refresh_token`、无感刷新
 - 找出应用配置、构建入口、版本号来源、图标和本地化文案来源
 - 校准对商店可见的字段：应用名、应用简介、图标、类目、多语言文本、版本描述
 - 检查权限、端口、挂载卷、网络依赖、环境变量、回调地址、初始化步骤是否与实际功能一致
@@ -253,6 +256,7 @@ Lazycat 商店资料既包含从本地配置自动带出的字段，也可能包
 
 - 复杂的上架核对和提审前复核，先读 [references/shipping-checklist.md](./references/shipping-checklist.md)
 - 复杂的应用简介、截图、资料包整理，先读 [references/store-assets.md](./references/store-assets.md)
+- 如果项目还没完成技术栈与认证基线，先切到 `lazycat:create-app`
 - 如果资料阶段缺正式图标，切到 `lazycat:prepare-icon`
 
 ## Example Triggers

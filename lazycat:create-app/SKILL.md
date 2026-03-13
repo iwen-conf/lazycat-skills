@@ -1,0 +1,200 @@
+---
+name: lazycat:create-app
+description: 面向 Lazycat 新项目创建和项目基线统一的 skill。只要用户提到从 0 创建懒猫应用、初始化项目、脚手架、项目标准、Go 后端、Vue、Element Plus、登录、注册、JWT、access_token、refresh_token、无感刷新、认证改造、把现有项目补成统一基线等请求，就必须使用此 skill。负责把项目创建阶段收敛到统一规范：Go + Vue + Element Plus，且默认具备登录、注册、双 token 和无感刷新能力。
+---
+
+# Lazycat 项目创建基线
+
+你负责把 Lazycat 项目从“一个想法”推进到“有统一技术基线、可继续开发、可进入资料准备与发布流程”的状态。重点不是只生成目录，而是把项目标准、认证基线和后续发布兼容性一次性定清楚。
+
+## Overview
+
+这个 skill 用于新建项目或给现有项目补齐统一基线。默认标准是：
+
+- 后端使用 Go
+- 前端使用 Vue
+- UI 使用 Element Plus
+- 所有项目默认具备登录、注册
+- 认证采用 `access_token + refresh_token`
+- 前端默认支持无感刷新
+
+如果现有仓库已经有更强的团队约束，优先沿用团队约束；如果没有，就按这个默认标准落地。
+
+## Quick Contract
+
+- **Trigger**: 用户提到创建懒猫项目、初始化脚手架、统一项目标准、补登录注册、接入双 token、做无感刷新、Go + Vue + Element Plus 基线
+- **Inputs**: 项目目标、仓库现状、是否新建项目、现有前后端结构、认证现状、是否已有用户系统
+- **Outputs**: 项目基线摘要、技术栈与目录建议、认证方案、必须完成的模块清单、后续交给 `lazycat:ship-app` 的发布准备接口
+- **Quality Gate**: 最终方案必须明确 Go 后端、Vue + Element Plus 前端、登录/注册、`access_token + refresh_token`、无感刷新，以及失败后的回退行为
+- **Decision Tree**: 先判断是新建项目还是补齐现有项目，再判断是全套基线落地、只补认证、还是只做结构收敛
+
+## When to Use
+
+**首选触发**
+
+- 用户要从 0 创建 Lazycat 项目
+- 用户明确要求项目统一使用 Go + Vue + Element Plus
+- 用户要求所有项目都必须具备登录、注册、双 token、无感刷新
+- 现有项目要补齐统一认证能力或前后端基线
+
+**典型场景**
+
+- 新建一个面向 Lazycat 上架的新应用，需要先把技术基线定下来
+- 已有项目功能已经有了，但认证链路混乱，需要统一成登录/注册 + 双 token
+- 前端已经有 Vue 页面，但没有 Element Plus、Pinia、路由守卫和无感刷新
+- 后端已有 Go 服务，但没有 refresh token、token rotation 或统一认证接口
+
+**边界提示**
+
+- 这个 skill 负责“创建和基线”，不是最终上架；准备提审时要回到 `lazycat:ship-app`
+- 如果用户只要图标或商店资料，不要误用本 skill
+- 如果现有项目已经采用别的语言栈，除非用户明确允许，不要擅自跨语言重写
+
+## Announce
+
+开始执行后，用一句短摘要说明：
+
+- 当前是新建项目还是补齐现有项目
+- 你将如何确认 Go / Vue / Element Plus 是否已经落地
+- 当前认证链路缺的是页面、接口、token 机制，还是无感刷新
+
+## Input Arguments
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `project_mode` | enum(`新建项目`/`补齐现有项目`/`仅认证改造`) | 推荐 | 决定本次是从零初始化，还是基于现有仓库做结构补强 |
+| `backend_stack` | string | 推荐 | 默认为 Go；除非用户明确要求，不要偏离 |
+| `frontend_stack` | string | 推荐 | 默认为 Vue + Element Plus；如果已有 Vue 项目，优先补齐而不是推倒重来 |
+| `auth_state` | enum(`无认证`/`仅登录`/`单 token`/`双 token 不完整`/`已完整`) | 推荐 | 用于判断认证改造深度 |
+| `user_system_state` | enum(`无用户表`/`已有用户表`/`已有第三方登录`) | 可选 | 用于决定注册流程和用户资料最小字段 |
+| `release_target` | enum(`先开发`/`准备提审`/`同时为发布做基线`) | 可选 | 决定是否同步补齐面向发布的元数据和配置约束 |
+
+## The Iron Law
+
+1. 所有新项目默认使用 Go 后端、Vue 前端、Element Plus 组件库；不要在没有证据的情况下切换到别的栈。
+2. 所有项目默认具备登录、注册；如果业务确实不需要开放注册，要在汇报里明确这是业务豁免，而不是遗漏。
+3. 认证默认使用 `access_token + refresh_token`，不能只发一个长生命周期 token 就算完成。
+4. 前端必须具备无感刷新与失败回退机制；不能把“token 过期后手动重登”当作完成态。
+5. 创建阶段就要考虑后续上架与提审，避免后面再返工认证、菜单、路由、初始化或环境变量。
+
+## Workflow
+
+### 1. 确认项目创建模式
+
+- 判断是全新项目、现有项目补齐，还是只补认证能力
+- 判断前后端是否已经存在，以及当前结构是否接近 Go + Vue + Element Plus 基线
+- 如果用户只给了想法，没有仓库，先生成最小项目蓝图
+
+### 2. 固化技术基线
+
+- 后端固定为 Go
+- 前端固定为 Vue
+- UI 固定为 Element Plus
+- 前端状态管理和鉴权状态建议统一到单一 store
+- 路由层必须预留匿名页和鉴权页边界
+
+如果仓库已有更细的框架约束，以仓库现状为准，但不能偏离这三项主基线。
+
+### 3. 落认证基线
+
+每个项目都要至少具备：
+
+- 登录页
+- 注册页
+- 鉴权状态持久化与恢复
+- `access_token`
+- `refresh_token`
+- 无感刷新
+- 刷新失败后的清理与回登录页
+
+推荐默认做法：
+
+- `access_token` 走短生命周期
+- `refresh_token` 走长生命周期
+- 刷新时执行 token rotation
+- 前端只允许一个刷新流程在飞，其他请求排队等待结果
+- 刷新失败后清理本地鉴权状态并跳转登录
+
+### 4. 设计最小接口与页面
+
+至少明确这些接口或等价能力：
+
+- `POST /auth/register`
+- `POST /auth/login`
+- `POST /auth/refresh`
+- `POST /auth/logout`
+- `GET /auth/me`
+
+至少明确这些前端能力：
+
+- 登录表单
+- 注册表单
+- 路由守卫
+- 启动时恢复登录态
+- 401 后单次刷新重试
+- 刷新失败后的退出登录
+
+### 5. 对齐数据与安全边界
+
+- 用户表最小字段要能支撑注册、登录和状态判断
+- refresh token 不能裸存明文长期复用，至少要具备可撤销或可轮换能力
+- 认证相关环境变量、密钥、过期时间、Cookie/Header 约束要提前定下来
+- 如果项目要上架 Lazycat，初始化说明里要明确首次登录、默认管理员或注册入口策略
+
+### 6. 交给发布链路
+
+当项目已经具备可开发、可登录、可注册、可刷新 token 的基线后，再交回 `lazycat:ship-app` 继续走资料、截图、提审和发布。
+
+复杂基线收敛先读 [references/project-baseline.md](./references/project-baseline.md)。
+
+## Quality Gates
+
+- 明确采用 Go + Vue + Element Plus
+- 明确具备登录、注册
+- 明确具备 `access_token + refresh_token`
+- 明确前端无感刷新流程和失败回退流程
+- 明确最小接口、最小页面和最小用户数据要求
+- 说明创建完成后如何进入 `lazycat:ship-app`
+
+## Red Flags
+
+- 项目已经开始做业务，但还没有统一认证基线
+- 只做登录，不做注册，却没有业务豁免说明
+- 只发一个 token，没有 refresh token
+- 前端请求 401 后直接把用户踢掉，没有无感刷新
+- 多个并发请求会重复触发 refresh，导致竞态或覆盖
+- 创建阶段没有考虑后续上架和初始化路径
+
+## Bundled References
+
+- 项目技术栈与认证基线： [references/project-baseline.md](./references/project-baseline.md)
+
+## Outputs
+
+```text
+阶段: 项目创建 / 基线补齐
+项目模式: <新建项目 / 补齐现有项目 / 仅认证改造>
+
+已确认
+- ...
+
+项目基线
+- 后端: Go
+- 前端: Vue + Element Plus
+- 认证: access_token + refresh_token + 无感刷新
+
+缺口 / 风险
+- ...
+
+当前执行
+- ...
+
+下一步
+1. ...
+2. ...
+
+交付物
+- 项目结构建议
+- 认证链路清单
+- 交给 lazycat:ship-app 的后续入口
+```
