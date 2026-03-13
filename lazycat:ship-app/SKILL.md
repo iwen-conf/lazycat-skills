@@ -1,6 +1,6 @@
 ---
 name: lazycat:ship-app
-description: 面向懒猫应用上架的端到端交付 skill。只要用户提到 Lazycat、懒猫、developer.lazycat.cloud、懒猫开发者中心、lpk、lzc-cli、应用简介、应用截图、应用图标、项目创建、Go、Vue、Element Plus、登录、注册、access_token、refresh_token、现金激励、微服账户系统、网盘右键菜单、提审、审核、上架、发布、版本更新、官方源、商店资料、发布后核验等相关请求，就必须使用此 skill。覆盖从 idea/scoping、应用创建与配置整理、技术栈与认证基线、激励资格判断、lpk 打包和上传、元数据、图标和截图准备、自测和安装验证、提审与审核跟进，到正式发布后的可见性和安装检查。
+description: 面向懒猫应用上架的端到端交付 skill。只要用户提到 Lazycat、懒猫、developer.lazycat.cloud、懒猫开发者中心、lpk、lzc-cli、应用简介、应用截图、应用图标、项目创建、Go、Vue、Element Plus、登录、注册、access_token、refresh_token、现金激励、微服账户系统、网盘右键菜单、移植应用、GitHub 选型、重复移植、build.sh、Makefile、攻略文章、提审、审核、上架、发布、版本更新、官方源、商店资料、发布后核验等相关请求，就必须使用此 skill。覆盖从 idea/scoping、应用创建与配置整理、技术栈与认证基线、激励资格判断、移植去重、脚本入口、lpk 打包和上传、元数据、图标和截图准备、自测和安装验证、提审与审核跟进，到正式发布后的可见性和安装检查。
 compatibility:
   tools:
     - shell
@@ -28,8 +28,8 @@ compatibility:
 
 ## Quick Contract
 
-- **Trigger**: 用户提到 Lazycat、懒猫开发者中心、`developer.lazycat.cloud`、`lpk`、提审、上架、版本发布、官方源、审核打回、商店截图、应用简介、应用图标、项目创建、登录注册、双 token、现金激励等任一信号
-- **Inputs**: 代码仓库或项目目录、目标版本、交付类型、开发者中心访问权限、商店资料现状、图标与截图状态、技术栈与认证基线现状、文档目录现状、激励目标、可验证环境
+- **Trigger**: 用户提到 Lazycat、懒猫开发者中心、`developer.lazycat.cloud`、`lpk`、提审、上架、版本发布、官方源、审核打回、商店截图、应用简介、应用图标、项目创建、登录注册、双 token、现金激励、移植、GitHub 选型、重复移植、build.sh、Makefile、攻略文章等任一信号
+- **Inputs**: 代码仓库或项目目录、目标版本、交付类型、开发者中心访问权限、商店资料现状、图标与截图状态、技术栈与认证基线现状、文档目录现状、命令入口现状、激励目标、可验证环境
 - **Outputs**: 发布摘要、证据链、缺口与风险、当前执行动作、下一步计划，以及必要时的提审包、激励资格判断和发布后核验结论
 - **Quality Gate**: 本地源数据、商店资料、打包产物、测试结果、开发者中心页面状态五项必须能互相对上；如果目标是现金激励，还要满足官方规则中的类型、凭证、稳定性和附加对接要求
 - **Decision Tree**: 先判断是首发 / 更新 / 打回重提 / 资料补齐，再判断交付物是官方发布、独立 `.lpk`、开发者中心提审，还是发布后核验
@@ -42,6 +42,7 @@ compatibility:
 - 用户要从仓库或现有项目直接推进到“可发布”状态，而不是只做一段孤立文案
 - 用户需要你代操作开发者中心创建应用、补充商店资料、上传包、提交审核、跟进审核状态
 - 用户希望应用尽量符合懒猫现金激励规则
+- 用户要先找一个值得移植的项目，或要确认有没有重复移植
 
 **典型场景**
 
@@ -80,6 +81,7 @@ compatibility:
 | `icon_generation_mode` | enum(`已有可用图标`/`需要生成新图标`/`需要升级旧图标`) | 可选 | 如果图标需要交给外部 AI 生成或升级，在资料阶段切换到 `lazycat:prepare-icon` 输出 prompt |
 | `project_baseline_state` | enum(`未创建`/`结构不统一`/`缺认证`/`已具备标准基线`) | 可选 | 如果项目还处在创建或补基线阶段，切换到 `lazycat:create-app` 统一 Go + Vue + Element Plus 与认证规范 |
 | `docs_state` | enum(`无 docs`/`docs 不完整`/`docs 已齐全`) | 可选 | 如果项目第一步还没建立 `docs/requirements`、`docs/api-design` 等目录，先切到 `lazycat:create-app` 补文档树 |
+| `commands_state` | enum(`无脚本入口`/`脚本不完整`/`已具备 build.sh 和 Makefile`) | 可选 | 如果项目没有 `build.sh`、`Makefile`、`make build` 或 `make install`，先切到 `lazycat:create-app` 或 `lazycat:port-app` 补齐 |
 | `reward_target` | enum(`普通上架`/`现金激励优先`) | 可选 | 如果用户明确想拿红包，先按官方规则判断资格路径，并优先补账户系统或文件关联等附加对接 |
 | `developer_access` | enum(`已登录并有权限`/`有账号待验证`/`未知`) | 可选 | 判断是否能直接推进开发者中心操作 |
 | `verification_env` | enum(`Lazycat 真机`/`标准测试环境`/`仅模拟检查`) | 可选 | 说明测试结论能达到什么可信度，哪些仍待实机验证 |
@@ -136,6 +138,8 @@ compatibility:
 
 - 如果当前还在项目创建期，或缺少统一技术栈与认证基线，先使用 `lazycat:create-app`
 - 如果 `docs/` 文档树还没建立，先使用 `lazycat:create-app` 创建并拆好文档目录
+- 如果项目缺少 `build.sh`、`Makefile`、`make build` 或 `make install`，先使用 `lazycat:create-app` 或 `lazycat:port-app` 补齐命令入口
+- 如果当前任务是“找值得移植的项目并避免重复”，先切到 `lazycat:port-app`
 - `lazycat:create-app` 默认把项目收敛到 Go 后端、Vue + Element Plus 前端、登录 / 注册、`access_token + refresh_token`、无感刷新
 - `lazycat:create-app` 也负责把第一步文档树收敛到 `docs/requirements`、`docs/api-design`、`docs/architecture`、`docs/release-prep`
 - 如果目标是现金激励，优先补上普通用户可获得凭证的登录路径，并评估微服 OIDC 或网盘文件关联
@@ -163,6 +167,7 @@ compatibility:
 - 上传或发布结果的页面状态、任务状态或 CLI 回执
 
 如果 `.lpk` 的具体生成命令在仓库中不存在，先从脚本、README、CI 或构建配置里找真实来源，不要臆造命令。
+如果仓库没有 `build.sh`、`Makefile`、`make build`、`make install` 这类标准入口，先补齐，再继续打包。
 
 ### 4. 商店资料、应用简介与截图
 
@@ -253,6 +258,7 @@ Lazycat 商店资料既包含从本地配置自动带出的字段，也可能包
 
 - 本地项目中的名称、简介、icon、类目、多语言与商店显示一致
 - `docs/` 文档树已建立，且至少有需求分析、API 设计、架构、发布准备四类目录
+- 已具备 `build.sh`、`Makefile`、`make build`、`make install`
 - 版本号、changelog、包文件和页面状态一致
 - 截图来自真实运行版本，且没有调试信息、敏感数据和失效内容
 - 关键功能至少完成一次最小可运行验证，并说明验证环境
@@ -267,6 +273,7 @@ Lazycat 商店资料既包含从本地配置自动带出的字段，也可能包
 
 - 只改网页表单，没有同步本地源数据
 - 项目已经开始开发，但没有 `docs/requirements` 或 `docs/api-design`
+- 项目需要构建和安装，但没有 `build.sh` 或 `Makefile`
 - 不清楚版本号来源、包生成方式或上传产物对应哪个 commit
 - 应用简介承诺了实际做不到的功能，或使用无法证实的宣传词
 - 截图和当前版本不一致，混用了不同语言、不同主题或开发环境画面
@@ -283,6 +290,8 @@ Lazycat 商店资料既包含从本地配置自动带出的字段，也可能包
 - 如果目标包含红包激励，先读 [references/cash-incentive.md](./references/cash-incentive.md)
 - 如果项目还没完成技术栈与认证基线，先切到 `lazycat:create-app`
 - 如果项目还没建立 `docs/` 文档树，也先切到 `lazycat:create-app`
+- 如果项目是移植路线，先切到 `lazycat:port-app`
+- 如果用户要写攻略或对接文章，先切到 `lazycat:write-guide`
 - 如果资料阶段缺正式图标，切到 `lazycat:prepare-icon`
 
 ## Example Triggers

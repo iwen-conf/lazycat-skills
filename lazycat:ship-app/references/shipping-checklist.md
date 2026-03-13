@@ -9,6 +9,7 @@
 - [ ] 确认开发者认证、开发者中心权限、目标应用权限
 - [ ] 找到仓库、构建命令、发布入口和版本来源
 - [ ] 已建立 `docs/requirements`、`docs/api-design`、`docs/architecture`、`docs/release-prep`
+- [ ] 已具备 `build.sh`、`Makefile`、`make build`、`make install`
 - [ ] 确认是否需要 `.lpk`、`lzc-cli project publish`，或两者都要
 - [ ] 如果目标是现金激励，明确是原创还是移植，并先判断是否属于官方不奖励类型
 

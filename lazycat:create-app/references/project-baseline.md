@@ -13,6 +13,23 @@
 
 具体拆分参考 [docs-blueprint.md](./docs-blueprint.md)。
 
+## 0.5 统一命令入口
+
+每个项目都必须提供可执行的命令入口，至少包含：
+
+- 根目录 `build.sh`
+- 根目录 `Makefile`
+- `make build`
+- `make install`
+
+推荐继续补：
+
+- `make dev`
+- `make test`
+- `make clean`
+
+命令不要只写在聊天记录或零散文档里，必须能在仓库根目录直接执行。
+
 ## 1. 默认技术栈
 
 - 后端：Go
