@@ -29,7 +29,7 @@ compatibility:
 ## Quick Contract
 
 - **Trigger**: 用户提到 Lazycat、懒猫开发者中心、`developer.lazycat.cloud`、`lpk`、提审、上架、版本发布、官方源、审核打回、商店截图、应用简介、应用图标、项目创建、登录注册、双 token、现金激励等任一信号
-- **Inputs**: 代码仓库或项目目录、目标版本、交付类型、开发者中心访问权限、商店资料现状、图标与截图状态、技术栈与认证基线现状、激励目标、可验证环境
+- **Inputs**: 代码仓库或项目目录、目标版本、交付类型、开发者中心访问权限、商店资料现状、图标与截图状态、技术栈与认证基线现状、文档目录现状、激励目标、可验证环境
 - **Outputs**: 发布摘要、证据链、缺口与风险、当前执行动作、下一步计划，以及必要时的提审包、激励资格判断和发布后核验结论
 - **Quality Gate**: 本地源数据、商店资料、打包产物、测试结果、开发者中心页面状态五项必须能互相对上；如果目标是现金激励，还要满足官方规则中的类型、凭证、稳定性和附加对接要求
 - **Decision Tree**: 先判断是首发 / 更新 / 打回重提 / 资料补齐，再判断交付物是官方发布、独立 `.lpk`、开发者中心提审，还是发布后核验
@@ -79,6 +79,7 @@ compatibility:
 | `store_assets_state` | enum(`齐全`/`部分缺失`/`几乎没有`) | 可选 | 说明应用名、简介、icon、截图、多语言、changelog 是否完备 |
 | `icon_generation_mode` | enum(`已有可用图标`/`需要生成新图标`/`需要升级旧图标`) | 可选 | 如果图标需要交给外部 AI 生成或升级，在资料阶段切换到 `lazycat:prepare-icon` 输出 prompt |
 | `project_baseline_state` | enum(`未创建`/`结构不统一`/`缺认证`/`已具备标准基线`) | 可选 | 如果项目还处在创建或补基线阶段，切换到 `lazycat:create-app` 统一 Go + Vue + Element Plus 与认证规范 |
+| `docs_state` | enum(`无 docs`/`docs 不完整`/`docs 已齐全`) | 可选 | 如果项目第一步还没建立 `docs/requirements`、`docs/api-design` 等目录，先切到 `lazycat:create-app` 补文档树 |
 | `reward_target` | enum(`普通上架`/`现金激励优先`) | 可选 | 如果用户明确想拿红包，先按官方规则判断资格路径，并优先补账户系统或文件关联等附加对接 |
 | `developer_access` | enum(`已登录并有权限`/`有账号待验证`/`未知`) | 可选 | 判断是否能直接推进开发者中心操作 |
 | `verification_env` | enum(`Lazycat 真机`/`标准测试环境`/`仅模拟检查`) | 可选 | 说明测试结论能达到什么可信度，哪些仍待实机验证 |
@@ -119,6 +120,7 @@ compatibility:
 
 - 应用目标、核心用户、最小可发布范围
 - 仓库路径、当前分支、构建方式、是否已有懒猫应用结构
+- 是否已经建立 `docs/requirements`、`docs/api-design`、`docs/architecture`、`docs/release-prep`
 - 目标版本号、发布日期、是否要同步 changelog
 - 是否已具备开发者中心账号、开发者认证和目标应用的权限
 - 是否需要生成独立 `.lpk`、还是走 `lzc-cli` 官方发布链路、或两者都要
@@ -133,7 +135,9 @@ compatibility:
 如果是从 idea 开始，先把应用创建到可构建、可安装、可描述的状态；如果已经有仓库，就把发布相关内容梳理完整：
 
 - 如果当前还在项目创建期，或缺少统一技术栈与认证基线，先使用 `lazycat:create-app`
+- 如果 `docs/` 文档树还没建立，先使用 `lazycat:create-app` 创建并拆好文档目录
 - `lazycat:create-app` 默认把项目收敛到 Go 后端、Vue + Element Plus 前端、登录 / 注册、`access_token + refresh_token`、无感刷新
+- `lazycat:create-app` 也负责把第一步文档树收敛到 `docs/requirements`、`docs/api-design`、`docs/architecture`、`docs/release-prep`
 - 如果目标是现金激励，优先补上普通用户可获得凭证的登录路径，并评估微服 OIDC 或网盘文件关联
 - 找出应用配置、构建入口、版本号来源、图标和本地化文案来源
 - 校准对商店可见的字段：应用名、应用简介、图标、类目、多语言文本、版本描述
@@ -248,6 +252,7 @@ Lazycat 商店资料既包含从本地配置自动带出的字段，也可能包
 在宣称“可提审”或“已发布”之前，至少确认下面这些门槛都过了：
 
 - 本地项目中的名称、简介、icon、类目、多语言与商店显示一致
+- `docs/` 文档树已建立，且至少有需求分析、API 设计、架构、发布准备四类目录
 - 版本号、changelog、包文件和页面状态一致
 - 截图来自真实运行版本，且没有调试信息、敏感数据和失效内容
 - 关键功能至少完成一次最小可运行验证，并说明验证环境
@@ -261,6 +266,7 @@ Lazycat 商店资料既包含从本地配置自动带出的字段，也可能包
 遇到下面这些情况，不要直接推进提审或发布，要先停下来补救：
 
 - 只改网页表单，没有同步本地源数据
+- 项目已经开始开发，但没有 `docs/requirements` 或 `docs/api-design`
 - 不清楚版本号来源、包生成方式或上传产物对应哪个 commit
 - 应用简介承诺了实际做不到的功能，或使用无法证实的宣传词
 - 截图和当前版本不一致，混用了不同语言、不同主题或开发环境画面
@@ -276,6 +282,7 @@ Lazycat 商店资料既包含从本地配置自动带出的字段，也可能包
 - 复杂的应用简介、截图、资料包整理，先读 [references/store-assets.md](./references/store-assets.md)
 - 如果目标包含红包激励，先读 [references/cash-incentive.md](./references/cash-incentive.md)
 - 如果项目还没完成技术栈与认证基线，先切到 `lazycat:create-app`
+- 如果项目还没建立 `docs/` 文档树，也先切到 `lazycat:create-app`
 - 如果资料阶段缺正式图标，切到 `lazycat:prepare-icon`
 
 ## Example Triggers

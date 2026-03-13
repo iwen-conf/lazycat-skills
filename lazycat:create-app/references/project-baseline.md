@@ -2,6 +2,17 @@
 
 当项目进入“创建 / 初始化 / 技术栈收敛 / 认证补齐”阶段时，默认按这个基线执行。
 
+## 0. 先文档后代码
+
+第一步先建立 `docs/` 文档树，再开始脚手架和业务开发。至少包含：
+
+- `docs/requirements/`
+- `docs/api-design/`
+- `docs/architecture/`
+- `docs/release-prep/`
+
+具体拆分参考 [docs-blueprint.md](./docs-blueprint.md)。
+
 ## 1. 默认技术栈
 
 - 后端：Go
