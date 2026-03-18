@@ -30,7 +30,12 @@
 - `lazycat_account`
 - `lazycat_password`
 
-优先用它们登录后再查重。
+优先用它们登录后再查重。它们是进入懒猫微服和访问 App Store 的入口凭证，不是开发者中心账号，也不是某个应用内部的账号。
+
+不要混用下面这些不同作用域的变量：
+
+- `lazycat_developer_center_account` / `lazycat_developer_center_password`：只用于开发者中心
+- `lazycat_gitea_account` / `lazycat_gitea_password`：只用于安装后打开 Gitea 应用做应用内登录测试
 
 注意：
 
@@ -44,6 +49,7 @@
 2. 没有的话，尝试读取 `lazycat_account` / `lazycat_password`
 3. 登录成功后，再搜索项目英文名、中文译名、别名和功能关键词
 4. 记录命中的商品名、重叠点和差异化空间
+5. 如果目标是现金激励优先，不要只停在查重；后续还要把应用真实安装到懒猫微服里并打开已安装应用测试核心能力
 
 ## 3. 遇到重复怎么办
 
@@ -57,3 +63,5 @@
 - 接入 `file_handler`，能直接打开懒猫网盘文件
 - UI / 使用路径明显更符合 Lazycat 场景
 - 稳定性、可维护性、初始化体验明显更好
+
+但不要把“OIDC 计划中”当成差异化已经成立。若应用能力偏弱、安装后真实体验不足，仍然可能拿不到激励。

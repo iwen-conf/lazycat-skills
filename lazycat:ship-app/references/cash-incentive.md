@@ -47,6 +47,12 @@
 - 其次是支持统一账户登录
 - 最差也要提供普通用户可获取的测试凭证
 
+同时要分清凭证作用域：
+
+- `lazycat_account` / `lazycat_password`：进入懒猫微服与打开其中应用
+- `lazycat_developer_center_account` / `lazycat_developer_center_password`：访问开发者中心
+- 具体应用的 app 级账号：只用于应用内部登录测试，例如 `lazycat_gitea_account` / `lazycat_gitea_password`
+
 如果普通用户无法在商店场景中获得凭证，会影响上架。
 
 ## 5. OIDC 对接机会
@@ -78,3 +84,5 @@
 - OIDC 对接说明
 - 文件关联说明
 - 稳定性与真实测试记录
+
+注意：OIDC 只是加分项，不是激励兜底项。若应用能力弱、真实安装后体验不足，或没有把应用安装到懒猫微服并打开已安装版本完成验证，仍然很可能拿不到激励。

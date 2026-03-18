@@ -26,6 +26,7 @@
 - [ ] 已评估是否需要 OIDC
 - [ ] 已评估是否需要 `file_handler`
 - [ ] 需要登录的应用已明确凭证获取路径
+- [ ] 已区分凭证作用域：`lazycat_account` / `lazycat_password` 用于进入懒猫微服和 App Store，`lazycat_developer_center_account` / `lazycat_developer_center_password` 用于开发者中心，应用内登录按具体 app 级变量读取
 - [ ] 如果上游是 AI 项目，已判断是否更适合懒猫算力仓 `AI应用` / AI 浏览器插件
 
 ## 4. 激励路径
@@ -34,4 +35,5 @@
 - [ ] 原创 / 移植路径已明确
 - [ ] 如为移植，已准备上游归因
 - [ ] 如适合，已规划 OIDC 或 `file_handler`
+- [ ] 如目标是激励，已规划后续把应用真实安装到懒猫微服并打开已安装版本验证核心能力
 - [ ] 如为 AI 原生项目，已规划普通应用 / `AI应用` / AI 浏览器插件路线
