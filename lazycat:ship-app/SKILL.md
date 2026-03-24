@@ -334,10 +334,12 @@ Lazycat 商店资料既包含从本地配置自动带出的字段，也可能包
 ## Bundled References
 
 - 复杂的上架核对和提审前复核，先读 [references/shipping-checklist.md](./references/shipping-checklist.md)
+- 商店元数据（名称、描述、关键词）质量标准，参考 [references/metadata-standard.md](./references/metadata-standard.md)
 - 复杂的应用简介、截图、资料包整理，先读 [references/store-assets.md](./references/store-assets.md)
 - `AI应用` / AI 浏览器插件提审资料与截图脚本，先读 [references/aipod-review-kit.md](./references/aipod-review-kit.md)
 - 如果目标包含红包激励，先读 [references/cash-incentive.md](./references/cash-incentive.md)
 - 如果项目涉及 AI Pod，先读 [../lazycat:create-app/references/aipod-playbook.md](../lazycat:create-app/references/aipod-playbook.md)
+- 如果涉及应用更新、镜像升级或 LPK 重新打包，切换到 `lazycat:update-app`
 - 如果项目还没完成技术栈与认证基线，先切到 `lazycat:create-app`
 - 如果项目有后台管理或控制台，先切到 `lazycat:admin-ui`
 - 如果项目还没建立 `docs/` 文档树，也先切到 `lazycat:create-app`
