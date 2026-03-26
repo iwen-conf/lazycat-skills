@@ -41,8 +41,9 @@ lzc-cli appstore publish ./your-app.lpk
 Ensure all the following conditions are met before submission:
 
 ### 1. Metadata Completeness
-- Logo, name, description, and screenshots must be complete.
-- Names, descriptions, and "Notes for Use" **must support multiple languages** via the `locales` configuration for localization.
+- `package.yml` must be complete with `package`, `version`, `name`, `description`, `author`, and `license`.
+- App Icon and screenshots must be provided in the Developer Center.
+- Names, descriptions, and "Notes for Use" **must support multiple languages** via the `locales` configuration in `package.yml`.
 - Language key standards should follow [BCP 47](https://en.wikipedia.org/wiki/IETF_language_tag).
 
 ### 2. Installability and Loadability

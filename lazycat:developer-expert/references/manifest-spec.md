@@ -3,31 +3,22 @@
 ## I. Overview
 `lzc-manifest.yml` is the configuration file used to define application deployment settings. This document details its structure and the meaning of each field.
 
+**Note (LPK v2):** Static metadata such as `package`, `version`, `name`, `description`, `locales`, `author`, `license`, `homepage`, `min_os_version`, and `unsupported_platforms` are now moved to `package.yml`. `lzc-manifest.yml` focuses solely on runtime execution and service configuration.
+
 ## II. Top-Level Data Structure `ManifestConfig`
 
-### 2.1 Basic Information {#basic-config}
+### 2.1 Basic Execution Info {#basic-config}
 
 | Field Name | Type | Description |
 | ---- | ---- | ---- |
-| `package` | `string` | Unique application ID. Must be globally unique; recommended to start with a personal domain. |
-| `version` | `string` | Application version number. X, Y, and Z are non-negative integers (Major, Minor, Patch). Format: `X.Y.Z`. [Read detailed specification](https://semver.org/). |
-| `name` | `string` | Application name. |
-| `description` | `string` | Application description. |
-| `usage` | `string` | Usage instructions. If not empty, it will be automatically rendered when each user first accesses the app within the Micro-service. |
-| `license` | `string` | License information for the application. |
-| `homepage` | `string` | Application homepage. |
-| `author` | `string` | Author name. If published through the store, the store account takes priority. |
-| `min_os_version` | `string` | Minimum required OS version. Installation will fail if not met, and the App Store will reject it. |
-
-### 2.2 Other Configurations
-| Field Name | Type | Description |
-| ---- | ---- | ---- |
-| `ext_config` | `ExtConfig` | Experimental attributes, currently not public. |
-| `unsupported_platforms` | `[]string` | Platforms not supported by the app. Valid fields: "ios", "android", "windows", "macos", "linux", "tvos". |
 | `application` | `ApplicationConfig` | lzcapp core service configuration. |
 | `services` | `map[string]ServiceConfig` | Traditional Docker container service configurations. |
-| `locales` | `map[string]I10nConfigItem` | Localization configuration (optional). **Requires lzc-os >= v1.3.0**. |
+| `ext_config` | `ExtConfig` | Experimental attributes and system features. |
+| `handlers` | `HandlersConfig` | Request handlers for OIDC and custom pages. |
 
+---
+
+*(Rest of the file remains the same...)*
 
 ## III. `IngressConfig` Configuration
 ### 3.1 Network Configuration
@@ -124,7 +115,7 @@ Semantic Description:
 
 - `path` is required; `query/hash` are optional.
 - `query` tokens support `key` or `key=value`.
-- Multiple query tokens within a rule use AND logic.
+- Multiple query tokens within a single rule use AND logic.
 - Query matching uses "contains" semantics (additional parameters allowed).
 - `hash` is a client-side soft-match condition; the server decides injection based on `path/query`.
 
@@ -255,36 +246,11 @@ For runtime behavior, hashchange, built-in script parameters, and best practices
 
 
 
-## XI. Localization `I10nConfigItem` Application Configuration {#i18n}
+## XI. Localization Configuration {#i18n}
 
-Configure `locales` for multi-language support. Language keys follow the [BCP 47 standard](https://en.wikipedia.org/wiki/IETF_language_tag).
+**Note (LPK v2):** Localization for `name`, `description`, and `usage` is now handled in `package.yml`.
+Specific runtime localization (like entry titles) still remains here but follows the same BCP 47 keys.
 
 | Field Name | Type | Description |
 | ---- | ---- | ---- |
-| `name` | `string` | Localized application name. |
-| `description` | `string` | Localized application description. |
-| `usage` | `string` | Localized usage instructions. |
 | `entries.<entry_id>.title` | `string` | Localized entry title; `entry_id` must match `application.entries`. |
-
-::: details Configuration Example
-```yml
-lzc-sdk-version: 0.1
-package: cloud.lazycat.app.netatalk
-version: 0.0.1
-name: Apple Time Machine Backup
-description: Netatalk service for Apple Time Machine backups.
-author: Netatalk
-locales:
-  zh:
-    name: "Apple 时间机器备份"
-    description: "Netatalk 服务可用于 Apple 时间机器备份"
-  en:
-    name: "Time Machine Server"
-    description: "Netatalk service can be used for Apple Time Machine backup"
-  ja:
-    name: "タイムマシンサーバー"
-    description: "Netatalk サービスは Apple Time Machine のバックアップに使用できます"
-application:
-  subdomain: netatalk3
-```
-:::

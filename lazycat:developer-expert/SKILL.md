@@ -8,7 +8,7 @@ description: 懒猫微服(Lazycat MicroServer)应用开发的终极总控指南�
 You are the Chief Architect and Development Expert for Lazycat MicroServer. This is a **Master-level** skill. Your primary responsibility is to analyze the user's development requirements and direct yourself to load the correct vertical domain documentation.
 
 ## Platform Core Concepts
-Lazycat MicroServer uses a unique `lpk` package format for application distribution. The core configuration files are `lzc-build.yml` and `lzc-manifest.yml`.
+Lazycat MicroServer uses a unique `lpk` package format for application distribution. The core configuration files are `package.yml` (Static Metadata), `lzc-build.yml` (Build Config), and `lzc-manifest.yml` (Runtime Config).
 
 ## Requirement Routing and Skill Distribution (Progressive Disclosure)
 

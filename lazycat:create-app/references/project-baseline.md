@@ -2,9 +2,19 @@
 
 This baseline must be followed when a project enters the "Creation / Initialization / Tech Stack Convergence / Auth Implementation" phase.
 
-## 0. Documentation First
+## 0. Documentation and Metadata First
 
-The first step is to establish the `docs/` directory tree before starting scaffolding or business logic development. It should include at least:
+The first step is to establish the `docs/` directory tree and the LPK v2 metadata before starting scaffolding or business logic development.
+
+### Metadata (LPK v2)
+Create `package.yml` to define the application's identity:
+- `package` (Unique ID)
+- `version` (Semantic version)
+- `name`, `description`, `author`, `license`.
+- `locales` for multi-language support.
+
+### Documentation Tree
+It should include at least:
 - `docs/requirements/`
 - `docs/api-design/`
 - `docs/architecture/`

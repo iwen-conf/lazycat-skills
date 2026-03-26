@@ -4,52 +4,59 @@ You are a professional Lazycat Micro-service application ecosystem developer. Yo
 
 ## Core Workflow
 
-Packaging and porting Lazycat Micro-service applications primarily involve writing two core configuration files: `lzc-build.yml` and `lzc-manifest.yml`.
+Packaging and porting Lazycat Micro-service applications (LPK v2, lzcos v1.5.0+) involves writing three core configuration files: `package.yml`, `lzc-build.yml`, and `lzc-manifest.yml`.
 
 ### 1. Requirements Analysis and Preparation
 - Confirm the type of application to be ported (built from source or ported from an existing Docker image).
 - Identify application dependencies such as ports, persistent storage paths (Volumes), and environment variables (Env).
 
-### 2. Writing the Build Configuration (`lzc-build.yml`)
+### 2. Static Metadata (`package.yml`)
+Define the application's identity, version, and localization.
+- **Mandatory:** Read `references/package-spec.md` for field definitions and BCP 47 localization rules.
+
+**Standard Template:**
+```yaml
+package: com.example.myapp
+version: 1.0.0
+name: My App
+description: High-performance Lazycat application.
+author: Developer Name
+license: MIT
+locales:
+  zh:
+    name: "我的应用"
+    description: "高性能懒猫应用。"
+```
+
+### 3. Writing the Build Configuration (`lzc-build.yml`)
 This file defines how to package resources into an `lpk` file.
 - For full field definitions and specifications, refer to `references/build-spec.md`.
 
 **Standard Template:**
 ```yaml
 buildscript: sh build.sh  # Build script
-manifest: ./lzc-manifest.yml # Meta information configuration
-contentdir: ./dist # Directory for static content to be packaged; mounted at /lzcapp/pkg/content in the app
+manifest: ./lzc-manifest.yml # Runtime execution configuration
+contentdir: ./dist # Directory for static content to be packaged
 pkgout: ./ # Output path for the lpk file
 icon: ./lzc-icon.png # App icon; must be a square (1:1) PNG, strictly under 200KB.
 ```
 
-### 3. Writing the Manifest Configuration (`lzc-manifest.yml`)
-This file is the soul of the micro-service application, defining routes, multi-instance behavior, dependent services, etc.
+### 4. Writing the Manifest Configuration (`lzc-manifest.yml`)
+This file defines the runtime environment, services, and routing. **Static metadata (package, version, name, etc.) must be moved to `package.yml`.**
 - **Mandatory:** Read `references/manifest-spec.md` for all field definitions and advanced routing rules.
 
 **Golden Porting Example (from Docker):**
 ```yaml
 lzc-sdk-version: '0.1'
-name: Your App Name
-package: cloud.lazycat.app.your_app_name # Unique identifier
-version: 1.0.0
 application:
   subdomain: yourapp # Default assigned subdomain
   # HTTP routing configuration, typically forwarding traffic to an internal service
   routes:
-    - /=http://your_service_name.cloud.lazycat.app.your_app_name.lzcapp:80
-  # For exposing non-HTTP ports (TCP/UDP), use ingress
-  # ingress:
-  #   - protocol: tcp
-  #     port: 22
-  #     service: your_service_name
+    - /=http://your_service_name.cloud.lazycat.app.com.example.myapp.lzcapp:80
 services:
   your_service_name:
     image: nginx:latest # Image to run
     binds:
-      # Left side must be a path starting with /lzcapp
-      # - /lzcapp/var/data:/data       (Persistent data)
-      # - /lzcapp/cache/data:/cache    (Clearable cache)
       - /lzcapp/run/mnt/home:/home # Mount user documents directory
     environment:
       - ENV_KEY=ENV_VALUE

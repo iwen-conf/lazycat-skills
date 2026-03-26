@@ -69,12 +69,18 @@ For AI Pod apps or plugins, also explain:
 
 See `references/aipod-review-kit.md` for more detailed templates.
 
-## Minimum Submission Package
-- App Name
-- Version Number
-- One-sentence Position
-- Full App Description
-- Changelog or Update Notes
+## Minimum Submission Package (LPK v2)
+Ensure `package.yml` contains:
+- `package` (ID)
+- `version`
+- `name`
+- `description`
+- `author`
+- `license`
+- `locales` (Localization)
+
+Additionally, the Developer Center submission requires:
+- App Icon (1:1 PNG, < 200KB)
 - Screenshot List
 - Test Account, Reproduction Path, or Initialization Info
 - External Dependencies and Limitations

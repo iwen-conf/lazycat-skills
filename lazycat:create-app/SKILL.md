@@ -128,8 +128,8 @@ Upon execution, provide a brief summary of:
 
 ## Workflow
 
-### 1. Confirm Creation Mode
-Determine if it's a new project, an update, or auth-only. Assess existing stack and structure. Identify if it's original/ported and if AI is needed. Default to `BaseURL` for AI unless AI Pod is specifically requested.
+### 1. Confirm Creation Mode and Metadata (LPK v2)
+Determine if it's a new project, an update, or auth-only. Assess existing stack and structure. Identify if it's original/ported and if AI is needed. **Establish `package.yml` early** with the unique package ID, version, and name.
 
 ### 2. Establish `docs/` Tree
 Check and create `docs/` before coding. Required subdirectories with `md` files:
@@ -138,10 +138,11 @@ Check and create `docs/` before coding. Required subdirectories with `md` files:
 - `docs/architecture/`
 - `docs/release-prep/`
 
-### 3. Command Entries and Validation Baseline
+### 3. Command Entries and Manifest Configuration
 All projects must include:
 - `build.sh`
 - `Makefile` with standard targets: `build`, `install`, `verify`, `release-prep`.
+- `lzc-manifest.yml` for runtime services (static metadata belongs in `package.yml`).
 **Mandatory: No submission without `make install` and real functional verification.**
 
 ### 4. Incentive and Originality Path

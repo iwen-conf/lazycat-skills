@@ -14,7 +14,8 @@ ai-pod-service/              # AI Service directory
 content.tar                   # Micro-service application content
 extension.zip                 # Optional - Browser extension
 icon.png                      # App icon
-manifest.yml                  # App manifest
+package.yml                   # App metadata (LPK v2)
+lzc-manifest.yml              # App runtime manifest
 ```
 
 ## Adding an AI Service

@@ -1,6 +1,6 @@
 # Lazycat Store Metadata Quality Standards
 
-The following four fields must be filled out according to these standards during submission. Leaving them blank or filling them perfunctorily is strictly prohibited.
+For LPK v2, the following fields must be defined in `package.yml` according to these standards during submission. Leaving them blank or filling them perfunctorily is strictly prohibited.
 
 ## 1. App Name (Name)
 *   **Standard**: [Chinese Name] - [English Name/Brand Name]

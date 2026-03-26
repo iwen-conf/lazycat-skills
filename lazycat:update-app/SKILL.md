@@ -11,10 +11,10 @@ You are responsible for progressing a "new version or image" to the state of "su
 
 This skill handles the lifecycle updates of Lazycat apps. The core workflow includes:
 1. **Image Update**: Use `lzc-cli appstore copy-image` to sync DockerHub images to Lazycat and obtain the internal image name.
-2. **Configuration Update**: Modify `manifest.yml` to update the image address to the synced version.
+1. **Configuration Update**: Modify `package.yml` to update the version and `manifest.yml` to update the image address to the synced version.
 3. **Build and Verify**: Run `make update` and `make install` to verify the new version in a real Lazycat environment.
 4. **Prepare Submission**: Run `make release-prep` to generate screenshots and reports.
-5. **Submit Update**: Ensure metadata (name, tagline, description, keywords) is complete and submit to the Developer Center.
+5. **Submit Update**: Ensure metadata in `package.yml` (name, tagline, description, keywords) is complete and submit to the Developer Center.
 
 ## Quick Contract
 
