@@ -1,122 +1,112 @@
-# Lazycat 项目基线
+# Lazycat Project Baseline
 
-当项目进入“创建 / 初始化 / 技术栈收敛 / 认证补齐”阶段时，默认按这个基线执行。
+This baseline must be followed when a project enters the "Creation / Initialization / Tech Stack Convergence / Auth Implementation" phase.
 
-## 0. 先文档后代码
+## 0. Documentation First
 
-第一步先建立 `docs/` 文档树，再开始脚手架和业务开发。至少包含：
-
+The first step is to establish the `docs/` directory tree before starting scaffolding or business logic development. It should include at least:
 - `docs/requirements/`
 - `docs/api-design/`
 - `docs/architecture/`
 - `docs/release-prep/`
 
-具体拆分参考 [docs-blueprint.md](./docs-blueprint.md)。
+Refer to [docs-blueprint.md](./docs-blueprint.md) for detailed breakdown.
 
-## 0.5 统一命令入口
+## 0.5 Unified Command Entry
 
-每个项目都必须提供可执行的命令入口，至少包含：
-
-- 根目录 `build.sh`
-- 根目录 `Makefile`
+Every project must provide executable command entry points, including:
+- `build.sh` (root directory)
+- `Makefile` (root directory)
 - `make build`
 - `make install`
 
-推荐继续补：
-
+Recommended additions:
 - `make dev`
 - `make test`
 - `make clean`
 
-命令不要只写在聊天记录或零散文档里，必须能在仓库根目录直接执行。
+Commands must be directly executable from the repository root, not just buried in chat logs or scattered documents.
 
-## 1. 默认技术栈
+## 1. Default Tech Stack
 
-- 后端：Go
-- 前端：Vue
-- UI：Element Plus
+- **Backend:** Go
+- **Frontend:** Vue
+- **UI:** Element Plus
 
-如果仓库已有更细的团队规范，可以在这三项主基线之内细化，但不要偏离主栈。
+If there are existing team-specific standards, they can be refined within this baseline, but do not deviate from the core stack.
 
-## 1.2 后台管理 UI 基线
+## 1.2 Admin UI Baseline
 
-如果项目存在后台管理、运营控制台或管理工作台，默认还要满足：
+If the project includes an admin panel, operation console, or management dashboard:
+- Keep the main stack as Vue + Element Plus.
+- You may use mature templates, but remove default branding, menus, and example charts.
+- Implement standard page patterns: Login/Register, Dashboard, Lists, Details/Forms, and Settings.
+- Ensure admin pages are ready for screenshots and review (not just a collection of unstyled features).
 
-- 后台主栈保持 Vue + Element Plus
-- 可以借助成熟模板起步，但不能保留默认 branding、默认菜单和示例图表
-- 至少形成登录 / 注册、工作台、列表、详情 / 表单、设置这几类后台页面模式
-- 后台页面要能支持真实截图和提审展示，不只是把功能拼起来
+Such projects should use `lazycat:admin-ui` to ensure quality.
 
-这类项目建议进入 `lazycat:admin-ui` 收敛后台质量。
+## 1.5 Incentive-Priority Mode
 
-## 1.5 激励优先模式
+If the goal is to qualify for Lazycat cash incentives, evaluate these during the creation phase:
+- **Originality First:** Original applications typically have higher incentive potential than simple ports.
+- **Lazycat Native Integration:** Explain the integration points with the Lazycat native system (not just "it hasn't been posted yet").
+- **Avoid Excluded Types:** Steer clear of application types explicitly noted as ineligible for incentives.
+- **User Credentials:** For apps requiring accounts, ensure ordinary users can obtain credentials easily.
+- **File Association:** Prioritize file handlers for utility apps.
+- **OIDC:** Prioritize Micro-service OIDC for applications suitable for unified accounts.
 
-如果目标是懒猫现金激励，创建阶段就先做这几个判断：
+## 1.6 Native Integration for Original Apps
 
-- 优先原创应用，其激励空间通常高于普通移植应用
-- 原创应用不只看“商店里是否没人发过”，还要说明它和 Lazycat 原生系统的结合点
-- 避开官方明确不发红包的类型
-- 对需要账号密码的应用，确保普通用户能获得凭证
-- 工具类应用优先规划文件关联
-- 适合统一账户的应用优先规划微服 OIDC
+For original applications, answer these questions during creation:
+- Why should a user install this in Lazycat instead of visiting a website?
+- What is the primary native integration point: Micro-service OIDC, File Handler, Local File Workflow, Lazycat Computing Warehouse `AI Application`, or other system entries?
+- Does the manifest reserve `application.oidc_redirect_path`, `application.file_handler`, or specific AI Pod routes?
+- What is the first high-frequency scenario after installation? Can it provide a "ready-to-use" local experience?
 
-## 1.6 原创应用的 Lazycat 原生融合
+If these questions cannot be answered, mark the project as "Weakly Integrated" rather than assuming it is natively compatible.
 
-如果项目是原创应用，创建阶段至少要回答这些问题：
+## 1.7 Computing Warehouse / AI Application Integration
 
-- 用户为什么要在 Lazycat 里安装它，而不是直接访问一个网站
-- 第一优先的原生结合点是什么：微服 OIDC、文件关联、本地文件工作流、懒猫算力仓 `AI应用`，还是其他明确的系统入口
-- manifest 里是否需要预留 `application.oidc_redirect_path`、`application.file_handler`、算力仓相关入口或对应路由
-- 安装完成后的首个高频场景是什么，能不能形成“打开就用”的本地体验
+For AI-native products, perform an extra evaluation step during creation:
+- If it is a standard Web app, retain the `API BaseURL + Protocol + Model Discovery` configuration.
+- Determine if it is better suited as a standard app using external APIs or as a Lazycat Computing Warehouse `AI Application`.
+- Consider if it should be an AI Browser Extension rather than a standalone page.
+- If following the `AI Application` route, plan for `ai-pod-service/`, `caddy-aipod`, and optional `extension.zip`.
+- If not using the Computing Warehouse, justify why a standard app structure is more appropriate.
 
-如果这些问题都回答不出来，就要把项目标记为弱融合原创应用，而不是默认它已经天然适合 Lazycat。
+## 2. Default Authentication Requirements
 
-## 1.7 懒猫算力仓 / AI应用 融合
-
-如果项目本身是 AI 原生产品，创建阶段默认多做一步判断：
-
-- 如果它仍然是普通业务型 Web 应用，默认先保留 `API BaseURL + 协议 + 模型发现` 这套配置方案
-- 这个项目更适合普通应用接外部模型 API，还是更适合进入懒猫算力仓 `AI应用`
-- 是否需要 AI 浏览器插件形态，而不是单独的业务页面
-- 如果走 `AI应用` 路线，是否需要规划 `ai-pod-service/`、`caddy-aipod`，以及可选的 `extension.zip`
-- 如果不走算力仓，也要说明为什么保留成普通应用更合理
-
-## 2. 所有项目默认具备的认证能力
-
-- 登录
-- 注册
+All projects must support:
+- Login
+- Registration
 - `access_token`
 - `refresh_token`
-- 无感刷新
-- 刷新失败后的清理与重新登录
+- Silent Refresh
+- Cleanup and Re-login after refresh failure
 
-## 3. 推荐认证流
+## 3. Recommended Auth Flow
 
-### 登录
+### Login
+1. User submits credentials.
+2. Backend validates and issues an `access_token` and a `refresh_token`.
+3. Frontend saves the authentication state and fetches user info.
 
-1. 用户提交账号和密码
-2. 后端校验成功后签发 `access_token`
-3. 后端同时签发 `refresh_token`
-4. 前端保存鉴权状态并拉取当前用户信息
+*For incentive-priority apps, registration must be accessible to ensure reviewers and users can enter the application.*
 
-如果目标是激励优先，普通用户必须可以通过注册或其他公开可获得方式进入应用，不要把凭证获取变成阻塞。
+### Startup Recovery
+1. App attempts to restore user state on launch.
+2. If `access_token` is expired but `refresh_token` is valid, perform a silent refresh.
+3. If successful, proceed to the business page.
+4. If failed, clear state and redirect to the login page.
 
-### 启动恢复
+### 401 Silent Refresh
+1. A request returns 401 due to an expired `access_token`.
+2. Frontend initiates a background refresh process.
+3. Pending requests are queued until the refresh completes.
+4. On success, replay the original request.
+5. On failure, logout and clear session state.
 
-1. 应用启动时尝试恢复当前用户状态
-2. 如果 `access_token` 已失效但 `refresh_token` 仍有效，走一次静默刷新
-3. 刷新成功后继续进入业务页
-4. 刷新失败后清理状态并跳到登录页
-
-### 401 无感刷新
-
-1. 业务请求因 `access_token` 过期返回 401
-2. 前端进入单飞刷新流程
-3. 其他待发请求先挂起，等待刷新结果
-4. 刷新成功后重放原请求
-5. 刷新失败后统一退出登录
-
-## 4. 最小后端接口
+## 4. Minimum Backend APIs
 
 - `POST /auth/register`
 - `POST /auth/login`
@@ -124,72 +114,61 @@
 - `POST /auth/logout`
 - `GET /auth/me`
 
-## 5. 最小前端模块
+## 5. Minimum Frontend Modules
 
-- 登录页
-- 注册页
-- 用户状态 store
-- 路由守卫
-- 请求拦截器
-- 刷新队列或单飞机制
-- 退出登录清理逻辑
+- Login/Register pages
+- User state store
+- Route guards
+- Request interceptors
+- Refresh queue/mechanism
+- Logout cleanup logic
 
-## 5.5 AI 接入配置基线
+## 5.5 AI Integration Baseline
 
-如果项目存在明确 AI 场景，默认按这个最小配置面执行：
-
+For projects with AI scenarios, follow this minimum configuration interface:
 - `API BaseURL`
-- 协议类型：`OpenAI Compatible`、`OpenAI Responses`、`Anthropic`
-- “获取模型”按钮：按当前 `BaseURL + 协议` 拉取模型列表
-- 模型下拉框：从已拉取的模型列表中选择，不要手填硬编码
-- “保存配置”按钮：统一保存 AI 接入配置
+- Protocol Type: `OpenAI Compatible`, `OpenAI Responses`, `Anthropic`
+- "Get Models" button: Fetches model list based on current `BaseURL + Protocol`.
+- Model Dropdown: Select from the fetched list (no hardcoded manual input).
+- "Save Configuration" button: Persists the AI settings.
 
-第一版不要把模型供应商配置散落在多个页面，也不要把默认模型名写死在功能表单里。
+*Avoid scattering provider configs across multiple pages or hardcoding default model names.*
 
-普通业务型 Web 应用只要做到这里即可，不要额外引入 AI Pod 包结构。
+Standard Web apps only need this level of integration; do not introduce AI Pod structures unless necessary. Refer to [ai-settings-template.md](./ai-settings-template.md) for specifics.
 
-固定字段和交互直接参考 [ai-settings-template.md](./ai-settings-template.md)。
+For projects intended as `AI Applications`:
+- Determine if core services belong in `ai-pod-service/`.
+- Determine if exposure via `caddy-aipod` is required for the AI Browser or other frontends.
+- Provide `extension.zip` if required as an AI Browser Extension.
 
-如果项目明确准备做成懒猫算力仓 `AI应用`，还要再补这些判断：
+## 6. Recommended Security Boundaries
 
-- 是不是需要把核心服务放进 `ai-pod-service/`
-- 是不是需要通过 `caddy-aipod` 暴露给 AI 浏览器或其他前端
-- 是不是需要提供 `extension.zip` 作为 AI 浏览器插件扩展
+- Short lifespan for `access_token`.
+- Long lifespan for `refresh_token`.
+- Implement token rotation on refresh.
+- Immediate local session cleanup upon refresh failure.
+- Explicitly define token secrets, expiration, and API URLs in environment variables.
 
-## 6. 推荐安全边界
-
-- `access_token` 使用短生命周期
-- `refresh_token` 使用长生命周期
-- refresh 时执行 rotation
-- refresh 失败后立即清理本地会话
-- 环境变量中明确 token 密钥、过期时间、前端 API 地址
-
-## 6.5 微服账户系统与文件关联
+## 6.5 Micro-service Auth and File Association
 
 ### OIDC
+- Set `application.oidc_redirect_path` in the manifest.
+- Pass system-generated OIDC env vars to the app.
+- Map OIDC login to the application's internal session or user context.
 
-- 在 manifest 中设置 `application.oidc_redirect_path`
-- 把系统生成的 OIDC 环境变量透传给应用
-- 应用侧将 OIDC 登录映射为自身会话或用户上下文
+### File Association
+- Evaluate `application.file_handler` for utility apps.
+- Declare `mime` types and `actions.open`.
+- Implement `/open` or equivalent routes to parse incoming file parameters.
 
-### 文件关联
+## 7. Transition to Release
 
-- 工具类应用评估 `application.file_handler`
-- 声明 `mime` 和 `actions.open`
-- 应用侧实现 `/open` 或等价路由，解析传入文件参数
-
-## 7. 与发布链路的衔接
-
-进入 `lazycat:ship-app` 之前，至少要保证：
-
-- 项目可启动
-- 登录可用
-- 注册可用或有明确业务豁免
-- token 刷新链路可用
-- 如果存在后台管理面，后台 UI 已完成质量收敛或已进入 `lazycat:admin-ui`
-- 如果目标是激励优先，激励资格路径已明确
-- 如果项目是原创应用，原生融合路径已明确
-- 如果项目接入 AI，最小 AI 配置面已明确
-- 如果项目是 AI 原生产品，算力仓 / `AI应用` 路径已明确
-- 首页和认证页可截图
-- 如果后台是核心卖点，工作台、列表、详情 / 表单也可截图
+Before entering `lazycat:ship-app`, ensure:
+- Project is startable.
+- Login and Registration work (or have clear business exemptions).
+- Token refresh flow is functional.
+- Admin UI is refined (if applicable).
+- Incentive eligibility is clear.
+- Native integration path is defined.
+- AI configuration or AI Pod path is clear.
+- Screenshots are available for the homepage, auth pages, and key features.

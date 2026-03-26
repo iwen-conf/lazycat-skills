@@ -1,130 +1,113 @@
-# 普通业务 Web 应用 AI 设置页模板
+# AI Settings Page Template for Standard Web Applications
 
-适用于“普通业务型 Web 应用接 AI”的默认方案。
+This template is the default solution for integrating AI into "Standard Business Web Applications."
 
-不适用于：
+**Not applicable to:**
+- Lazycat Computing Warehouse `AI Applications`
+- AI Browser Extensions
+- Projects requiring `ai-pod-service/`, `caddy-aipod`, or `extension.zip`
 
-- 懒猫算力仓 `AI应用`
-- AI 浏览器插件
-- 需要 `ai-pod-service/`、`caddy-aipod`、`extension.zip` 的项目
+For these standard applications, the goal is to provide a stable, reusable AI configuration interface without introducing the additional complexity of the AI Pod package structure.
 
-这类普通业务应用默认只做一套稳定、可复用的 AI 连接配置面，不额外引入 AI Pod 包结构。
+## 1. Required Fields
 
-## 1. 固定必备字段
-
-第一版固定保留这 5 项，不要随意删减：
-
+The first version must include these five essential elements:
 1. `API BaseURL`
-2. `API 协议`
-3. `获取模型` 按钮
-4. `模型` 下拉框
-5. `保存配置` 按钮
+2. `API Protocol`
+3. `Get Models` button
+4. `Model` dropdown
+5. `Save Configuration` button
 
-## 2. 字段定义
+## 2. Field Definitions
 
 ### `API BaseURL`
-
-- 类型：输入框
-- 必填：是
-- 用途：指定模型服务基础地址
-- 示例：
+- **Type:** Input field
+- **Required:** Yes
+- **Purpose:** Specifies the base address for the model service.
+- **Examples:**
   - `https://api.openai.com/v1`
   - `https://openrouter.ai/api/v1`
   - `<private-base-url>`
 
-最小校验：
+**Minimum Validation:**
+- Cannot be empty.
+- Must start with `http://` or `https://`.
+- Trim leading and trailing whitespace before saving.
 
-- 不能为空
-- 必须是 `http://` 或 `https://`
-- 保存前去掉首尾空格
-
-### `API 协议`
-
-- 类型：下拉框 / 单选
-- 必填：是
-- 固定选项：
+### `API Protocol`
+- **Type:** Dropdown / Radio buttons
+- **Required:** Yes
+- **Fixed Options:**
   - `OpenAI Compatible`
   - `OpenAI Responses`
   - `Anthropic`
 
-不要让用户手填协议名。
+*Do not allow users to manually type the protocol name.*
 
-### `获取模型` 按钮
+### `Get Models` Button
+- **Type:** Primary action button
+- **Trigger Condition:** Both `API BaseURL` and `API Protocol` are filled.
+- **Action:** Fetch the list of available models based on the current `BaseURL + Protocol`.
 
-- 类型：主操作按钮
-- 触发条件：`API BaseURL` 和 `API 协议` 都已填写
-- 动作：基于当前 `BaseURL + 协议` 拉取模型列表
+**Minimum Interaction:**
+- Show a loading state during the request.
+- Refresh the `Model` dropdown options upon success.
+- Display a readable error message upon failure; do not fail silently.
 
-最小交互：
+### `Model` Dropdown
+- **Type:** Select dropdown
+- **Required:** Yes
+- **Data Source:** The model list returned after clicking the `Get Models` button.
 
-- 请求中展示加载状态
-- 成功后刷新模型下拉框选项
-- 失败后展示可读错误，不要静默失败
+**Minimum Interaction:**
+- Display placeholder text (e.g., "Please fetch models first") before data is loaded.
+- Enable the dropdown only after a successful fetch.
+- Ensure a valid option is selected before saving.
 
-### `模型` 下拉框
+### `Save Configuration` Button
+- **Type:** Primary button
+- **Action:** Persist the current AI integration settings.
 
-- 类型：下拉选择
-- 必填：是
-- 数据来源：点击 `获取模型` 按钮后返回的模型列表
+**Minimum Interaction:**
+- Disable the button during the saving process to prevent duplicate submissions.
+- Provide confirmation feedback upon success.
+- Display a clear error message upon failure.
 
-最小交互：
+## 3. Recommended Page Layout
 
-- 未拉取前显示占位文案，例如“请先获取模型”
-- 拉取成功后可选
-- 保存前必须有有效选项
-
-### `保存配置` 按钮
-
-- 类型：主按钮
-- 动作：保存当前 AI 接入配置
-
-最小交互：
-
-- 保存中禁用重复点击
-- 保存成功给出确认反馈
-- 保存失败给出明确错误信息
-
-## 3. 推荐页面布局
-
-按这个顺序排：
-
+Arrange fields in this specific order:
 1. `API BaseURL`
-2. `API 协议`
-3. `获取模型`
-4. `模型`
-5. `保存配置`
+2. `API Protocol`
+3. `Get Models`
+4. `Model`
+5. `Save Configuration`
 
-不要把“获取模型”和“保存配置”混成一个按钮。
-不要把“模型”做成自由输入框。
+*Do not combine "Get Models" and "Save Configuration" into a single button.*
+*Do not use a free-text input for the "Model" field.*
 
-## 4. 推荐状态流
+## 4. Recommended State Flow
 
-### 初始状态
+### Initial State
+- `BaseURL` is empty or displays the previously saved value.
+- `Protocol` uses the saved value or a default.
+- `Model` dropdown is disabled.
+- `Get Models` and `Save Configuration` buttons are visible.
 
-- `BaseURL` 为空或回显已保存值
-- 协议使用已保存值或默认值
-- 模型下拉框禁用
-- `获取模型` 按钮可见
-- `保存配置` 按钮可见
+### Successful Model Fetch
+- Populate the `Model` dropdown.
+- If a previously valid model still exists in the list, auto-select it.
+- If the previous model is no longer available, prompt the user to re-select.
 
-### 拉取模型成功
+### Failed Model Fetch
+- Retain current form values.
+- Clear the `Model` dropdown or keep the old value marked as "to be confirmed."
+- Display the reason for failure.
 
-- 模型下拉框填充选项
-- 保留上次有效模型时，若仍存在可自动选中
-- 若上次模型已不存在，提示重新选择
+### Successful Save
+- Persist the current `BaseURL / Protocol / Model`.
+- Display a "Saved Successfully" notification or equivalent feedback.
 
-### 拉取模型失败
-
-- 保留当前表单值
-- 模型下拉框清空或保持旧值但标记待确认
-- 给出失败原因
-
-### 保存成功
-
-- 持久化当前 `BaseURL / 协议 / 模型`
-- 页面提示“保存成功”或等价反馈
-
-## 5. 最小数据结构
+## 5. Minimum Data Structure
 
 ```json
 {
@@ -134,32 +117,28 @@
 }
 ```
 
-协议枚举建议：
-
+**Protocol Enum Suggestions:**
 ```text
 openai_compatible
 openai_responses
 anthropic
 ```
 
-## 6. 最小接口建议
+## 6. Minimum API Recommendations
 
-如果要在项目里写成后端配置接口，第一版至少准备等价能力：
-
+If implementing as a backend configuration API, the first version should provide equivalent capabilities:
 - `GET /settings/ai`
 - `PUT /settings/ai`
 - `POST /settings/ai/models`
 
-示意：
+**Examples:**
 
-### 获取已保存配置
-
+### Get Saved Configuration
 ```http
 GET /settings/ai
 ```
 
-### 保存配置
-
+### Save Configuration
 ```http
 PUT /settings/ai
 Content-Type: application/json
@@ -171,8 +150,7 @@ Content-Type: application/json
 }
 ```
 
-### 拉取模型
-
+### Fetch Models
 ```http
 POST /settings/ai/models
 Content-Type: application/json
@@ -183,22 +161,21 @@ Content-Type: application/json
 }
 ```
 
-## 7. 可选扩展项
+## 7. Optional Extensions
 
-这些不是第一版硬门槛，只有业务明确需要时再加：
-
+These are not mandatory for the first version and should only be added if required by the business:
 - API Key
-- 超时时间
-- 组织 / workspace 标识
-- 默认 system prompt
-- 温度等高级参数
+- Timeout settings
+- Organization / Workspace ID
+- Default System Prompt
+- Advanced parameters (e.g., Temperature)
 
-如果要加，也放在“高级设置”区域，不要污染第一屏主配置。
+*Place these in an "Advanced Settings" section to avoid cluttering the primary configuration.*
 
-## 8. 质量门槛
+## 8. Quality Thresholds
 
-- 页面上明确存在 5 个固定要素
-- 协议选项固定，不可随意输入
-- 模型来自真实拉取结果，而不是写死
-- 保存逻辑只保存当前选择，不夹带隐式默认模型
-- 错误提示对用户可读
+- All 5 required elements must be clearly present on the page.
+- Protocol options must be fixed (no free-text input).
+- Models must be sourced from a real fetch operation, not hardcoded.
+- Saving logic must only persist the current selection without hidden defaults.
+- Error messages must be user-friendly and actionable.
