@@ -3,213 +3,201 @@ name: lazycat:admin-ui
 description: 面向 Lazycat 应用后台管理、控制台和管理工作台 UI 收敛的 skill。只要用户提到后台管理、Admin、管理台、控制台、仪表盘、运营后台、Vue 后台、Element Plus 管理界面、后台模板、管理端改版、后台页面美化、管理列表、数据工作台、提审前页面升级、高质量后台等请求，就必须使用此 skill。负责把后台管理界面收敛成高质量、可截图、可提审的 Vue + Element Plus 管理体验，并允许以成熟模板为起点但必须完成品牌化和业务化改造。
 ---
 
-# Lazycat 后台管理 UI 质量基线
+# Lazycat Admin UI Quality Baseline
 
-你负责把 Lazycat 项目里的后台管理、运营控制台和 B 端工作台，从“能用”推进到“高质量、可截图、可提审”。重点不是单纯换皮，而是让信息架构、页面层级、表格、表单、状态反馈和品牌表达都达到发布级水准。
+You are responsible for progressing admin interfaces, operational consoles, and B-side workspaces within Lazycat projects from "functional" to "high-quality, screenshot-ready, and submission-ready." The focus is not just a visual skinning, but ensuring information architecture, page hierarchy, tables, forms, feedback, and branding meet release standards.
 
 ## Overview
 
-这个 skill 用于后台管理类页面的设计收敛与实施约束。默认标准是：
+This skill is used for the design convergence and implementation constraints of admin-type pages. The default standards are:
 
-- 保持 Vue + Element Plus 主栈，不擅自切换到其他后台 UI 体系
-- 允许使用成熟后台模板作为起点，但禁止原样交付默认模板
-- 必须建立真实的品牌色、导航结构、页面层级和业务模块分区
-- 必须把工作台、列表页、详情页、表单页、设置页和登录页做成统一视觉系统
-- 必须覆盖加载、空状态、错误状态、权限限制和长数据场景
-- 最终页面要能支撑商店截图、提审材料和真实演示
+- Maintain a Vue + Element Plus stack; do not switch to other UI frameworks without authorization.
+- Mature admin templates are allowed as a starting point, but delivering raw templates is prohibited.
+- Establish a real brand color, navigation structure, page hierarchy, and business module partitioning.
+- Ensure workspaces, list pages, detail pages, form pages, settings pages, and login pages form a unified visual system.
+- Cover loading, empty states, error states, permission restrictions, and long data scenarios.
+- Final pages must be able to support store screenshots, submission materials, and real demonstrations.
 
-如果项目并没有后台管理面，只存在少量设置页或普通用户端页面，不要强行套用本 skill；只有当项目存在管理台、控制台、运营后台、数据面板或明显的 backoffice 表面时再进入这条质量链路。
+If a project does not have an admin interface—only a few settings pages or standard user pages—do not force this skill. Enter this quality pipeline only when there is a clear management console, dashboard, or back-office surface.
 
 ## Quick Contract
 
-- **Trigger**: 用户提到后台管理、Admin、管理台、控制台、后台模板、Vue 后台、Element Plus 管理界面、运营后台、工作台、仪表盘、后台页面升级、高质量 UI
-- **Inputs**: 项目目录、管理端现状、页面清单、是否已有模板、目标截图场景、品牌方向、关键业务流
-- **Outputs**: 后台信息架构建议、模板使用策略、核心页面模式、视觉质量要求、截图清单、交给 `lazycat:ship-app` 的提审前 UI 结论
-- **Quality Gate**: 后台管理界面必须完成品牌化和业务化改造；如果使用模板，必须消除默认 branding、默认 copy、默认数据和样板图表；核心工作台、列表、详情、表单、设置与登录页必须能形成统一且可截图的高质量体验
-- **Decision Tree**: 先判断是否真的存在后台管理面，再判断是新建后台、改造旧后台、还是基于模板做二次收敛；最后决定先修信息架构、先换布局，还是先补核心页面模式
+- **Trigger**: User mentions admin interface, "Admin," management console, dashboard, back-office template, Vue Admin, Element Plus management UI, operational backend, workspace, dashboard, admin UI upgrade, high-quality UI.
+- **Inputs**: Project directory, current admin state, page list, template presence, target screenshot scenarios, brand direction, core business flows.
+- **Outputs**: Admin information architecture recommendations, template strategy, core page patterns, visual quality requirements, screenshot checklist, and UI quality conclusions for `lazycat:ship-app`.
+- **Quality Gate**: Admin interfaces must undergo branding and business-specific customization. If a template is used, default branding, copy, data, and boilerplate charts must be removed. Core pages (workspace, list, detail, form, settings, login) must form a unified, high-quality, and screenshot-ready experience.
+- **Decision Tree**: Determine if an admin interface actually exists, then decide whether to build from scratch, refactor an old one, or converge based on a template. Finally, decide whether to prioritize architecture, layout, or core page patterns.
 
 ## When to Use
 
-**首选触发**
+**Primary Triggers**
 
-- 用户要求后台管理部分做高质量升级
-- 用户希望使用模板搭建后台，但不要显得像模板站
-- 用户明确说项目基于 Vue + Element Plus，需要管理台、工作台或控制台
-- 用户准备提审或截图，后台页面还不够成熟
-- 用户需要把现有“能用但很丑”的后台改成发布级界面
+- User requests a high-quality upgrade for an admin section.
+- User wants to use a template to build an admin interface but doesn't want it to look like a template.
+- User specifies Vue + Element Plus and needs a console, workspace, or dashboard.
+- User is preparing for submission or screenshots, but the admin pages are immature.
+- User needs to transform a "functional but ugly" admin UI into a release-level interface.
 
-**典型场景**
+**Typical Scenarios**
 
-- 新建一个管理后台，需要同时落地登录、工作台、列表、表单和设置页
-- 已经套了 admin 模板，但还保留默认 logo、默认布局、默认示例图表
-- 有业务功能，但后台页面层级混乱、表格难用、表单冗长、截图不出效果
-- 发布前要补一套真正能展示产品价值的后台管理截图
-- 需要在不换主栈的前提下，把 Element Plus 后台做出更强的品牌感和专业感
+- Building a new admin interface from scratch, requiring login, workspace, list, form, and settings pages.
+- A template is already in use, but still retains default logos, layouts, and sample charts.
+- Business logic exists, but the UI hierarchy is messy, tables are hard to use, forms are too long, and screenshots look poor.
+- Preparing to list on the store and needing admin screenshots that actually showcase product value.
+- Enhancing branding and professionalism for an Element Plus admin UI without changing the tech stack.
 
-**边界提示**
+**Boundary Notes**
 
-- 如果任务主要是统一技术栈、补登录注册、补双 token 或创建 docs 目录，优先走 `lazycat:create-app`
-- 如果任务已经进入商店资料、提审和发布动作，仍要回到 `lazycat:ship-app` 统筹
-- 如果只是普通用户前台页面，不要把所有 UI 任务都归到后台管理 skill
+- If the task is primarily about unifying the stack, adding auth, or creating documentation, use `lazycat:create-app`.
+- If the task is already at the stage of store assets, submission, or release, return to `lazycat:ship-app`.
+- For standard user-facing front-end pages, do not categorize all UI tasks under this admin skill.
 
 ## Announce
 
-开始执行后，先给用户一个短摘要：
+Upon execution, provide a brief summary of:
 
-- 当前后台是从零开始、已有旧页面，还是基于模板改造
-- 你先检查的是信息架构、视觉质量，还是截图价值
-- 当前最弱的是工作台、列表、表单、登录页，还是品牌化
-- 如果打算用模板，你准备保留什么、替换什么
+- Whether the current admin is from scratch, an old UI, or a template upgrade.
+- Whether you are checking information architecture, visual quality, or screenshot value first.
+- The weakest area (workspace, list, form, login, or branding).
+- If using a template, what you intend to keep vs. replace.
 
 ## Input Arguments
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| `admin_surface_type` | enum(`无后台`/`轻后台`/`重后台`) | 推荐 | 判断是否真的需要进入后台 UI 质量链路 |
-| `ui_state` | enum(`从零开始`/`已有页面待升级`/`已有模板待改造`) | 推荐 | 判断是新建工作台还是整治现有后台 |
-| `template_strategy` | enum(`不用模板`/`可用模板打底`/`已有模板继续改造`) | 推荐 | 模板只允许做起点，不允许原样交付 |
-| `brand_state` | enum(`已有品牌规范`/`仅有产品名`/`几乎没有`) | 可选 | 决定要不要先建立颜色、图标、导航命名和 copy 基线 |
-| `release_pressure` | enum(`开发阶段`/`截图准备`/`提审前收尾`) | 可选 | 决定优先补功能型页面，还是优先补截图与提审质量 |
-| `critical_views` | string | 可选 | 关键页面清单，例如仪表盘、订单列表、详情抽屉、库存表单、系统设置 |
+| `admin_surface_type` | enum(`None`/`Light`/`Heavy`) | Recommended | Determines if the admin UI quality pipeline is needed. |
+| `ui_state` | enum(`From Scratch`/`Old UI Upgrade`/`Template Refactor`) | Recommended | Determines if it's a new build or a cleanup. |
+| `template_strategy` | enum(`No Template`/`Template Scaffold`/`Continue Template Refactor`) | Recommended | Templates are for scaffolding, not final delivery. |
+| `brand_state` | enum(`Has Guidelines`/`Name Only`/`None`) | Optional | Determines if color, icon, and copy baselines are needed first. |
+| `release_pressure` | enum(`Dev Phase`/`Screenshot Prep`/`Final Submission`) | Optional | Prioritizes functional pages vs. screenshot/submission quality. |
+| `critical_views` | string | Optional | Key page list (e.g., Dashboard, Order List, Detail Drawer, Form, Settings). |
 
 ## The Iron Law
 
-1. 后台管理类项目默认使用 Vue + Element Plus，不要在没有明确约束的情况下切换 UI 主栈。
-2. 模板可以用，但只能当脚手架；必须替换默认品牌、默认 copy、默认图标、默认菜单、默认图表和默认数据。
-3. 后台不是把所有功能堆进侧边栏。导航、分组、页面层级和动作优先级必须反映真实业务流程。
-4. 工作台、列表、详情、表单、设置和登录页必须属于同一视觉系统，不能每一页都像来自不同项目。
-5. 表格、筛选、分页、批量操作、状态标签和详情查看必须服务真实运营流程，不能只停留在“有一个表”。
-6. 表单必须控制长度、分组、校验反馈和提交结果；不要让后台页面只有长表单和默认输入框。
-7. 必须补齐加载、空状态、错误状态、权限受限和无数据场景，不能只打磨 happy path。
-8. 提审前的后台截图必须来自真实业务页面和真实数据结构，不能用模板自带的示例面板冒充成品。
-9. 如果后台页面存在，就必须在发布前给出可截图、可评审的质量结论；不要把“功能已通”误当成 UI 已达标。
+1. Admin projects default to Vue + Element Plus; do not switch without explicit constraints.
+2. Templates are allowed as scaffolds only; default branding, copy, icons, menus, charts, and data must be replaced.
+3. An admin UI is not just a sidebar full of features. Navigation, grouping, and hierarchy must reflect real business flows.
+4. Workspace, list, detail, form, settings, and login pages must share the same visual system.
+5. Tables, filtering, pagination, batch actions, and status tags must serve real operational flows.
+6. Forms must be controlled for length, grouping, validation feedback, and results; avoid long, raw input dumps.
+7. Cover loading, empty, error, and restricted states; do not just polish the "happy path."
+8. Submission screenshots must come from real business pages and data structures, not template boilerplate.
+9. If an admin interface exists, provide a quality conclusion before release; functional completion is not UI completion.
 
 ## Workflow
 
-### 1. 识别后台范围与业务流
+### 1. Identify Admin Scope and Flow
+- Inventory current modules: Dashboard, List, Detail, Approval, Config, Logs, Users, Permissions, Stats.
+- Identify pages a reviewer is most likely to see and high-frequency user paths.
+- Categorize as an operational console, management system, BI panel, or hybrid workspace.
 
-- 盘点当前后台包含哪些模块：工作台、列表、详情、审批、配置、日志、用户、权限、统计
-- 标出 reviewer 最可能看到的页面，以及用户最常用的高频路径
-- 判断后台是运营台、管理系统、BI 面板，还是混合型工作台
+### 2. Converge Information Architecture
+- Organize top-level navigation, sub-grouping, and page naming.
+- Merge low-frequency pages; split high-frequency hybrid pages.
+- Determine content placement for Dashboard vs. List vs. Detail/Settings.
+- If navigation is just template defaults, re-arrange based on real business needs.
 
-### 2. 先收敛信息架构
+### 3. Determine Template Strategy
+If a template is needed, select one that:
+- Is compatible with Vue + Element Plus.
+- Is friendly to tables, forms, and detail panels.
+- Has clear licensing.
+- Is restrained enough to allow for business customization.
 
-- 梳理一级导航、二级分组和页面命名
-- 合并低频页面，拆分高频混合页面
-- 确认哪些内容应该放工作台，哪些应该放列表，哪些应该放详情或设置
-- 如果当前导航只是模板默认菜单，先按真实业务重排
+After scaffolding, perform these modifications:
+- Replace brand colors, name, favicon, menu copy, and empty state copy.
+- Delete template-specific sample charts, banners, and placeholder modules.
+- Rebuild homepage cards, quick actions, and data blocks based on business modules.
+- Adapt table columns, filters, status values, and detail structures to real business semantics.
 
-### 3. 决定模板策略
+### 4. Unify Visual System
+- Establish admin color tokens, status colors, spacing, and card hierarchies.
+- Standardize structures for page headers, action areas, filters, and detail areas.
+- Unify button priorities, destructive actions, tag colors, and empty state illustrations.
+- Ensure login/register pages and the admin shell share the same brand direction.
 
-如果需要模板，只选符合下面条件的模板：
+### 5. Converge Core Page Patterns
+Check and refine these patterns:
+- **Workspace**: Key metrics, primary entry points, pending tasks, recent activity.
+- **List Page**: Filter, search, sort, batch actions, status tags, pagination.
+- **Detail Page**: Summary info, primary data area, secondary info, timeline/logs.
+- **Form Page**: Grouping, mandatory prompts, validation, feedback, multi-step flows.
+- **Settings Page**: Security, integration, notifications, system params, members/permissions.
+- **Auth Pages**: Login, Register, recovery entries, or business exemptions.
 
-- 技术栈兼容 Vue + Element Plus
-- 对表格、表单、详情面板、权限页友好
-- 许可证和商用条件清晰
-- 布局和组件足够克制，方便做业务化改造
+### 6. Add Interaction States and Error Paths
+- Ensure skeleton screens, local loading, and disabled states are clear.
+- Empty states should guide the next step, not just say "No Data."
+- Failure messages must guide recovery, not just pop a generic error.
+- Use secondary confirmation and feedback for risky actions (delete, sync, etc.).
 
-拿模板打底后，至少完成这些改造：
-
-- 替换品牌色、品牌名、favicon、菜单文案和空状态文案
-- 删除模板自带的示例图表、示例 banner、示例导航和占位模块
-- 按业务模块重做首页卡片、快捷操作和数据块
-- 把列表列项、筛选器、状态值和详情结构改成真实业务语义
-
-### 4. 统一后台视觉系统
-
-- 建立管理端颜色 token、状态色、间距和卡片层级
-- 确定页面头部、操作区、筛选区、表格区、详情区的固定结构
-- 统一按钮优先级、危险动作、标签颜色和空状态插图策略
-- 登录页、注册页和后台 shell 要保持同一品牌方向
-
-### 5. 收敛核心页面模式
-
-至少检查并完善这些后台页面模式：
-
-- 工作台：关键指标、主任务入口、待处理事项、最近活动
-- 列表页：筛选、搜索、排序、批量操作、状态标签、分页
-- 详情页：摘要信息、主数据区、次级信息区、操作时间线或日志
-- 表单页：分组、必填提示、校验、提交反馈、长表单分步
-- 设置页：安全、集成、通知、系统参数、成员与权限
-- 鉴权页：登录、注册、找回入口或业务豁免说明
-
-### 6. 补交互状态与异常路径
-
-- 加载 skeleton、局部 loading 和禁用态要清楚
-- 空状态要说明下一步，而不是只写“暂无数据”
-- 失败提示要能指导恢复，不要只弹一个泛化错误
-- 删除、停用、导出、同步这类风险动作要有二次确认和结果反馈
-
-### 7. 组织截图与提审展示
-
-- 后台类应用至少准备工作台、核心列表、关键详情或表单、设置或权限页
-- 如果后台是核心卖点，截图要能看出组织、控制、监控和智能化，而不是只有表格
-- 删除模板默认示意图、示例账户、无意义图表和占位文案后再截图
-- 把截图结论交回 `lazycat:ship-app`，作为资料阶段和提审前验收的一部分
-
-复杂任务先读 [references/admin-ui-playbook.md](./references/admin-ui-playbook.md)。
+### 7. Organize Screenshots and Submission Display
+- Prepare screenshots for Workspace, List, Detail/Form, and Settings/Permissions.
+- If the admin is a selling point, screenshots should showcase organization, control, and intelligence.
+- Clean up sample charts, accounts, and boilerplate before taking screenshots.
+- Hand over results to `lazycat:ship-app` for the release preparation phase.
 
 ## Quality Gates
 
-- 后台管理页已确认存在真实业务信息架构，而不是模板默认菜单
-- 如使用模板，默认 branding、默认文案、默认图表和示例数据已清理
-- 工作台、列表、详情、表单、设置、登录 / 注册至少已形成一致的视觉系统
-- 表格筛选、状态标签、空状态、错误提示和提交反馈已按真实业务语义落地
-- 截图候选页能展示产品价值，不会让 reviewer 一眼看出是未改造模板
-- 后台 UI 已明确交回 `lazycat:ship-app` 的截图与提审结论
+- Admin interface has real business information architecture, not just template menus.
+- Default branding, copy, charts, and sample data have been cleaned.
+- Workspace, list, detail, form, settings, and login pages form a consistent visual system.
+- Filtering, tags, empty states, and error handling are based on business semantics.
+- Candidate screenshots showcase product value, not just an uncustomized template.
+- UI quality conclusions have been handed over to `lazycat:ship-app`.
 
 ## Red Flags
 
-- 直接把现成 admin 模板换个名字就交付
-- 还保留模板自带 logo、菜单、统计卡片、版权信息或示例文案
-- 所有页面都是“筛选表单 + 表格”，没有工作台和详情逻辑
-- 表单过长、没有分组、没有校验反馈、没有提交结果提示
-- 空状态、错误态和权限受限场景完全没处理
-- 截图里还带着假数据、占位图表或默认示例账号
-- 登录页和后台主框架风格割裂，看起来像两个项目
+- Delivering a raw admin template with just a name change.
+- Retaining default template logos, menus, charts, or copyright info.
+- All pages are just "Filter + Table" without workspace or detail logic.
+- Forms are too long, lack grouping, or lack validation feedback.
+- Empty, error, and restricted states are entirely unhandled.
+- Screenshots include fake data, placeholder charts, or default accounts.
+- Login pages look like a completely different project from the admin shell.
 
 ## Bundled References
 
-- 后台 UI 标准、模板策略和截图脚本： [references/admin-ui-playbook.md](./references/admin-ui-playbook.md)
-- 发布前截图与资料整理： [../lazycat:ship-app/references/store-assets.md](../lazycat:ship-app/references/store-assets.md)
-- 提审前质量核对： [../lazycat:ship-app/references/shipping-checklist.md](../lazycat:ship-app/references/shipping-checklist.md)
+- Admin UI Standards and Templates: [references/admin-ui-playbook.md](./references/admin-ui-playbook.md)
+- Post-release Screenshots and Assets: [../lazycat:ship-app/references/store-assets.md](../lazycat:ship-app/references/store-assets.md)
+- Pre-submission Quality Check: [../lazycat:ship-app/references/shipping-checklist.md](../lazycat:ship-app/references/shipping-checklist.md)
 
 ## Outputs
 
 ```text
-阶段: 后台管理 UI 规划 / 改造 / 提审前收敛
-后台类型: <轻后台 / 重后台 / 不适用>
+Phase: Admin UI Planning / Refactor / Pre-submission Convergence
+Admin Type: <Light / Heavy / N/A>
 
-已确认
+Confirmed
 - ...
 
-信息架构
-- 一级导航: ...
-- 核心页面: ...
+Information Architecture
+- Primary Nav: ...
+- Core Pages: ...
 
-模板策略
-- 来源: <不用模板 / 模板名称或已有后台>
-- 保留: ...
-- 必改: ...
+Template Strategy
+- Source: <No Template / Template Name / Existing UI>
+- Retain: ...
+- Modify: ...
 
-视觉与交互结论
-- 工作台: ...
-- 列表页: ...
-- 详情/表单: ...
-- 登录/注册: ...
+Visual and Interaction Conclusion
+- Workspace: ...
+- List Page: ...
+- Detail/Form: ...
+- Login/Register: ...
 
-截图建议
+Screenshot Recommendations
 - ...
 
-缺口 / 风险
+Gaps / Risks
 - ...
 
-下一步
+Next Steps
 1. ...
 2. ...
 
-交付物
-- 后台 UI 质量门槛
-- 截图候选页清单
-- 交给 lazycat:ship-app 的提审前 UI 结论
+Deliverables
+- Admin UI Quality Gates
+- Candidate Screenshot List
+- UI Quality Conclusion for lazycat:ship-app
 ```

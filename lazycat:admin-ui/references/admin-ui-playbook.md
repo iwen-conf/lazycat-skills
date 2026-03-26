@@ -1,111 +1,97 @@
-# Lazycat 后台管理 UI Playbook
+# Lazycat Admin UI Playbook
 
-后台管理界面允许借助成熟模板起步，但最终必须是“你的产品后台”，而不是“某个模板的示例站”。
+Admin interfaces can start with established templates, but they must eventually become "your product's dashboard," not a "template demo site."
 
-## 1. 目标
+## 1. Objectives
 
-把后台做成：
+Create an admin interface that:
+- Projects a clear brand identity.
+- Features a distinct information hierarchy.
+- Reflects actual business workflows.
+- Serves as high-quality App Store screenshots and reviewer demonstration material.
 
-- 有明确品牌感
-- 有清晰信息层级
-- 有真实业务流
-- 可作为商店截图和 reviewer 演示材料
+## 2. Template Usage Rules
 
-## 2. 模板使用规则
+### Prerequisites for Using Templates
+- The template stack is compatible with Vue + Element Plus.
+- Licenses are clear and permit current usage.
+- The template is optimized for admin scenarios rather than marketing sites or BI dashboards.
+- The structure is easy to prune and can be quickly replaced with real business pages.
 
-### 可以使用模板的前提
+### Elements That Must Be Modified
+- Default brand name, logo, favicon, and copyright.
+- Default menu groupings and example routes.
+- Default charts, metrics, notifications, and announcements.
+- Default empty state copy, example table columns, and detail fields.
+- Default demo accounts, placeholder avatars, and mock data.
 
-- 模板主栈与 Vue + Element Plus 相容
-- 许可证清楚，允许当前使用方式
-- 模板更擅长后台场景，而不是偏营销站或纯 BI 大屏
-- 模板结构易于删减，能快速换成真实业务页面
+### Templates to Avoid
+- Deeply coupled with other UI libraries, leading to high migration costs.
+- Excessive animations or heavy decoration that reduces administrative efficiency.
+- Templates where example content outweighs real business logic, resulting in high cleanup costs.
+- Visual styles that clearly conflict with the current product direction.
 
-### 模板必须改掉的内容
+## 3. Minimum Requirements for Admin Pages
 
-- 默认品牌名、logo、favicon、copyright
-- 默认菜单分组和示例路由
-- 默认图表、示例指标、示例通知、示例公告
-- 默认空状态文案、示例表格列、示例详情字段
-- 默认演示账号、占位头像和假数据
+Admin applications should include at least the following pages or equivalent capabilities:
+- Login / Registration.
+- Workbench or Home page.
+- Core business list views.
+- Detail pages or detail drawers.
+- Create / Edit forms.
+- Settings / Permissions / System parameters.
 
-### 不建议使用的模板
+If a project lacks a workbench, screenshots and the landing experience often appear weak. Even for lightweight admin panels, provide a home page that illustrates core statuses and primary actions.
 
-- 深度绑定别的 UI 库，迁移成本很高
-- 动效过多、装饰过重，削弱管理效率
-- 示例内容比真实业务代码还多，清理成本过大
-- 视觉方向和当前产品明显冲突
+## 4. Workbench Design Essentials
+- Retain only the most critical metrics and statuses at the top.
+- Place primary task entries on the first screen; do not force users to navigate deep menus.
+- Ensure card data relates to real business logic; avoid template-provided mock statistics.
+- Prioritize "Recent Activity," "Pending Tasks," "Sync Status," and "Alerts" over flashy but non-functional charts.
 
-## 3. 后台页面最低配
+## 5. List Page Design Essentials
+- Keep only high-frequency filters visible; move low-frequency conditions to an expandable area.
+- Maintain consistent placement for Search, Filter, Sort, Pagination, and Bulk Actions.
+- Use semantic tags for status columns rather than plain text.
+- Implement truncation, copy-to-clipboard, or tooltip strategies for long text, IDs, and timestamps.
+- Order action columns by priority; separate dangerous actions from primary ones.
 
-后台类应用至少应有以下几类页面或等价能力：
+## 6. Detail Page and Form Design Essentials
+- Provide a summary first, followed by details; avoid overwhelming the user with a full page of fields immediately.
+- Group long forms into modules; use multi-step or collapsible sections when necessary.
+- Ensure clear feedback for required fields, validation errors, successful saves, and failures.
+- Provide explanations, default values, and rollback hints for high-risk configurations.
 
-- 登录 / 注册
-- 工作台或首页
-- 核心业务列表
-- 详情页或详情抽屉
-- 创建 / 编辑表单
-- 设置 / 权限 / 系统参数
+## 7. Visual System Recommendations
+- Establish your own color tokens instead of using Element Plus's default blue or template defaults.
+- Maintain a consistent spacing rhythm (e.g., 8/16/24px) to avoid density fluctuations.
+- Standardize borders and shadow intensities across cards, tables, drawers, and modals.
+- Unify icon styles; avoid mixing too many different icon sets.
+- Ensure the login page and the admin shell follow the same branding direction.
 
-如果项目没有工作台，截图和首屏通常会显得很弱。哪怕是轻后台，也应给出一页能够说明核心状态和主要动作的首页。
+## 8. State and Exception Handling
+- Use skeletons or local loading indicators; avoid full-screen flickering.
+- Provide clear calls to action (CTAs) in empty states.
+- Specify the cause and recovery steps for error prompts.
+- Explain missing permissions on restricted pages instead of just showing an error.
 
-## 4. 工作台设计要点
+## 9. Preparing Screenshots
+A standard screenshot set for admin applications typically includes:
+1. Workbench/Home page.
+2. The primary business list page.
+3. A detail page or key form.
+4. A settings, permissions, or unique feature page.
 
-- 顶部只保留最关键的指标和状态
-- 把主任务入口放在首屏，不要让用户先钻菜单
-- 卡片数据必须和真实业务有关，不要摆模板示例统计
-- 最近活动、待处理事项、同步状态和告警比花哨图表更有用
+Pre-screenshot checklist:
+- No template default mock data.
+- No debug markers or test buttons.
+- Unified language and copy.
+- Data fields consistent with real product semantics.
+- Colors and branding successfully replaced.
 
-## 5. 列表页设计要点
-
-- 筛选区只保留高频条件，低频条件放进展开区
-- 搜索、筛选、排序、分页、批量操作的位置保持一致
-- 状态列用语义化标签，不要全靠文字堆叠
-- 长文本、长 ID、时间列要有截断、复制或 tooltip 策略
-- 操作列按优先级排序，危险动作与主动作分开
-
-## 6. 详情页与表单设计要点
-
-- 详情页先给摘要，再给细节，不要上来整页字段
-- 长表单按模块分组，必要时使用分步或折叠
-- 必填、校验、保存成功、保存失败都要有清晰反馈
-- 高风险配置要给解释、默认值和回滚提示
-
-## 7. 视觉系统建议
-
-- 不直接使用 Element Plus 默认蓝和模板默认配色，先建立自己的颜色 token
-- 保持 8/16/24 为主的间距节奏，不要页面间密度忽高忽低
-- 卡片、表格、抽屉、弹窗的边界和阴影强度统一
-- 图标风格统一，不混用过多风格
-- 登录页和后台 shell 保持同一品牌方向
-
-## 8. 状态与异常处理
-
-- 加载时用 skeleton 或局部 loading，不要整屏闪烁
-- 空状态写清下一步动作
-- 失败提示写明原因和恢复动作
-- 权限受限页不能只报错，要说明缺什么权限
-
-## 9. 截图准备
-
-适合后台管理应用的截图组合通常包括：
-
-1. 工作台首页
-2. 最重要的一张业务列表页
-3. 一张详情页或关键表单页
-4. 一张设置、权限或差异化功能页
-
-截图前确认：
-
-- 没有模板默认示例数据
-- 没有调试标识和测试按钮
-- 文案语言统一
-- 数据字段与真实产品语义一致
-- 颜色和品牌信息已经替换完成
-
-## 10. 提审前自检
-
-- reviewer 一眼能看出这个后台是做什么的吗？
-- reviewer 会不会误判这是未改造模板？
-- 首页是否展示了真正重要的运营信息？
-- 列表、详情、表单是否能看出业务闭环？
-- 登录页、后台首页和设置页是否属于同一产品？
+## 10. Pre-Submission Self-Check
+- Can a reviewer immediately identify the purpose of this admin panel?
+- Might a reviewer mistake this for an unmodified template?
+- Does the home page display truly important operational information?
+- Do the lists, details, and forms demonstrate a complete business loop?
+- Do the login page, home page, and settings page feel like part of the same product?
