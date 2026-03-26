@@ -1,24 +1,21 @@
-# Lazycat 攻略质量要求
+# Lazycat Guide Quality Requirements
 
-高质量文章至少包含：
+High-quality articles must include:
+- App Store links.
+- Real screenshots.
+- Reproducible steps.
+- Real-world usage scenarios.
+- Practical experiences, tips, and common pitfalls.
 
-- App Store 链接
-- 真实截图
-- 可复现步骤
-- 真实使用场景
-- 实际体验、技巧和坑点
+Avoid simply providing:
+- Button descriptions.
+- Page lists.
+- Vague descriptions without screenshots.
+- Verbatim copies of official documentation.
 
-不要只写：
-
-- 按钮介绍
-- 页面罗列
-- 没有截图的空泛说明
-- 纯粹照抄官方文档
-
-如果是复杂应用，写出：
-
-- 适合谁
-- 解决什么问题
-- 安装后怎么配置
-- 常见错误怎么处理
-- 有什么使用建议
+For complex applications, specify:
+- Target audience.
+- Problems solved.
+- Post-installation configuration.
+- Common error handling.
+- Usage recommendations.
