@@ -1,103 +1,87 @@
-# Lazycat 商店资料包
+# Lazycat Store Assets Package
 
-当任务集中在“应用简介、截图、提审资料、商店页信息”时，先按这个模板整理，再去开发者中心填写或上传。
+When tasks focus on "App Summary, Screenshots, Submission Materials, and Store Page Info," organize them per this template before filling them out in the Developer Center.
 
-## 资料包模板
+## Metadata Template
 
-### 一句话定位
+### One-sentence Position
+- What is this app?
+- Who is it for?
+- What problem does it solve?
 
-- 这是什么应用？
-- 面向谁？
-- 解决什么问题？
+Template: `<App Name>` is a Lazycat app for `<Target User>` used to `<Core Value>`.
 
-写法模板：
+### App Description
+Write in this order:
+1. One-sentence Position.
+2. 3 to 5 core features.
+3. Prerequisites or dependencies.
+4. Use cases.
+5. Known limitations or notes.
 
-`<应用名>` 是一款面向 `<目标用户>` 的懒猫应用，用来 `<核心价值>`。
+Avoid:
+- Exaggerated terms like "Best in the world," "Strongest," or "Unique."
+- Promises that don't match actual features.
+- Implying "out-of-the-box" without explaining prerequisites.
+- Empty slogan-style sentences.
 
-### 应用简介
+## Screenshot Script
 
-按这个顺序写：
+Prepare at least these screens:
+1. Homepage or main dashboard after startup.
+2. Most critical operation step.
+3. Feature page showing differentiated value.
+4. Settings, management, or results page.
 
-1. 一句话定位
-2. 3 到 5 条核心能力
-3. 使用前提或依赖条件
-4. 适用场景
-5. 已知限制或注意事项
+For AI Apps or AI Browser Plugins, add:
+5. AI entry point or browser sidebar entry.
+6. Core AI workflow page.
+7. AI settings or model configuration page.
 
-避免这些写法：
+If the app focuses on admin/backend, add:
+8. Dashboard or analytics view.
+9. Most important list view.
+10. Details page or key form page.
 
-- “全网第一”“最强”“国家级”“行业唯一”
-- 和实际功能对不上的承诺
-- 不解释前置条件就暗示开箱即用
-- 空泛口号式句子堆砌
+Each image must answer:
+- Can a user understand what the app does from this image?
+- Is this image identical to the actual submitted version?
 
-## 截图脚本
+## Screenshot Quality Requirements
+- Use actual running screens, not design mockups.
+- Maintain consistent language and visual theme.
+- Remove debug markers, dummy data, sensitive info, and error prompts.
+- If using a template, clean up default branding, sample charts, and placeholder copy.
+- If a page has an empty state, prioritize showing a meaningful valid state.
+- Follow fixed dimensions required by the Developer Center.
 
-截图至少准备以下候选画面：
+## Icon Outsourcing
+- If the project lacks a formal icon or existing quality is low, use `lazycat:prepare-icon`.
+- `lazycat:prepare-icon` should output an English prompt (Project Name + Function) for external image models.
+- Check if the result is: `1024x1024`, no rounded corners, no text, no transparency, and clearly expresses the function.
 
-1. 启动后首页或主工作台
-2. 最核心的一步操作
-3. 能体现差异化价值的功能页
-4. 设置页、管理页或结果页
+## AI App Metadata Supplements
+For AI Pod apps or plugins, also explain:
+- Why it isn't a standard web app.
+- Where the AI entry point is located.
+- Whether users need extra configuration before first use.
+- The role of the browser extension if included.
 
-如果项目是 `AI应用` 或 AI 浏览器插件，再额外准备：
+See `references/aipod-review-kit.md` for more detailed templates.
 
-5. AI 入口或 AI 浏览器侧边入口
-6. 一张最核心的 AI 工作流页面
-7. 一张 AI 设置页或模型配置页
+## Minimum Submission Package
+- App Name
+- Version Number
+- One-sentence Position
+- Full App Description
+- Changelog or Update Notes
+- Screenshot List
+- Test Account, Reproduction Path, or Initialization Info
+- External Dependencies and Limitations
+- AI Pod / AI Browser entry points (if applicable)
 
-如果应用以后台管理为核心，再额外准备：
-
-8. 工作台或仪表盘
-9. 一张最重要的列表页
-10. 一张详情页或关键表单页
-
-每张图都要回答两个问题：
-
-- 用户看这张图，能否理解应用能做什么？
-- 这张图和实际提审版本是否完全一致？
-
-## 截图质量要求
-
-- 用真实运行画面，不要用设计稿冒充
-- 保持统一语言和统一视觉主题
-- 去掉调试标记、假数据、敏感信息和错误提示
-- 如果使用了后台模板，先清理默认 branding、示例图表、示例菜单和占位 copy
-- 如果页面存在空状态，优先展示可理解的有效状态
-- 若开发者中心要求固定尺寸，以页面当前要求为准并记录
-
-## 图标生成外包
-
-- 如果当前项目没有正式 icon，或现有 icon 质量不够，优先走 `lazycat:prepare-icon`
-- `lazycat:prepare-icon` 要输出一份已经填好项目名和项目功能的英文 prompt，方便用户交给外部图像模型生成 PNG
-- 收到 PNG 后，回头检查是否满足：`1024x1024`、无圆角、无文字、无透明、功能表达明确
-
-## `AI应用` 资料补充
-
-如果项目是懒猫算力仓 `AI应用` 或 AI 浏览器插件，资料里还要说明：
-
-- 它为什么不是普通网页应用
-- AI 入口在什么位置
-- 用户首次使用前是否需要额外配置
-- 如果带浏览器扩展，扩展在产品中的作用是什么
-
-更细的 reviewer 资料模板和截图脚本，直接看 `references/aipod-review-kit.md`。
-
-## 提审资料最小包
-
-- 应用名
-- 版本号
-- 一句话定位
-- 完整应用简介
-- changelog 或本次更新说明
-- 截图列表
-- 测试账号、复现路径或初始化说明
-- 外部依赖和已知限制
-- 如适用，AI Pod / AI 浏览器入口说明
-
-## 被打回时优先检查
-
-- 简介是否夸大、错写或漏写前置条件
-- 截图是否和当前版本不一致
-- 图标、链接、截图、文案里是否出现明显失效项
-- 运行体验是否能支撑简介中的承诺
+## Check Before Re-submission
+- Is the summary exaggerated, incorrect, or missing prerequisites?
+- Are screenshots inconsistent with the current version?
+- Are icons, links, screenshots, or copy broken or invalid?
+- Does the actual experience support the promises made in the summary?

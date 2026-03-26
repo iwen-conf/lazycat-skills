@@ -1,173 +1,157 @@
-# Lazycat AI应用提审资料模板
+# Lazycat AI App Submission Kit
 
-适用于懒猫算力仓 `AI应用` 和 AI 浏览器插件的提审资料整理、截图准备和 reviewer 复现说明。
+Applicable to Lazycat AI Pod apps and AI Browser Plugins for organizing submission materials, preparing screenshots, and providing reviewer instructions.
 
-不适用于普通业务型 Web 应用接 AI。
+Not applicable to standard web apps integrating AI. If your project is a standard web app with AI features, use the `BaseURL` configuration and follow `store-assets.md`. Do not use this AI Pod template.
 
-如果项目只是普通业务 Web 应用增加 AI 功能，默认走 `BaseURL` 配置方案，按常规 `store-assets.md` 准备资料即可，不要误套这份 AI Pod 模板。
+## 1. Official References
 
-## 1. 官方依据
-
-- `AI应用` 开发文档：
+- AI App Development Docs:
   `https://developer.lazycat.cloud/open/zh/guide/aipod/ai-application.html`
-- AI 浏览器插件测试文档：
+- AI Browser Plugin Testing Docs:
   `https://developer.lazycat.cloud/open/zh/guide/aipod/ai-browser-plugin-testing.html`
-- 应用提审 / 发布说明：
+- App Submission/Review Guide:
   `https://developer.lazycat.cloud/open/zh/guide/publish/app-review.html`
 
-根据当前官方文档，`AI应用` 常见会涉及：
-
+Per official docs, AI Apps typically involve:
 - `lzc-build.yml`
 - `lzc-manifest.yml`
 - `ai-pod-service/`
 - `caddy-aipod/`
-- 可选的 `extension.zip`
+- Optional `extension.zip`
 
-AI 浏览器插件测试阶段要特别注意：
-
+Special attention for AI Browser Plugin testing:
 - `public_path`
-- 插件和普通页面的登录态隔离
-- Cookie 不生效时的独立鉴权
-- 网络请求失败或 `401` 的排查
+- Isolation of login states between the plugin and normal pages.
+- Independent authentication when cookies are ineffective.
+- Troubleshooting network failures or `401` errors.
 
-## 2. 什么时候用这份模板
+## 2. When to Use This Template
 
-满足任一条件就优先使用：
+Prioritize this if:
+- The project is a Lazycat AI Pod app.
+- The project includes an AI Browser Plugin.
+- The reviewer needs to understand why it isn't a standard web app.
+- Metadata, screenshots, or instructions must explain AI entries, plugin entries, or the AI Pod directory structure.
 
-- 项目本身是懒猫算力仓 `AI应用`
-- 项目包含 AI 浏览器插件
-- 项目需要 reviewer 理解“为什么它不是普通网页应用”
-- 商店资料、截图、提审说明里必须解释 AI 入口、插件入口或 AI Pod 目录结构
+## 3. Minimum Submission Package for AI Apps
 
-## 3. AI应用提审资料最小包
+Organize at least the following:
+- App Name
+- Version Number
+- One-sentence Position
+- Product Form: Standard App / AI App / AI Browser Plugin
+- AI Entry Point location
+- Key directory descriptions
+- Reviewer reproduction path
+- External dependencies and known limitations
+- Actual screenshots
+- Key verification conclusions
 
-至少整理这些信息：
-
-- 应用名
-- 版本号
-- 一句话定位
-- 产品形态：普通应用 / `AI应用` / AI 浏览器插件
-- AI 入口位置
-- 关键目录说明
-- reviewer 复现路径
-- 外部依赖和已知限制
-- 真实截图
-- 关键验证结论
-
-### 可直接复用的资料模板
+### Data Template (Copy-paste)
 
 ```text
-应用名:
-版本号:
-产品形态: <AI应用 / AI 浏览器插件 / 普通应用>
+App Name:
+Version Number:
+Product Form: <AI App / AI Browser Plugin / Standard App>
 
-一句话定位:
-<应用名> 是一款面向 <目标用户> 的懒猫 <AI应用 / AI 浏览器插件>，用于 <核心价值>。
+One-sentence Position:
+<App Name> is a Lazycat <AI App / AI Browser Plugin> for <Target Users>, used for <Core Value>.
 
-为什么不是普通网页应用:
+Why it's not a standard web app:
 - ...
 
-AI 入口说明:
-- 主入口:
-- AI 浏览器入口:
-- 设置入口:
+AI Entry Points:
+- Main Entry:
+- AI Browser Entry:
+- Settings Entry:
 
-关键目录 / 包结构:
+Key Directory / Package Structure:
 - lzc-build.yml: ...
 - lzc-manifest.yml: ...
-- ai-pod-service/: <有 / 无，作用>
-- caddy-aipod/: <有 / 无，作用>
-- extension.zip: <有 / 无，作用>
+- ai-pod-service/: <Yes/No, Purpose>
+- caddy-aipod/: <Yes/No, Purpose>
+- extension.zip: <Yes/No, Purpose>
 
-reviewer 复现路径:
+Reviewer Reproduction Path:
 1. ...
 2. ...
 3. ...
 
-测试账号 / 初始化条件:
+Test Account / Initialization:
 - ...
 
-依赖与限制:
-- 外部模型或服务:
-- 网络要求:
-- 已知限制:
+Dependencies & Limitations:
+- External models or services:
+- Network requirements:
+- Known limitations:
 
-验证结论:
-- 安装:
-- 启动:
-- AI 入口:
-- 核心流程:
-- 数据持久化:
+Verification Conclusions:
+- Installation:
+- Startup:
+- AI Entry:
+- Core Workflow:
+- Data Persistence:
 ```
 
-## 4. reviewer 复现说明怎么写
+## 4. Writing Reviewer Instructions
 
-目标是让 reviewer 在 5 分钟内理解并跑通核心路径。
+The goal is to let the reviewer understand and run the core path within 5 minutes.
+Clarify:
+- Where to access AI capabilities.
+- Whether login, authorization, or configuration is needed before first use.
+- Which step demonstrates the product value fastest.
+- For AI Browser Plugins, which pages and content to test on.
+- For AI Apps, the relationship between AI Browser, independent pages, and local services.
 
-至少写清楚：
+Do not just say "Open the app and see for yourself." Provide the shortest path to success.
 
-- 从哪里进入 AI 能力
-- 首次使用前是否要登录、授权或填配置
-- 哪一步能最快体现产品价值
-- 如果是 AI 浏览器插件，要在什么页面、什么内容上测试
-- 如果是 `AI应用`，AI 浏览器、独立页面和本地服务之间的关系是什么
+## 5. AI Browser Plugin Screenshot Script
 
-不要写成“打开应用自己看”。必须给 reviewer 一条最短成功路径。
+### Preparation
+- Fix language, theme, and test data.
+- Confirm the plugin is correctly installed and discoverable by the AI Browser.
+- Confirm AI services are available.
+- If the plugin requires separate login, verify the session is established.
+- Remove debug markers, sensitive data, and invalid banners.
 
-## 5. AI 浏览器插件截图脚本
+### Store Screenshot Priority
+1. Entry point location within the AI Browser.
+2. Main interface after opening the plugin.
+3. Web context before triggering AI.
+4. Plugin configuration or model settings page.
+5. A representative AI operation in progress.
+6. Results page after AI response.
+7. A page showing the loop (history, saving, exporting, or re-invoking).
 
-### 拍摄前准备
+### Questions for Each Image
+- Can the user tell at a glance this is an AI capability in the browser, not just a webpage?
+- Does the image explain the core value?
+- Is the image from the current submission version?
 
-- 固定语言、主题和测试数据
-- 确认插件已正确安装并可被 AI 浏览器发现
-- 确认 AI 服务已可用
-- 如果插件需要单独登录，先验证登录态已经成立
-- 去掉调试标记、敏感数据和无效 banner
+### Reviewer Evidence Screenshots
+Prepare an extra set for internal verification (not necessarily for the store):
+1. Plugin entry is visible.
+2. Plugin successfully loads the target page.
+3. Core AI request returns successfully.
+4. Debugging screenshot for `401` or login isolation issues if applicable.
 
-### 商店截图候选顺序
+## 6. AI App Screenshot Script
 
-1. AI 浏览器中的入口位置
-2. 插件已打开后的主界面
-3. 触发前的网页上下文
-4. 插件配置页或模型设置页
-5. 发起一次代表性 AI 操作的过程页
-6. AI 返回结果后的结果页
-7. 若有历史、保存、导出或再次调用，再补一张体现闭环的页面
+For independent AI Apps, prioritize:
+1. Homepage or main workflow entry after startup.
+2. AI input or task configuration interface.
+3. Key AI processing in progress.
+4. Results page.
+5. Settings or model/service configuration.
+6. AI Browser entry if linked.
 
-### 每张图要回答的问题
+## 7. Self-Checklist
 
-- 用户能否一眼看懂这是浏览器里的 AI 能力，而不是普通网页
-- 用户能否从这张图理解核心价值
-- 这张图是否来自当前提审版本
-
-### reviewer 证据截图
-
-除了商店截图，建议额外准备一组不一定上架但可自证的内部截图：
-
-1. 插件入口已可见
-2. 插件成功加载目标页面
-3. 核心 AI 请求成功返回
-4. 如果遇到鉴权问题，补一张定位 `401` 或登录隔离问题的调试截图
-
-这组图主要服务于被打回时的复核，不一定放进商店资料。
-
-## 6. AI应用截图脚本
-
-如果项目是独立 `AI应用`，优先拍这些画面：
-
-1. 启动后首页或主工作流入口
-2. AI 输入或任务配置界面
-3. 关键 AI 处理过程页
-4. 结果页
-5. 设置页或模型 / 服务配置页
-6. 若和 AI 浏览器联动，再补 AI 浏览器入口图
-
-## 7. 自检清单
-
-- `AI应用` / AI 浏览器插件产品形态已讲清楚
-- AI 入口位置已讲清楚
-- reviewer 能在 5 分钟内复现核心流程
-- 截图来自真实运行版本
-- `ai-pod-service/`、`caddy-aipod/`、`extension.zip` 等目录说明已完整
-- 如果插件登录态独立，已写清登录或配置方法
-- 如果依赖外部模型或网络，已写清前提条件
+- AI App / AI Browser Plugin form clearly explained.
+- AI entry point location clearly explained.
+- Reviewer can reproduce core workflows within 5 minutes.
+- Screenshots are from the actual running version.
+- Directory descriptions (`ai-pod-service/`, etc.) are complete.
+- Login or configuration methods for plugins are clear.
+- External dependencies/network requirements are stated.

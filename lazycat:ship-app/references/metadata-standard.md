@@ -1,40 +1,40 @@
-# Lazycat 商店元数据质量标准
+# Lazycat Store Metadata Quality Standards
 
-提审时，以下四个字段必须按照此标准填写，严禁留空或敷衍。
+The following four fields must be filled out according to these standards during submission. Leaving them blank or filling them perfunctorily is strictly prohibited.
 
-## 1. 应用名称 (Name)
-*   **标准**：[中文名] - [英文名/品牌名]
-*   **要求**：禁止包含“测试”、“最新版”、“V1”等后缀。
-*   **示例**：云之幻 - CloudPsi
+## 1. App Name (Name)
+*   **Standard**: [Chinese Name] - [English Name/Brand Name]
+*   **Requirement**: Do not include suffixes like "Test", "Latest", or "V1".
+*   **Example**: 云之幻 - CloudPsi
 
-## 2. 应用简介 (Summary)
-*   **标准**：一句话描述核心价值。
-*   **长度**：10 - 30 个字。
-*   **示例**：面向专业团队的高性能 3D 渲染与协作平台。
+## 2. App Summary (Summary)
+*   **Standard**: A single sentence describing the core value.
+*   **Length**: 10 - 30 characters (Chinese) or equivalent.
+*   **Example**: High-performance 3D rendering and collaboration platform for professional teams.
 
-## 3. 应用描述 (Description)
-必须包含以下三个板块：
-*   **功能特性**：列出至少 3 个核心功能点。
-*   **使用说明**：说明如何开始使用。
-*   **登录凭证**：如果是移植应用或有认证的应用，必须注明默认账号密码或注册方式。
-*   **示例**：
+## 3. App Description (Description)
+Must include the following three sections:
+*   **Features**: List at least 3 core functionalities.
+*   **Instructions**: Explain how to get started.
+*   **Credentials**: For ported or authenticated apps, specify default accounts/passwords or registration methods.
+*   **Example**:
     ```text
-    【功能特性】
-    - 支持多端实时同步
-    - 内置 AI 渲染加速
-    - 兼容所有主流文件格式
+    [Features]
+    - Real-time multi-device synchronization
+    - Built-in AI rendering acceleration
+    - Compatible with all major file formats
 
-    【使用说明】
-    安装后直接打开，在设置中配置您的存储路径即可开始。
+    [Instructions]
+    Open the app after installation and configure your storage path in settings to begin.
 
-    【登录凭证】
-    默认账号：admin，密码：lazycat123
+    [Credentials]
+    Default Username: admin, Password: lazycat123
     ```
 
-## 4. 关键词 (Keywords)
-*   **标准**：业务分类,技术栈,核心特征 (不少于 5 个)。
-*   **示例**：3D渲染,GPU加速,Go,协作工具,设计
+## 4. Keywords (Keywords)
+*   **Standard**: Business category, Tech stack, Core features (at least 5 keywords).
+*   **Example**: 3D Rendering, GPU Acceleration, Go, Collaboration Tool, Design
 
-## 5. 更新说明 (Changelog) - 仅限更新
-*   **标准**：明确说明“新增”、“优化”、“修复”了什么。
-*   **示例**：新增 OIDC 登录支持；优化了镜像加载速度；修复了导出 PDF 时的崩溃问题。
+## 5. Changelog (Changelog) - Updates Only
+*   **Standard**: Clearly state what has been "Added", "Optimized", or "Fixed".
+*   **Example**: Added OIDC login support; Optimized image loading speed; Fixed crash issue when exporting PDFs.

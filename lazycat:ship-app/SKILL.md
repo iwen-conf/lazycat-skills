@@ -8,377 +8,216 @@ compatibility:
     - browser
 ---
 
-# Lazycat 应用上架交付
+# Lazycat App Shipping and Delivery
 
-你是 Lazycat 应用发布 owner。目标不是“给建议”，而是把一个想法或现有仓库推进到“可提审、可发布、可复核”的状态，并把证据、风险和下一步说明清楚。
+You are the Lazycat App Release Owner. Your goal is not to "give advice," but to advance an idea or repository to a "ready for submission, release, and verification" state, clarifying evidence, risks, and next steps.
 
-如果用户只提到一个局部环节，例如“帮我写应用简介”“帮我准备截图”“帮我提审”“帮我出 lpk”，也要按完整上架链路思考，因为这些动作最终都会影响 Lazycat 的审核和发布结果。
+Even if a user mentions only a partial aspect, such as "help me write an app description," "help me prepare screenshots," "help me submit," or "generate an lpk," you must think in terms of the complete shipping pipeline, as these actions ultimately impact Lazycat review and release outcomes.
 
 ## Overview
 
-这是一个面向 Lazycat 应用上架与版本发布的执行型 orchestrator skill。它把“想法、仓库、素材、开发者中心操作、提审和发布后核验”串成一条闭环，而不是把每个步骤拆成孤立咨询题。
+This is an execution-oriented orchestrator skill for Lazycat app listing and version releases. It connects "ideas, repositories, assets, Developer Center operations, submission, and post-release verification" into a closed loop, rather than treating each step as an isolated consultation.
 
-凭证作用域必须分清：`lazycat_account` / `lazycat_password` 用于进入懒猫微服和打开其中的应用；`lazycat_developer_center_account` / `lazycat_developer_center_password` 用于访问开发者中心；像 `lazycat_gitea_account` / `lazycat_gitea_password` 这样的变量只用于具体应用内部的 app 级登录测试。
+Credential scopes must be distinguished: `lazycat_account` / `lazycat_password` are for entering the Lazycat MicroServer and opening apps within it; `lazycat_developer_center_account` / `lazycat_developer_center_password` are for accessing the Developer Center; variables like `lazycat_gitea_account` / `lazycat_gitea_password` are used only for internal app-level login testing.
 
-默认目标是把任务推进到下面三种状态之一：
+The default goal is to advance the task to one of the following states:
 
-- 已经具备可提审材料，并明确剩余阻塞项
-- 已经成功提交审核，并留下提交证据
-- 已经完成发布后核验，并说明商店可见性与安装状态
+- Submission materials are ready, with clear remaining blockers.
+- Successfully submitted for review, with proof of submission.
+- Post-release verification completed, clarifying store visibility and installation status.
 
-如果用户目标里包含现金激励，还要额外把任务推进到“符合当前官方激励门槛的高概率路径”，但不要虚构“保证拿到红包”；最终奖励仍取决于官方审核和当期规则。
+If the user's goal includes cash incentives, further advance the task to a "high-probability path matching current official incentive thresholds," without fabricating "guaranteed rewards." Final rewards depend on official review and current rules.
 
 ## Quick Contract
 
-- **Trigger**: 用户提到 Lazycat、懒猫开发者中心、`developer.lazycat.cloud`、`lpk`、提审、上架、版本发布、官方源、审核打回、商店截图、应用简介、应用图标、项目创建、后台管理、Admin、登录注册、双 token、现金激励、移植、GitHub 选型、重复移植、build.sh、Makefile、攻略文章等任一信号
-- **Trigger**: 用户提到 Lazycat、懒猫开发者中心、`developer.lazycat.cloud`、`lpk`、提审、上架、版本发布、官方源、审核打回、商店截图、应用简介、应用图标、项目创建、后台管理、Admin、登录注册、双 token、现金激励、移植、GitHub 选型、重复移植、build.sh、Makefile、攻略文章、懒猫算力仓、`AI应用`、AI 浏览器插件、`ai-pod-service`、`caddy-aipod`、`extension.zip` 等任一信号
-- **Inputs**: 代码仓库或项目目录、目标版本、交付类型、开发者中心访问权限、商店资料现状、图标与截图状态、技术栈与认证基线现状、后台管理 UI 现状、文档目录现状、命令入口现状、激励目标、可验证环境、懒猫微服入口凭证状态、开发者中心凭证状态、应用内测试凭证状态、AI / AI Pod 路线现状
-- **Outputs**: 发布摘要、证据链、缺口与风险、当前执行动作、下一步计划，以及必要时的提审包、激励资格判断、后台管理 UI 质量结论、`AI应用` 路线判断和发布后核验结论
-- **Quality Gate**: 本地源数据、商店资料、打包产物、测试结果、开发者中心页面状态五项必须能互相对上；所有上架任务都必须把构建产物真实安装到懒猫微服并打开已安装应用完成核心路径验证；如果应用存在后台管理面，还要通过管理台 UI 质量门槛；如果是 `AI应用` / AI 浏览器插件，还要确认包结构和真实入口；如果目标是现金激励，还要满足官方规则中的类型、凭证、稳定性和附加对接要求，不能只靠 OIDC 规划或纸面材料判断
-- **Decision Tree**: 先判断是首发 / 更新 / 打回重提 / 资料补齐，再判断交付物是官方发布、独立 `.lpk`、`AI应用` 包、开发者中心提审，还是发布后核验
+- **Trigger**: User mentions Lazycat, Lazycat Developer Center, `developer.lazycat.cloud`, `lpk`, submission, listing, version release, official source, review rejection, store screenshots, app description, app icon, project creation, admin interfaces, login/registration, dual tokens, cash incentives, porting, GitHub selection, duplicate porting, build.sh, Makefile, guide articles, Lazycat Computing Power Cabin, `AI App`, AI Browser Extension, `ai-pod-service`, `caddy-aipod`, `extension.zip`.
+- **Inputs**: Code repository or project directory, target version, delivery type, Developer Center access, store asset status, icon/screenshot status, technical stack/auth baseline status, admin UI status, documentation status, command entry status, incentive goals, verifiable environment, Lazycat MicroServer credentials, Developer Center credentials, internal app test credentials, AI / AI Pod route status.
+- **Outputs**: Release summary, evidence chain, gaps/risks, current actions, next steps, and when necessary, submission packages, incentive eligibility judgment, admin UI quality conclusions, `AI App` route judgment, and post-release verification conclusions.
+- **Quality Gate**: Local source data, store assets, package artifacts, test results, and Developer Center page states must align; all listing tasks must involve installing the build product on Lazycat MicroServer and verifying the core path; admin interfaces must meet UI quality thresholds; `AI App` / AI Browser Extensions must have verified package structures and entries; incentive-targeted apps must meet official rules for type, credentials, stability, and additional integrations.
+- **Decision Tree**: Determine if it's a first release, update, re-submission, or asset completion; then identify the delivery target (official release, independent `.lpk`, `AI App` package, Developer Center submission, or post-release verification).
 
 ## When to Use
 
-**首选触发**
+**Primary Triggers**
 
-- 用户明确提到 Lazycat、懒猫开发者中心、`developer.lazycat.cloud`、`lpk`、提审、上架、发布、官方源、审核状态
-- 用户要从仓库或现有项目直接推进到“可发布”状态，而不是只做一段孤立文案
-- 用户需要你代操作开发者中心创建应用、补充商店资料、上传包、提交审核、跟进审核状态
-- 用户希望应用尽量符合懒猫现金激励规则
-- 用户要先找一个值得移植的项目，或要确认有没有重复移植
-- 用户准备让后台管理页也达到提审级质量
-- 用户准备发布懒猫算力仓 `AI应用` 或 AI 浏览器插件
+- User explicitly mentions Lazycat, Developer Center, `developer.lazycat.cloud`, `lpk`, submission, listing, release, official source, or review status.
+- User wants to move from a repository or project directly to a "ready to release" state.
+- User needs you to operate the Developer Center: creating apps, adding store info, uploading packages, submitting for review, and following up.
+- User wants the app to comply with Lazycat cash incentive rules.
+- User is looking for a project worth porting or wants to check for duplicates.
+- User is ready to bring an admin UI to submission-level quality.
+- User is preparing to release a Lazycat Computing Power Cabin `AI App` or AI Browser Extension.
 
-**典型场景**
+**Typical Scenarios**
 
-- 从一个想法或仓库开始，创建或整理 Lazycat 应用并推进上架
-- 生成或核对 `.lpk`，并同步修正应用名、简介、icon、类目、多语言、截图
-- 准备提审资料，提交审核，并在打回后给出修复和重提闭环
-- 审核通过后检查商店页是否更新、是否可搜索、安装下来的是否是目标版本
-- 后台管理应用在提审前，还需要把控制台、列表页和设置页收敛到高质量截图标准
-- AI 原生项目需要确认普通应用、`AI应用`、AI 浏览器插件三者中的真实发布形态
+- Creating or organizing a Lazycat app from an idea or repository and advancing it to listing.
+- Generating or checking `.lpk` while syncing app name, tagline, icon, category, l10n, and screenshots.
+- Preparing submission materials, submitting for review, and providing a fix/re-submit loop after rejection.
+- Checking store page updates, searchability, and installation version after approval.
+- Refitting admin apps to high-quality screenshot standards before submission.
+- Confirming the actual release form (standard app, `AI App`, or extension) for AI-native projects.
 
-**边界提示**
+**Boundary Notes**
 
-- 如果任务只是普通 Web 发布、Docker 部署或其他应用商店上架，不要误用本 skill
-- 如果用户只要一句宣传文案，也要先检查这段文案是否与 Lazycat 审核链路冲突
-- 如果用户只问局部问题，回答里必须补一句“这一项影响 Lazycat 上架链路中的哪个阶段”
+- Do not use this skill for standard web releases, Docker deployments, or other app store listings.
+- Even for a simple promotional tagline, check if it conflicts with Lazycat review pipelines.
+- For partial questions, include "how this item affects which stage of the Lazycat listing pipeline" in your response.
 
 ## Announce
 
-开始执行后，先向用户报一个短摘要，至少包含：
+Upon execution, provide a brief summary of:
 
-- 当前阶段
-- 目标版本
-- 已确认事实
-- 当前最大阻塞
-- 你立刻要做的下一步
+- Current phase.
+- Target version.
+- Confirmed facts.
+- Primary blockers.
+- Your immediate next step.
 
-不要只说“我去看看”。要让用户知道你正在推进 Lazycat 哪一段链路。
+Don't just say "I'll take a look." Let the user know you are advancing a specific segment of the Lazycat pipeline.
 
 ## Input Arguments
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| `release_type` | enum(`首发`/`更新`/`打回重提`/`资料补齐`) | 推荐 | 先判断当前属于哪一种交付，决定后续检查深度和证据类型 |
-| `delivery_target` | enum(`官方发布`/`.lpk`/`开发者中心提审`/`发布后核验`/`组合`) | 推荐 | 决定最终要交付的是发布命令、包文件、页面提交，还是上线后的验证结论 |
-| `repo_or_project_path` | string | 推荐 | 仓库或项目目录；如果用户没给，先从当前工作区、构建脚本、README 中查找 |
-| `version_goal` | string | 可选 | 目标版本号、发布日期或本次迭代范围 |
-| `store_assets_state` | enum(`齐全`/`部分缺失`/`几乎没有`) | 可选 | 说明应用名、简介、icon、截图、多语言、changelog 是否完备 |
-| `icon_generation_mode` | enum(`已有可用图标`/`需要生成新图标`/`需要升级旧图标`) | 可选 | 如果图标需要交给外部 AI 生成或升级，在资料阶段切换到 `lazycat:prepare-icon` 输出 prompt |
-| `project_baseline_state` | enum(`未创建`/`结构不统一`/`缺认证`/`已具备标准基线`) | 可选 | 如果项目还处在创建或补基线阶段，切换到 `lazycat:create-app` 统一 Go + Vue + Element Plus 与认证规范 |
-| `admin_ui_state` | enum(`不适用`/`待设计`/`待升级`/`已达标`) | 可选 | 如果项目存在后台管理面，用于判断是否先切到 `lazycat:admin-ui` 做质量收敛 |
-| `docs_state` | enum(`无 docs`/`docs 不完整`/`docs 已齐全`) | 可选 | 如果项目第一步还没建立 `docs/requirements`、`docs/api-design` 等目录，先切到 `lazycat:create-app` 补文档树 |
-| `commands_state` | enum(`无脚本入口`/`脚本不完整`/`已具备 build.sh 和 Makefile`) | 可选 | 如果项目没有 `build.sh`、`Makefile`、`make build` 或 `make install`，先切到 `lazycat:create-app` 或 `lazycat:port-app` 补齐 |
-| `aipod_delivery_state` | enum(`不适用`/`待判断`/`AI应用 待打包`/`AI 浏览器插件待验证`/`已完成 AI Pod 适配`) | 可选 | 用于判断是否需要补 `AI应用` / AI 浏览器插件的结构和发布验证 |
-| `reward_target` | enum(`普通上架`/`现金激励优先`) | 可选 | 如果用户明确想拿红包，先按官方规则判断资格路径，并优先补账户系统或文件关联等附加对接 |
-| `developer_access` | enum(`已登录并有权限`/`有账号待验证`/`未知`) | 可选 | 判断是否能直接推进开发者中心操作 |
-| `verification_env` | enum(`Lazycat 真机`/`标准测试环境`/`仅模拟检查`) | 可选 | 说明测试结论能达到什么可信度，哪些仍待实机验证 |
-| `microservice_access` | enum(`已登录可进入`/`可用环境变量登录`/`未登录`/`未知`) | 可选 | 进入懒猫微服和打开已安装应用时使用 `lazycat_account` / `lazycat_password` |
-| `developer_center_credentials` | enum(`已登录可操作`/`可用环境变量登录`/`未登录`/`未知`) | 可选 | 访问开发者中心时使用 `lazycat_developer_center_account` / `lazycat_developer_center_password` |
-| `app_login_credentials` | enum(`已提供`/`按应用单独读取`/`不需要`/`未知`) | 可选 | 应用内测试使用对应 app 级账号；例如 Gitea 使用 `lazycat_gitea_account` / `lazycat_gitea_password` |
+| `release_type` | enum(`First Release`/`Update`/`Re-submit`/`Asset Completion`) | Recommended | Determines check depth and evidence type. |
+| `delivery_target` | enum(`Official Release`/`.lpk`/`Dev Center Submission`/`Post-release Verification`/`Hybrid`) | Recommended | Final deliverable type. |
+| `repo_or_project_path` | string | Recommended | Repository or project path; if not provided, search workspace/scripts/README. |
+| `version_goal` | string | Optional | Target version, release date, or iteration scope. |
+| `store_assets_state` | enum(`Complete`/`Partial`/`Missing`) | Optional | Status of name, tagline, icon, screenshots, l10n, changelog. |
+| `icon_generation_mode` | enum(`Available`/`Need New`/`Need Upgrade`) | Optional | If AI icon generation is needed, use `lazycat:prepare-icon`. |
+| `project_baseline_state` | enum(`Not Created`/`Messy`/`Needs Auth`/`Standard`) | Optional | Use `lazycat:create-app` if creation/baseline is needed. |
+| `admin_ui_state` | enum(`N/A`/`Needs Design`/`Needs Upgrade`/`Pass`) | Optional | Use `lazycat:admin-ui` if admin UI convergence is needed. |
+| `docs_state` | enum(`No Docs`/`Incomplete`/`Complete`) | Optional | Use `lazycat:create-app` to establish documentation tree. |
+| `commands_state` | enum(`No Entry`/`Incomplete`/`Standard`) | Optional | Use `lazycat:create-app` or `lazycat:port-app` to add scripts. |
+| `aipod_delivery_state` | enum(`N/A`/`Evaluating`/`Wait Packaging`/`Wait Verification`/`Complete`) | Optional | For AI Pod / AI App structure and verification. |
+| `reward_target` | enum(`Standard`/`Incentive Priority`) | Optional | If incentive-focused, evaluate eligibility and prioritize integrations. |
+| `developer_access` | enum(`LoggedIn`/`Has Account`/`Unknown`) | Optional | Ability to operate Developer Center directly. |
+| `verification_env` | enum(`Real Lazycat`/`Standard Test`/`Simulation Only`) | Optional | Confidence level of test conclusions. |
+| `microservice_access` | enum(`LoggedIn`/`EnvVars Available`/`Not LoggedIn`/`Unknown`) | Optional | Access to MicroServer via `lazycat_account`. |
+| `developer_center_credentials` | enum(`LoggedIn`/`EnvVars Available`/`Not LoggedIn`/`Unknown`) | Optional | Access to Developer Center via `lazycat_developer_center_account`. |
+| `app_login_credentials` | enum(`Provided`/`Read Per App`/`Not Needed`/`Unknown`) | Optional | Internal app test credentials (e.g., `lazycat_gitea_account`). |
 
 ## The Iron Law
 
-1. 先查仓库和官方信息，再问用户。能从代码、构建脚本、配置文件、CLI、开发者中心页面里拿到的信息，不要空手提问。
-2. 把“本地应用信息”当成发布源数据。Lazycat 发布流程会从本地项目读取应用名称、应用简介、icon、类目和多语言信息；不要只改网页表单而忽略代码与配置。
-3. 涉及 CLI 参数、页面字段、审核规则这类易变信息时，优先复核 Lazycat 官方文档或开发者中心实际页面，不要凭记忆编造。
-4. 不要假装已经提审、通过审核或成功发布。每个关键节点都要留下可验证证据：命令日志、包文件、截图、页面状态、版本号、提交时间。
-5. 不要为了赶进度跳过最小可运行验证。Lazycat 审核会拒绝闪退、无法正常配置、图标缺失、链接失效、描述不符、夸大宣传等问题；所有上架任务都要把产物真实安装到懒猫微服并打开已安装应用验证。
-6. 如果以现金激励为目标，优先走原创、高质量、真实场景的应用路线；对于明显不在奖励范围内的类型，要尽早告知用户。
-7. 对需要用户名和密码的应用，必须确保普通用户能获得凭证，例如自助注册、统一账户登录或公开测试凭证；否则会影响上架。
-8. 对工具类应用，优先评估网盘文件关联；对适合统一账户的应用，优先评估微服 OIDC，因为这会影响激励路径和可用性。
-9. 不要混用不同作用域的环境变量：`lazycat_account` / `lazycat_password` 是懒猫微服入口；`lazycat_developer_center_account` / `lazycat_developer_center_password` 是开发者中心；具体应用的 app 级登录测试应读取各自变量，如 `lazycat_gitea_account` / `lazycat_gitea_password`。
-10. 如果应用存在后台管理、控制台或运营工作台，截图和提审前必须先通过 `lazycat:admin-ui` 的质量门槛；不要把默认模板页面直接拿去上架。
-11. 如果项目是普通业务型 Web 应用接 AI，默认按 `BaseURL` 配置方案发布，不要擅自追加 AI Pod 包结构。
-12. 只有当项目明确是懒猫算力仓 `AI应用` 或 AI 浏览器插件时，才复核和使用官方 AI Pod 文档与目录结构。
-13. 运行中的应用页面与商店/提审资料必须分层处理。像“为什么选择它”“当前版本”“路线规划”“价值主张”“卖点摘要”这类内容，默认属于 `README`、`docs/release-prep/`、商店简介和截图说明，除非用户明确要求介绍页或营销页，否则不得默认写进运行中的 `web/*.html` 页面。
-14. 对工具型、控制台型、工作台型应用，首页默认优先级必须是：`连接配置`、`当前状态`、`真实操作`、`结果反馈`。不要先写宣传段落，再把操作入口放在后面。
+1. Check repository and official info before asking the user. Don't ask for info available in code, scripts, configs, or Developer Center pages.
+2. Treat "local app info" as the release source of truth. Lazycat release flows read name, tagline, icon, category, and l10n from the local project; do not change web forms while ignoring local code/configs.
+3. For volatile info like CLI params, page fields, or review rules, prioritize official docs or actual Dev Center pages over memory.
+4. Do not pretend to have submitted, passed review, or released. Every milestone requires verifiable evidence: command logs, package files, screenshots, page states, versions, submission times.
+5. Do not skip minimal functional verification. Lazycat reviews reject crashes, config failures, missing icons, broken links, misleading descriptions, etc.; all shipping tasks must involve real installation and verification on Lazycat MicroServer.
+6. For cash incentives, prioritize original, high-quality, real-world apps; inform the user early if a type is not rewarded.
+7. Apps requiring login must ensure users can obtain credentials (registration, OIDC, or public test accounts).
+8. For tool apps, prioritize disk file association; for account-based apps, prioritize OIDC.
+9. Do not mix environment variables: `lazycat_account` is for the MicroServer; `lazycat_developer_center_account` is for the Dev Center; app-level tests use specific variables like `lazycat_gitea_account`.
+10. Admin apps must pass `lazycat:admin-ui` quality gates before screenshots and submission; do not use default templates.
+11. Standard business web apps with AI use the `BaseURL` scheme; do not add AI Pod structures unless required.
+12. Use official AI Pod docs/structure only when explicitly targeting Computing Power Cabin `AI Apps` or AI Browser Extensions.
+13. Distinguish between running app pages and store/submission assets. Content like "Why choose this," "Roadmap," or "Value proposition" belongs in `README`, `docs/release-prep/`, or store descriptions, not in running `web/*.html` pages (unless requested).
+14. For tool/console apps, the homepage priority must be: `Connection Config`, `Current Status`, `Actions`, `Feedback`. Do not put promotional text before functional entries.
 
 ## Delivery Decision Table
 
-| 情况 | 先判断什么 | 主动作 | 最终证据 |
+| Case | Primary Assessment | Main Action | Final Evidence |
 | --- | --- | --- | --- |
-| 首发 | 是否已有 Lazycat 应用结构、账号权限、最小可发布范围 | 创建或整理应用、补齐资料、打包、提审 | 新应用页面、版本号、截图、提审状态 |
-| 版本更新 | 本次版本改动范围、changelog、升级路径 | 复核版本来源、重打包、回归升级流程、提审 | 新版本产物、测试记录、审核记录 |
-| 打回重提 | 打回原因属于功能 / 配置 / 文案 / 截图 / 合规 / 流程 | 根因分类、修复、重测、重提 | 审核意见对照表、修复证据、重新提交记录 |
-| 只补资料 | 自动带出字段与手填字段是否冲突 | 先改本地源数据，再改网页表单并校验展示 | 页面截图、字段一致性检查 |
-| 发布后核验 | 商店是否已更新、是否能安装到目标版本 | 检查商店可见性、安装结果、版本一致性 | 商店页截图、安装验证、版本比对结论 |
+| First Release | App structure, account permissions, minimal scope | Create/Organize app, complete assets, pack, submit | New app page, version, screenshots, sub status |
+| Update | Change scope, changelog, upgrade path | Review source, repack, verify upgrade, submit | New artifact, test records, review records |
+| Re-submission | Rejection reason (function/config/copy/screenshot/etc) | Root cause, fix, re-test, re-submit | Rejection mapping, fix proof, re-submission log |
+| Assets Only | Source data vs. manual field conflicts | Sync local source, then update web form and verify | Page screenshots, consistency checks |
+| Post-release | Visibility, version installation | Check store visibility, install results, version match | Store screenshot, install verification, comparison |
 
 ## Workflow
 
-### 1. 立项与范围收敛
+### 1. Initiation and Scope
+Determine delivery type (First release, Update, Re-submit, or Asset completion). Rapidly gather info on goals, repository, documentation, version, and credentials. Access MicroServer via `lazycat_account` and Dev Center via `lazycat_developer_center_account`. For AI projects, distinguish between standard apps and AI Pod routes. Evaluate incentive eligibility for rewarded targets.
 
-先判断这是哪一种交付：
+### 2. App Creation and Organization
+Ensure standard baseline (Go/Vue/Element Plus/Auth) using `lazycat:create-app` if needed. Establish the `docs/` tree. Ensure `build.sh` and `Makefile` entries. If an admin UI exists, use `lazycat:admin-ui` to meet quality gates. For porting, use `lazycat:port-app`.
 
-- 全新应用首发
-- 现有应用新版本发布
-- 审核打回后的修复重提
-- 仅补齐商店资料或截图
+### 3. Packaging, Uploading, and Evidence
+Identify the deliverable (official publish, `.lpk`, `AI App` package, or Dev Center upload). Record time, version, artifact path, size, and checksum. Log success via CLI or page status. For AI Pod routes, verify the existence and version of `ai-pod-service/`, `caddy-aipod`, and extensions.
 
-随后快速拉齐下面这些信息；缺失的先从仓库和已有资料推断，再补问用户：
+### 4. Store Assets and Screenshots
+Sync local source data first, then update web forms. Prepare taglines and descriptions with real functional highlights. Screenshots must come from the actual running app without debug info or sensitive data. For admin apps, ensure they pass the quality gate before taking screenshots. Use `lazycat:prepare-icon` for professional icons.
 
-- 应用目标、核心用户、最小可发布范围
-- 仓库路径、当前分支、构建方式、是否已有懒猫应用结构
-- 是否已经建立 `docs/requirements`、`docs/api-design`、`docs/architecture`、`docs/release-prep`
-- 目标版本号、发布日期、是否要同步 changelog
-- 是否已具备开发者中心账号、开发者认证和目标应用的权限
-- 是否已具备开发者中心登录方式；若可用环境变量登录，读取 `lazycat_developer_center_account` / `lazycat_developer_center_password`
-- 是否已具备进入懒猫微服并打开已安装应用的登录方式；若可用环境变量登录，读取 `lazycat_account` / `lazycat_password`
-- 是否需要生成独立 `.lpk`、还是走 `lzc-cli` 官方发布链路、或两者都要
-- 如果是 AI 原生项目：先判断它是不是普通业务型 Web 应用；如果是，默认还是普通应用交付；只有明确做算力仓 / `AI应用` / AI 浏览器插件时才切换
-- 商店资料是否已具备：应用名、简介、类目、icon、多语言、截图、测试账号、演示数据
-- 是否有 Lazycat 真机、可安装环境或其他可验证环境
-- 如果应用需要 app 内登录，是否已有对应应用级凭证；例如 Gitea 使用 `lazycat_gitea_account` / `lazycat_gitea_password`
-- 如果目标是现金激励：该应用属于原创还是移植、是否在不奖励类型内、是否已有上游地址、是否适合接 OIDC 或 file_handler
+### 5. Test and Pre-submission Acceptance
+Verify installation, startup, core flow, upgrade path, and exit. Test on real Lazycat hardware if possible. Verify login paths and test credentials. Ensure store assets match the actual app.
 
-这一阶段至少产出一个简短的发布摘要，说明目标版本、范围边界、已知风险、缺口和下一步。若目标是现金激励，还要补一段“激励资格判断”。
+### 6. Submission and Follow-up
+Organize a submission package: version, changelog, descriptions, screenshots, artifact info, test accounts, and reviewer instructions. Record status changes and rejection root causes. Generate fix lists and re-submit.
 
-### 2. 应用创建或整理
-
-如果是从 idea 开始，先把应用创建到可构建、可安装、可描述的状态；如果已经有仓库，就把发布相关内容梳理完整：
-
-- 如果当前还在项目创建期，或缺少统一技术栈与认证基线，先使用 `lazycat:create-app`
-- 如果 `docs/` 文档树还没建立，先使用 `lazycat:create-app` 创建并拆好文档目录
-- 如果项目缺少 `build.sh`、`Makefile`、`make build` 或 `make install`，先使用 `lazycat:create-app` 或 `lazycat:port-app` 补齐命令入口
-- 如果项目存在后台管理面，且后台 UI 还没有达到截图和提审标准，先切到 `lazycat:admin-ui`
-- 如果当前任务是“找值得移植的项目并避免重复”，先切到 `lazycat:port-app`
-- `lazycat:create-app` 默认把项目收敛到 Go 后端、Vue + Element Plus 前端、登录 / 注册、`access_token + refresh_token`、无感刷新
-- `lazycat:admin-ui` 负责把后台管理页、工作台、列表、表单和设置页收敛到高质量管理台体验
-- `lazycat:create-app` 也负责把第一步文档树收敛到 `docs/requirements`、`docs/api-design`、`docs/architecture`、`docs/release-prep`
-- 如果目标是现金激励，优先补上普通用户可获得凭证的登录路径，并评估微服 OIDC 或网盘文件关联
-- 如果项目是 AI 原生产品，先确认它是不是普通业务型 Web 应用；普通业务应用沿用 `BaseURL` 方案即可
-- 只有当项目明确要走 AI Pod 路线时，才确认是否已进入 `lazycat:create-app` 的 AI Pod 路线判断，并补齐 `docs/architecture/aipod-integration.md`
-- 如果应用本质上是工具页、控制台或工作台，运行页面只允许保留直接帮助用户完成任务的内容；介绍性、包装性、提审导向的文案要写到 `README`、`docs/` 或商店资料，不要塞进首页 HTML。
-- 找出应用配置、构建入口、版本号来源、图标和本地化文案来源
-- 校准对商店可见的字段：应用名、应用简介、图标、类目、多语言文本、版本描述
-- 检查权限、端口、挂载卷、网络依赖、环境变量、回调地址、初始化步骤是否与实际功能一致
-- 检查安装、升级、卸载是否有明显阻塞项
-- 如果仓库缺少发布说明、测试说明、提审说明，补一份最小可执行说明供后续使用
-- 如果项目明确是 `AI应用` 或 AI 浏览器插件，优先按 [references/aipod-review-kit.md](./references/aipod-review-kit.md) 整理提审资料模板和截图脚本
-
-不要发明不存在的字段名；以仓库现状和 Lazycat 当前页面为准。
-
-### 3. 打包、上传与证据留存
-
-先判断当前任务的交付物到底是什么：
-
-- 发布到官方源：按官方链路执行 `lzc-cli login`、`lzc-cli project publish`，并记录关键日志
-- 需要独立 `.lpk`：按仓库或工具链的真实打包方式生成包文件，再核对包名、版本号、目标架构、图标和文件大小
-- 如果明确是 `AI应用`：额外核对 `ai-pod-service/`、`caddy-aipod`、`extension.zip` 等目录或文件是否符合当前官方要求
-- 需要上传开发者中心：先确认页面实际需要的文件格式、版本字段和人工填写项，再用 `lazycat_developer_center_account` / `lazycat_developer_center_password` 对应的开发者中心权限执行上传
-
-每次打包或上传都要留这些证据：
-
-- 命令或页面操作的时间点
-- 版本号和构建来源
-- 产物路径、文件名、大小、校验信息
-- 上传或发布结果的页面状态、任务状态或 CLI 回执
-
-如果项目明确是 AI Pod 路线，额外留这些证据：
-
-- `AI应用` / AI 浏览器插件路径判断结论
-- `ai-pod-service/`、`caddy-aipod`、`extension.zip` 的存在性和版本来源
-- AI 浏览器或 AI 入口的真实加载结果
-
-如果 `.lpk` 的具体生成命令在仓库中不存在，先从脚本、README、CI 或构建配置里找真实来源，不要臆造命令。
-如果仓库没有 `build.sh`、`Makefile`、`make build`、`make install` 这类标准入口，先补齐，再继续打包。
-
-### 4. 商店资料、应用简介与截图
-
-Lazycat 商店资料既包含从本地配置自动带出的字段，也可能包含开发者中心页面上需要手填或上传的内容。处理顺序如下：
-
-1. 先改本地项目中的源数据，再改网页表单。
-2. 再去开发者中心核对哪些字段是自动读取、哪些字段是人工填写。
-3. 最后统一检查展示效果是否和实际运行状态一致。
-
-准备应用简介时：
-
-- 先写一句话价值主张，再补充 3 到 5 个核心能力点
-- 描述真实可验证功能，不写空泛口号，不写无法证实的“第一”“最佳”“最高级”
-- 说清楚目标用户、前置依赖、登录条件、网络要求、已知限制
-- 如果版本更新是重点，补一段精炼 changelog
-
-准备截图时：
-
-- 截图必须来自真实运行页面，不要使用线框图、占位图或和发布版本不一致的 UI
-- 保持同一语言、同一视觉主题和同一数据口径，避免一张中文一张英文、或一张本地开发页一张生产页
-- 至少覆盖：启动后首页、核心操作流程、差异化功能、设置页或管理页
-- 如果项目明确是 `AI应用` 或 AI 浏览器插件，额外覆盖 AI 入口、核心 AI 工作流和配置页
-- 如果应用以后台管理为核心，还要覆盖工作台、核心列表、关键详情或表单、设置或权限页，并确认这些页面已经过 `lazycat:admin-ui` 收敛
-- 去掉调试标记、测试脚本残留、敏感数据、无效 banner、报错 toast
-- 如果开发者中心对截图张数、尺寸、宽高比有要求，必须以当前页面实际要求为准，并在提交说明里记录下来
-
-准备图标时：
-
-- 先检查本地项目、商店资料和当前 UI 是否已经有可用 icon
-- 如果图标缺失、质量不够或明显不适合 App Store 展示，使用 `lazycat:prepare-icon`
-- `lazycat:prepare-icon` 的职责是给用户一份可直接发给外部图像模型的英文 prompt，不要假装 PNG 已经生成
-- 等用户把生成后的 PNG 带回后，再继续检查尺寸、背景、圆角、文字和功能表达是否合规
-
-复杂的商店资料工作先读 [references/store-assets.md](./references/store-assets.md)。
-
-### 5. 测试与提审前验收
-
-在提审前，至少覆盖以下验证：
-
-- 安装、启动、基础功能、退出、重启
-- 首次安装和已有版本升级
-- 必须把构建产物真实安装到懒猫微服，然后从已安装应用入口打开它；不要只在本地 dev server、截图页或静态预览里做验证
-- 必要权限、目录挂载、网络访问、回调配置
-- 关键失败路径：未登录、配置缺失、网络异常、空数据
-- 多语言回退和默认文案
-- 商店资料与运行实物一致：名称、图标、简介、截图、版本号
-- 如果应用需要登录：先用 `lazycat_account` / `lazycat_password` 进入懒猫微服，再验证普通用户是否真的能注册、登录或拿到测试凭证；若应用本身还有 app 级登录，再读取对应应用变量
-- 如果做了 OIDC 或 file_handler：对应场景是否已经真实走通
-- 如果项目明确是 `AI应用` 或 AI 浏览器插件：AI 入口、服务启动、关键 AI 流程是否已经真实走通
-- 如果应用存在后台管理面：工作台、列表筛选、详情 / 表单、空状态和权限受限场景是否已经真实走通
-
-如果有 Lazycat 真机或标准测试环境，优先用真实环境验证。没有真机时，也要明确哪些检查是模拟完成、哪些仍待实机验证。
-
-复杂任务先读 [references/shipping-checklist.md](./references/shipping-checklist.md)。
-
-### 6. 提审与审核跟进
-
-发起提审前，整理一个最小提审包：
-
-- 版本号
-- 发布说明或 changelog
-- 应用简介和卖点摘要
-- 截图清单
-- 包文件或发布产物信息
-- 测试结论
-- 测试账号、初始化步骤或 reviewer 复现路径
-- 已知限制、兼容性说明、外部依赖说明
-- 如果目标是现金激励：原创 / 移植说明、上游地址、账户系统 / 文件关联对接说明
-- 如果项目明确是 `AI应用`：AI Pod 路线说明、关键目录说明、AI 浏览器或扩展入口说明
-
-提审后持续跟进：
-
-- 记录提交时间、状态变化、审核意见、下一次回合时间
-- 如果被打回，先归类问题属于功能、配置、文案、截图、合规还是流程缺失
-- 生成修复清单、重打包、重测、重提的闭环
-
-不要只把审核意见转发给用户；要先定位根因，再给出下一轮动作。
-
-### 7. 发布后核验
-
-审核通过或发布完成后，必须做发布后检查：
-
-- 应用是否能在目标入口被搜索或看到
-- 商店页名称、图标、简介、类目、截图、版本号是否正确
-- 从商店安装的版本是否能正常启动和完成核心流程
-- 商店里展示的变更说明是否是本次目标版本
-- 下载到的版本是否与刚刚提交的构建一致
-
-如果发现“审核通过但商店没更新”“应用详情不对”“安装下来的不是最新版本”这类问题，回到证据链里对比发布时间、版本号、上传记录和官方源状态。
+### 7. Post-release Verification
+Confirm store visibility and searchability. Verify that the installed version from the store matches the target version and functions correctly.
 
 ## Quality Gates
 
-在宣称“可提审”或“已发布”之前，至少确认下面这些门槛都过了：
-
-- 本地项目中的名称、简介、icon、类目、多语言与商店显示一致
-- `docs/` 文档树已建立，且至少有需求分析、API 设计、架构、发布准备四类目录
-- 已具备 `build.sh`、`Makefile`、`make build`、`make install`
-- 版本号、changelog、包文件和页面状态一致
-- 截图来自真实运行版本，且没有调试信息、敏感数据和失效内容
-- 已把产物真实安装到懒猫微服并打开已安装应用完成最小核心流程测试
-- 如果项目存在后台管理面，后台 UI 已经过 `lazycat:admin-ui` 收敛，且截图页不存在默认模板 branding
-- 关键功能至少完成一次最小可运行验证，并说明验证环境
-- 每个关键节点都留有证据，能回溯到具体时间点、版本号和构建来源
-- 如果目标是现金激励，应用不属于官方不发红包类型
-- 如果应用需要账号密码，普通用户可获得凭证
-- 如果应用适合，已经明确是否对接微服 OIDC 或网盘文件关联
-- 如果项目是 AI 原生产品，已经明确“普通业务 Web 应用走 `BaseURL`”还是“官方 AI Pod 路线”，且对应入口已验证
+- Local metadata (name, tagline, icon, category) matches store display.
+- `docs/` tree established with requirements, API design, etc.
+- `build.sh` and `Makefile` with standard targets exist.
+- Versions, changelogs, and artifacts are consistent.
+- Screenshots are from the real version, clean of debug/sensitive data.
+- Artifact verified by real installation and core flow test on Lazycat MicroServer.
+- Admin UIs pass `lazycat:admin-ui` gates (no default template branding).
+- Incentive targets meet official rules (not an excluded type).
+- Account-based apps have registration or test credentials.
+- OIDC or file association implemented if applicable.
+- AI products follow the correct route (`BaseURL` vs. AI Pod) and verified entries.
 
 ## Red Flags
 
-遇到下面这些情况，不要直接推进提审或发布，要先停下来补救：
-
-- 只改网页表单，没有同步本地源数据
-- 项目已经开始开发，但没有 `docs/requirements` 或 `docs/api-design`
-- 项目需要构建和安装，但没有 `build.sh` 或 `Makefile`
-- 不清楚版本号来源、包生成方式或上传产物对应哪个 commit
-- 应用简介承诺了实际做不到的功能，或使用无法证实的宣传词
-- 截图和当前版本不一致，混用了不同语言、不同主题或开发环境画面
-- 后台管理页还保留默认模板 logo、菜单、示例图表或示例文案
-- 没有验证安装 / 启动 / 核心路径，就准备提交审核
-- 还没把应用安装到懒猫微服并打开已安装版本，就宣称“测试通过”或“满足激励条件”
-- 页面、CLI、仓库三边信息对不上
-- 目标是拿红包，但应用属于纯网页游戏、纯教程站、网页离线应用、纯数据库软件等官方不奖励类型
-- 需要账号密码，却没有自助注册、统一账户登录或公开测试凭证
-- 混用了懒猫微服入口凭证、开发者中心凭证和应用内凭证，导致测试路径与真实用户路径不一致
-- 适合做 OIDC 或 file_handler，却完全没有评估
-- 项目明明是 AI 原生产品，却没判断是否应该走 `AI应用` 或 AI 浏览器插件路线
+- Updating web forms without syncing local source data.
+- Developing without `docs/requirements` or `docs/api-design`.
+- No `build.sh` or `Makefile` entries.
+- Unclear version sources or commit mapping.
+- Taglines with unverified or superlative claims.
+- Screenshots inconsistent with current version (mixed languages/themes).
+- Admin apps with default template logos, menus, or charts.
+- Submission without install/startup/core verification.
+- Claiming "test pass" without verifying on Lazycat MicroServer.
+- Inconsistent data between page, CLI, and repository.
+- Targeting incentives with excluded types (web games, tutorial sites, etc.).
+- Missing registration or test credentials for account-based apps.
+- Mixed credentials causing test path divergence from real users.
+- Missing OIDC or file association for suitable apps.
+- AI products without a clear route judgment.
 
 ## Bundled References
 
-- 复杂的上架核对和提审前复核，先读 [references/shipping-checklist.md](./references/shipping-checklist.md)
-- 商店元数据（名称、描述、关键词）质量标准，参考 [references/metadata-standard.md](./references/metadata-standard.md)
-- 复杂的应用简介、截图、资料包整理，先读 [references/store-assets.md](./references/store-assets.md)
-- `AI应用` / AI 浏览器插件提审资料与截图脚本，先读 [references/aipod-review-kit.md](./references/aipod-review-kit.md)
-- 如果目标包含红包激励，先读 [references/cash-incentive.md](./references/cash-incentive.md)
-- 如果项目涉及 AI Pod，先读 [../lazycat:create-app/references/aipod-playbook.md](../lazycat:create-app/references/aipod-playbook.md)
-- 如果涉及应用更新、镜像升级或 LPK 重新打包，切换到 `lazycat:update-app`
-- 如果项目还没完成技术栈与认证基线，先切到 `lazycat:create-app`
-- 如果项目有后台管理或控制台，先切到 `lazycat:admin-ui`
-- 如果项目还没建立 `docs/` 文档树，也先切到 `lazycat:create-app`
-- 如果项目是移植路线，先切到 `lazycat:port-app`
-- 如果用户要写攻略或对接文章，先切到 `lazycat:write-guide`
-- 如果资料阶段缺正式图标，切到 `lazycat:prepare-icon`
-
-## Example Triggers
-
-- “帮我把这个懒猫应用上架到 developer.lazycat.cloud。”
-- “这个项目要出 lpk，顺手把应用简介和截图也准备好。”
-- “这个后台管理界面太像模板了，先收一版能提审的质量再上架。”
-- “懒猫开发者中心提审被打回了，帮我看看是文案、截图还是包的问题。”
-- “我要发 Lazycat 新版本，检查一下本地 metadata、打包、提审和发布后可见性。”
+- Shipping Checklist: [references/shipping-checklist.md](./references/shipping-checklist.md)
+- Metadata Standards: [references/metadata-standard.md](./references/metadata-standard.md)
+- Store Assets Guide: [references/store-assets.md](./references/store-assets.md)
+- AI Pod Review Kit: [references/aipod-review-kit.md](./references/aipod-review-kit.md)
+- Cash Incentive Rules: [references/cash-incentive.md](./references/cash-incentive.md)
+- AI Pod Playbook: [../lazycat:create-app/references/aipod-playbook.md](../lazycat:create-app/references/aipod-playbook.md)
+- App Updates: `lazycat:update-app`
+- Creation/Baseline: `lazycat:create-app`
+- Admin UI: `lazycat:admin-ui`
+- Porting: `lazycat:port-app`
+- Guides: `lazycat:write-guide`
+- Icons: `lazycat:prepare-icon`
 
 ## Outputs
 
 ```text
-阶段: <立项 / 创建 / 打包 / 资料准备 / 测试 / 提审 / 跟进 / 发布后核验>
-目标版本: <版本号或待定>
+Phase: <Initiation / Creation / Packing / Assets / Testing / Submission / Follow-up / Post-release>
+Target Version: <Version or TBD>
 
-激励目标: <普通上架 / 现金激励优先 / 未指定>
+Incentive Goal: <Standard / Incentive Priority / Unspecified>
 
-已确认
+Confirmed
 - ...
 
-激励资格判断
+Incentive Eligibility
 - ...
 
-缺口 / 风险
+Gaps / Risks
 - ...
 
-当前执行
+Current Action
 - ...
 
-下一步
+Next Steps
 1. ...
 2. ...
 
-交付物
+Deliverables
 - ...
 ```
