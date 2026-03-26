@@ -1,74 +1,55 @@
-# Lazycat Skills
+# 🐱 Lazycat Skills (AI Skill Pack for LazyCat MicroServer)
 
-Lazycat 专项技能目录，只收纳 `lazycat:*` 命名空间下的技能与配套参考资料。
+This is a comprehensive set of **AI Agent Skills** specifically designed for developers on the **LazyCat MicroServer** platform. 
+By integrating these skills, your AI assistants (such as Cursor, Windsurf, Cline, etc.) transform into Lazycat ecosystem experts, capable of automatically writing `lzc-manifest.yml`, packaging LPKs, handling routing, and implementing MicroServer authentication.
 
-- 技能命名空间：`lazycat:*`
-- 仓库边界：仅保留 Lazycat 领域技能；通用调试或通用协作 skill 不放在这个仓库里
-- 当前主技能：`lazycat:ship-app`
-- 当前子技能：`lazycat:create-app`、`lazycat:admin-ui`、`lazycat:port-app`、`lazycat:write-guide`、`lazycat:prepare-icon`
-- 当前目标：围绕懒猫开发者中心、`lpk`、商店资料、提审、发布、发布后核验，以及懒猫算力仓 / `AI应用` 路线形成闭环
+## 📦 Available Skills
 
-## 仓库结构
+The skill pack currently includes the following core and specialized skills:
 
+### Core Lifecycle Skills
+- `lazycat:ship-app`: **Overall Control**. Manages the entire lifecycle from project initiation, asset organization, packaging, submission for review, to post-release verification. Also handles AI App / AI Browser Extension delivery assessment.
+- `lazycat:create-app`: **Project Initialization**. Responsible for new project creation, initial documentation structure, tech stack baselines, native capability integration, unified authentication, and AI configuration baselines.
+- `lazycat:update-app`: **Application Updates**. Manages the process of updating existing Lazycat applications, ensuring version consistency and compatibility.
+- `lazycat:port-app`: **Application Porting**. Focuses on porting existing applications to Lazycat, including selection, GitHub research, App Store de-duplication, script entry points, and AI Pod route assessment.
+
+### Specialized Technical Skills
+- `lazycat:developer-expert`: **All-around Developer Expert**. General-purpose expert for all things LazyCat MicroServer development.
+- `lazycat:lpk-builder`: **Packaging Expert**. Specializes in transforming Docker/source code into `.lpk` Lazycat MicroServer applications.
+- `lazycat:advanced-routing`: **Network & Routing**. Handles complex network requirements like multi-domain configuration, Layer 4 forwarding (ingress), URL prefix stripping, and custom Nginx proxies.
+- `lazycat:auth-integration`: **Authentication & Identity**. Expert in Lazycat API access, OIDC login integration, and identity management.
+- `lazycat:aipod-developer`: **AI Pod Development**. Specialized guide for developing applications utilizing LazyCat's AI Pod and compute power infrastructure.
+- `lazycat:dynamic-deploy`: **Dynamic Deployment**. Handles the intricacies of Lazycat's dynamic deployment mechanisms.
+
+### Assets & Documentation Skills
+- `lazycat:admin-ui`: **Admin UI Quality**. Ensures admin interfaces, operational consoles, and B-side workspaces are high-quality, branded, and screenshot-ready.
+- `lazycat:prepare-icon`: **Icon Preparation**. Generates high-quality App Icon prompts suitable for external image models during the asset preparation phase.
+- `lazycat:write-guide`: **Guide & Documentation**. Focuses on writing high-quality application guides and tutorials following official incentive rules.
+
+## 📂 Repository Structure
+
+This repository follows the **Progressive Disclosure** principle for Agent loading:
 ```text
-Lazycat-Skills/
-├── README.md
+lazycat-skills/
+├── README.md              # Project overview (Human-facing)
+├── AGENTS.md              # AI Agent behavior constraints
 ├── lazycat:create-app/
-│   ├── SKILL.md
-│   └── references/
-│       ├── ai-settings-template.md
-│       ├── aipod-playbook.md
-│       ├── docs-blueprint.md
-│       └── project-baseline.md
-├── lazycat:admin-ui/
-│   ├── SKILL.md
-│   └── references/
-│       └── admin-ui-playbook.md
-├── lazycat:port-app/
-│   ├── SKILL.md
-│   └── references/
-│       ├── command-conventions.md
-│       ├── market-research.md
-│       └── porting-checklist.md
-├── lazycat:prepare-icon/
-│   ├── SKILL.md
-│   └── references/
-│       └── app-icon-prompt.md
-├── lazycat:write-guide/
-│   ├── SKILL.md
-│   └── references/
-│       ├── guide-quality.md
-│       └── integration-topics.md
-└── lazycat:ship-app/
-    ├── SKILL.md
-    └── references/
-        ├── aipod-review-kit.md
-        ├── cash-incentive.md
-        ├── shipping-checklist.md
-        └── store-assets.md
+│   ├── SKILL.md           # Core skill instructions and triggers
+│   └── references/        # Detailed reference documentation
+└── ... (other skills)
 ```
 
-## 当前形态
+## 🚀 How to Use
 
-- `lazycat:ship-app` 是总控型 skill，负责从立项、资料整理、打包、提审到发布后核验的完整链路，也负责 `AI应用` / AI 浏览器插件交付判断
-- `lazycat:create-app` 负责新项目创建、第一步文档树、技术栈基线、原生能力融合、统一认证能力、AI 配置基线以及懒猫算力仓 / `AI应用` 适配判断
-- `lazycat:create-app/references/ai-settings-template.md` 固定了普通业务 Web 应用接 AI 时的设置页字段和交互模板
-- `lazycat:admin-ui` 负责后台管理 / 控制台 UI 质量收敛、模板改造和截图级页面打磨
-- `lazycat:port-app` 负责移植选型、GitHub 搜索、App Store 去重、脚本入口、上游归因和 AI Pod 路线判断
-- `lazycat:prepare-icon` 负责在资料阶段输出可直接交给外部图像模型的 App Icon prompt
-- `lazycat:write-guide` 负责按照官方激励规则撰写高质量应用攻略，也覆盖 `AI应用` / AI 浏览器插件文章主题
-- `references/shipping-checklist.md` 用于提审前检查与发布后复核
-- `references/store-assets.md` 用于应用简介、截图和提审资料包整理
+We recommend using the `npx skills` tool to add these to your AI assistant's workspace:
 
-## 演进方向
+```bash
+# Execute in your project root:
+npx skills add whoamihappyhacking/lazycat-skills
+```
 
-当前先维持一个强主技能，确保闭环稳定。后续如果 Lazycat skill 继续扩张，再把能力下沉为更细的子技能，例如：
+Once installed, your AI will automatically discover these skills. Try asking: "**Help me package this Docker project as a Lazycat LPK app**" or "**Set up a high-quality admin UI for my Lazycat project.**"
 
-- `lazycat:create-app`
-- `lazycat:admin-ui`
-- `lazycat:port-app`
-- `lazycat:prepare-assets`
-- `lazycat:prepare-icon`
-- `lazycat:write-guide`
-- `lazycat:submit-review`
-- `lazycat:post-release-check`
+## 🤝 Contribution
+
+We welcome Pull Requests from the community to improve documentation, add more automation scripts, or refine skill instructions!
