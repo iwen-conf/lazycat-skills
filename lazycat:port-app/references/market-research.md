@@ -1,67 +1,57 @@
-# GitHub 搜索与 App Store 查重
+# GitHub Search & App Store Duplication Check
 
-移植项目开始前，必须先做两类搜索：
+Before starting a porting project, perform two types of searches:
 
-## 1. GitHub 搜索
+## 1. GitHub Search
+Record at least:
+- Repository Name
+- Upstream URL
+- License
+- Stars / Activity
+- Last Update Time
+- Deployment Complexity
+- Inclusion of Web UI / API / Login system
 
-至少记录：
+## 2. App Store Duplication Check
+Search on `https://appstore.ezer.heiyu.space/#/shop` for:
+- English Project Name
+- Chinese Project Translation
+- Core Function Keywords
+- Possible Aliases
 
-- 仓库名
-- 上游地址
-- 许可证
-- Star / 活跃度
-- 最后更新时间
-- 部署难度
-- 是否自带 Web UI / API / 登录体系
+The site usually requires a login session. Do not assume "no search results" means "no duplicate" if you are not logged in.
 
-## 2. App Store 查重
-
-在 `https://appstore.ezer.heiyu.space/#/shop` 中搜索：
-
-- 项目英文名
-- 项目中文译名
-- 核心功能关键词
-- 可能的别名
-
-当前站点通常需要登录态；未登录时不要把“搜索不到”当成“没有重复”。
-
-如果本机提供了商店环境变量：
-
+If local store environment variables are provided:
 - `lazycat_account`
 - `lazycat_password`
 
-优先用它们登录后再查重。它们是进入懒猫微服和访问 App Store 的入口凭证，不是开发者中心账号，也不是某个应用内部的账号。
+Prioritize using these for login before checking. These are for Lazycat OS and App Store access, not Developer Center or internal app accounts.
 
-不要混用下面这些不同作用域的变量：
+Do not mix variables with different scopes:
+- `lazycat_developer_center_account` / `lazycat_developer_center_password`: Developer Center only.
+- `lazycat_gitea_account` / `lazycat_gitea_password`: Internal login for the Gitea app only.
 
-- `lazycat_developer_center_account` / `lazycat_developer_center_password`：只用于开发者中心
-- `lazycat_gitea_account` / `lazycat_gitea_password`：只用于安装后打开 Gitea 应用做应用内登录测试
+Note:
+- If these variables are in `~/.zshrc`, non-interactive shells may not see them.
+- Use an interactive shell `zsh -ic` to read them and drive the browser login.
+- Do not misjudge "no credentials on this machine" just because they aren't in standard `env`.
 
-注意：
+Recommended Check Order:
+1. Check for an existing login session.
+2. If none, try reading `lazycat_account` / `lazycat_password`.
+3. After successful login, search project names, translations, aliases, and keywords.
+4. Record matching products, overlaps, and room for differentiation.
+5. If aiming for incentives, verify the app by installing and testing it within Lazycat OS.
 
-- 如果这两个变量定义在 `~/.zshrc` 中，非交互 shell 可能读不到
-- 这时应使用交互式 `zsh -ic` 或等价方式读取，再驱动浏览器登录
-- 不要因为普通 `env` 里没看到它们，就误判为“本机没有凭证”
+## 3. Handling Duplicates
+- If a similar port exists with high overlap and no clear differentiation, do not pursue the incentive path.
+- If a similar product exists but you can provide significant added value, clearly state the differentiation.
+- Pure "re-shelling" is not worth pursuing.
 
-建议查重顺序：
+## 4. Differentiation Examples
+- Integrating OIDC when the existing port doesn't.
+- Integrating `file_handler` to open Lazycat Drive files directly.
+- UI/UX that better fits Lazycat scenarios.
+- Significantly better stability, maintainability, or initialization experience.
 
-1. 先检查是否已有登录会话
-2. 没有的话，尝试读取 `lazycat_account` / `lazycat_password`
-3. 登录成功后，再搜索项目英文名、中文译名、别名和功能关键词
-4. 记录命中的商品名、重叠点和差异化空间
-5. 如果目标是现金激励优先，不要只停在查重；后续还要把应用真实安装到懒猫微服里并打开已安装应用测试核心能力
-
-## 3. 遇到重复怎么办
-
-- 如果已有同类移植，且功能重叠高，没有明显差异化，不走激励路径
-- 如果已有类似产品，但你能提供明显新增价值，要明确写出差异化点
-- 如果只是重复换壳，不值得继续
-
-## 4. 差异化示例
-
-- 接入微服 OIDC，而现有移植没有
-- 接入 `file_handler`，能直接打开懒猫网盘文件
-- UI / 使用路径明显更符合 Lazycat 场景
-- 稳定性、可维护性、初始化体验明显更好
-
-但不要把“OIDC 计划中”当成差异化已经成立。若应用能力偏弱、安装后真实体验不足，仍然可能拿不到激励。
+Do not consider "OIDC planned" as established differentiation. If the app is weak or the experience is poor, incentives may still be denied.

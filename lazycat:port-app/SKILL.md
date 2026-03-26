@@ -3,209 +3,194 @@ name: lazycat:port-app
 description: 面向 Lazycat 应用移植选型与落地的 skill。只要用户提到移植应用、移植开源项目、从 GitHub 选项目、查重、避免重复移植、看 App Store 里是否已有、移植激励、上游仓库、build.sh、Makefile、lpk 打包、file_handler、OIDC、商店登录、lazycat_account、lazycat_password、懒猫算力仓、AI应用、AI 浏览器插件 等请求，就必须使用此 skill。负责从 GitHub 搜索候选项目、在 Lazycat App Store 查重、判断是否还有激励空间，并把移植项目收敛到可打包、可安装、可提审的状态，同时判断 AI 项目是否更适合移植为懒猫 `AI应用` 或 AI 浏览器插件。
 ---
 
-# Lazycat 应用移植
+# Lazycat App Porting
 
-你负责把“找一个可移植项目”推进到“可移植且值得移植”的状态。重点不只是移植本身，而是先做市场去重和激励判断，避免把时间花在已经有重复移植、没有红包空间、或根本不适合上架的项目上。
+You are responsible for progressing a "search for a portable project" to a "portable and worthwhile" state. The focus is not just on porting itself, but on market de-duplication and incentive assessment, avoiding projects that are already duplicates, lack incentive potential, or are unsuitable for listing.
 
 ## Overview
 
-这个 skill 用于移植开源或自托管软件到 Lazycat。默认要求：
+This skill is for porting open-source or self-hosted software to Lazycat. Default requirements:
 
-- 先搜 GitHub，确定上游项目、许可证、活跃度和功能边界
-- 再搜 Lazycat App Store，确认是否已有相关移植产品
-- 如果本机存在 `lazycat_account` 和 `lazycat_password`，优先用它们登录 App Store 后再查重；这组变量用于进入懒猫微服和访问 App Store，不是开发者中心或应用内账号
-- 如果已存在同类移植且没有新增价值，不走重复移植路径
-- 项目落地后必须提供 `build.sh`、`Makefile`、`make build`、`make install`
-- 必须保留上游地址、许可证和移植说明
+- Search GitHub first to determine upstream project, license, activity, and feature boundaries.
+- Search the Lazycat App Store to confirm if a similar port already exists.
+- If `lazycat_account` and `lazycat_password` exist on the local machine, prioritize using them to log in to the App Store before checking for duplicates. These variables are for MicroServer and App Store access, not the Developer Center or internal app accounts.
+- If a similar port exists with no added value, do not proceed with a duplicate path.
+- Implementation must provide `build.sh`, `Makefile`, `make build`, and `make install`.
+- Must retain upstream address, license, and porting notes.
 
-如果项目是工具类或需要统一登录，还要额外评估 `file_handler` 和微服 OIDC。若项目本身是 AI 原生产品，还要判断它是否更适合移植为懒猫算力仓 `AI应用` 或 AI 浏览器插件。
+For tool-based apps or those requiring unified login, evaluate `file_handler` and Microservice OIDC. If the project is AI-native, determine if it should be ported as a Computing Power Cabin `AI App` or AI Browser Extension.
 
-如果后续要验证已安装到懒猫微服里的真实应用能力，进入懒猫微服仍使用 `lazycat_account` / `lazycat_password`；应用内再按具体应用读取对应的 app 级凭证，例如 Gitea 使用 `lazycat_gitea_account` / `lazycat_gitea_password`。
+To verify apps installed on Lazycat MicroServer, use `lazycat_account` / `lazycat_password` for entry; use app-specific credentials (e.g., `lazycat_gitea_account`) for internal app login testing.
 
 ## Quick Contract
 
-- **Trigger**: 用户提到移植、port、从 GitHub 找项目、查重、避免重复移植、移植激励、上游仓库、Makefile、build.sh、file_handler、OIDC、商店登录、lazycat_account、lazycat_password、懒猫算力仓、`AI应用`、AI 浏览器插件
-- **Inputs**: 候选项目关键词、目标品类、激励目标、GitHub 上游信息、App Store 可访问状态、本机懒猫微服入口凭证状态、是否需要登录或文件关联、是否为 AI 原生项目
-- **Outputs**: 候选项目清单、去重结论、激励判断、移植落地要求、脚本入口要求、AI Pod 路线判断、后续交给 `lazycat:ship-app` 的发布入口
-- **Quality Gate**: 必须完成 GitHub 搜索和 App Store 查重；如果本机已有 `lazycat_account` / `lazycat_password`，优先真实登录后再查重；如果查到重复移植且没有明显差异化，不继续按激励路径推进；落地方案必须包含 `build.sh` 和 `Makefile`；如果项目是 AI 原生产品，还要明确是否走 `AI应用` / AI 浏览器插件路线
-- **Decision Tree**: 先判断要移植什么，再做 GitHub 搜索、App Store 查重、激励判断、集成机会判断和 AI Pod 路线判断，最后决定继续移植还是换项目
+- **Trigger**: User mentions porting, "port," finding projects on GitHub, checking for duplicates, avoiding duplicate porting, porting incentives, upstream repository, Makefile, build.sh, file_handler, OIDC, store login, lazycat_account, lazycat_password, Computing Power Cabin, `AI App`, AI Browser Extension.
+- **Inputs**: Candidate project keywords, target category, incentive goals, GitHub upstream info, App Store access status, local MicroServer credentials status, login/file association needs, AI-native status.
+- **Outputs**: Candidate project list, de-duplication conclusion, incentive judgment, porting requirements, script entry requirements, AI Pod route judgment, and release entry for `lazycat:ship-app`.
+- **Quality Gate**: Must complete GitHub search and App Store de-duplication. If local `lazycat_account` / `lazycat_password` are present, prioritize real login before checking. If a duplicate exists without differentiation, do not proceed with the incentive path. Deliverables must include `build.sh` and `Makefile`. AI projects must define a route (Standard, AI App, or Browser Ext).
+## Decision Tree
+
+- **Identify Strategy**: Determine if the project is high-complexity (SaaS, multi-stage Docker build) or low-complexity (simple script, static site).
+- **Identify S2I Route**: If a `Dockerfile` exists but no remote image is available:
+    - For **Complex Apps**: Recommend Strategy A (Build locally for `linux/amd64` -> Push to Hub -> `lzc-cli appstore copy-image`).
+    - For **Simple Apps**: Recommend Strategy B (Extract source -> Direct build/run in LPK using `exec://` or generic base images).
+- **Check Project Type**: Perform GitHub search, App Store check, incentive judgment, integration assessment, and AI Pod route judgment. Finally, decide to proceed or switch projects.
+
 
 ## When to Use
 
-**首选触发**
+**Primary Triggers**
 
-- 用户要把某个 GitHub 项目移植到 Lazycat
-- 用户要你帮忙找值得移植的项目
-- 用户明确说“先查有没有重复移植”
-- 用户希望按移植激励规则来选项目
-- 用户已经提供商店登录方式，希望直接进入 App Store 查重
-- 用户准备移植 AI 产品到懒猫算力仓或 AI 浏览器
+- User wants to port a GitHub project to Lazycat.
+- User needs help finding projects worth porting.
+- User explicitly says "check for duplicate ports first."
+- User wants to select projects based on porting incentive rules.
+- User provides store login and wants to check App Store duplicates directly.
+- User is preparing to port an AI product to the Computing Power Cabin or AI Browser.
 
-**典型场景**
+**Typical Scenarios**
 
-- 从 GitHub 搜一批自托管应用，筛选适合移植到 Lazycat 的候选
-- 移植工具类应用，并评估网盘右键菜单
-- 移植需要登录的应用，并评估微服 OIDC
-- 已有上游仓库，但不确定 App Store 里是否已经有同类移植
-- 想把 AI 产品移植到 Lazycat，但还没判断普通应用和 `AI应用` 哪条路更合理
+- Searching GitHub for self-hosted apps and filtering candidates for Lazycat.
+- Porting tool apps and evaluating Disk Context Menus.
+- Porting account-based apps and evaluating Microservice OIDC.
+- Having an upstream repo but unsure if a similar port exists in the App Store.
+- Porting an AI product but haven't decided between standard app and `AI App`.
 
-**边界提示**
+**Boundary Notes**
 
-- 如果用户要的是原创应用，不要误用本 skill，优先走 `lazycat:create-app`
-- 如果用户只要写攻略文章，不要误用本 skill，优先走 `lazycat:write-guide`
-- 如果 App Store 查重没有完成，不要对“值得移植”下结论
+- If the user wants an original app, use `lazycat:create-app`.
+- If the user only wants to write a guide, use `lazycat:write-guide`.
+- Do not conclude that a project is "worth porting" without completing the App Store check.
 
 ## Announce
 
-开始执行后，先给用户一个短摘要：
+Upon execution, provide a brief summary of:
 
-- 你将搜哪些 GitHub 关键词
-- 是否已经具备 App Store 搜索条件，以及是否可用本机环境变量登录
-- 当前最关键的 blocker 是上游质量、重复移植，还是激励空间
+- Which GitHub keywords you will search.
+- Whether you have App Store search conditions and local environment variables.
+- Whether the primary blocker is upstream quality, duplication, or incentive potential.
 
 ## Input Arguments
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| `candidate_keywords` | string | 推荐 | GitHub 搜索关键词，可含品类、协议、技术方向 |
-| `reward_target` | enum(`普通移植`/`现金激励优先`) | 推荐 | 如果目标是激励，重复移植和不奖励类型要尽早排除 |
-| `appstore_access` | enum(`已登录可搜索`/`可用环境变量登录`/`未登录`/`未知`) | 推荐 | App Store 查重在当前站点通常需要先进入懒猫微服；若本机有 `lazycat_account` / `lazycat_password`，优先用这组微服入口环境变量登录，不要误用开发者中心或应用内账号 |
-| `upstream_state` | enum(`已指定仓库`/`仅有方向`/`还未搜索`) | 推荐 | 用于判断是直接评估，还是先做 GitHub 搜索 |
-| `integration_hint` | enum(`OIDC`/`file_handler`/`两者都评估`/`无`) | 可选 | 判断是否适合接微服账户系统或网盘文件关联 |
-| `ai_native_hint` | enum(`无`/`疑似 AI 项目`/`明确 AI 项目`) | 可选 | 判断是否需要额外评估懒猫算力仓 `AI应用` / AI 浏览器插件路线 |
+| `candidate_keywords` | string | Recommended | GitHub keywords (category, protocol, tech stack). |
+| `reward_target` | enum(`Standard Port`/`Incentive Priority`) | Recommended | Exclude duplicates and non-reward types early for incentives. |
+| `appstore_access` | enum(`LoggedIn`/`EnvVars Available`/`Not LoggedIn`/`Unknown`) | Recommended | App Store checks usually require MicroServer entry. Use `lazycat_account` / `lazycat_password`; do not use Dev Center or app-specific accounts. |
+| `upstream_state` | enum(`Specified`/`Direction Only`/`Not Searched`) | Recommended | Direct assessment vs. GitHub search. |
+| `integration_hint` | enum(`OIDC`/`file_handler`/`Both`/`None`) | Optional | Evaluate Microservice OIDC or Disk File Association. |
+| `ai_native_hint` | enum(`None`/`Suspected AI`/`Definite AI`) | Optional | Evaluate AI Pod / AI App route. |
 
 ## The Iron Law
 
-1. 移植前必须先做 GitHub 搜索和 App Store 查重；不要先写适配代码再回头看是否重复。
-2. 如果本机已有 `lazycat_account` 和 `lazycat_password`，优先用交互式 `zsh` 读取环境变量并登录 App Store 后再查重；这组变量是懒猫微服入口凭证，不要明明有凭证还停在“未登录”，也不要误用开发者中心或应用内账号。
-3. 如果 App Store 已经存在同类移植，且你没有明确差异化理由，不要继续按激励路径推进。
-4. 每个移植项目都必须带上上游地址、许可证和移植说明。
-5. 每个移植项目都必须提供 `build.sh`、`Makefile`、`make build`、`make install`。
-6. 如果项目适合 OIDC 或 `file_handler`，优先评估并记录，因为这会影响激励空间和使用体验。
-7. 如果上游项目本身是 AI 原生产品，必须判断它更适合普通应用、懒猫算力仓 `AI应用`，还是 AI 浏览器插件。
-8. 如果移植项目需要一个静态壳层或首页，默认只放 `连接入口`、`状态检查`、`核心操作`、`结果反馈`。不要默认把“为什么使用它”“当前版本”“路线规划”“价值说明”写进运行中的页面，这些内容应写入 `README`、`docs/` 或商店资料。
+1. Perform GitHub search and App Store de-duplication before porting. Do not write code before checking duplicates.
+2. If local `lazycat_account` and `lazycat_password` exist, prioritize using an interactive `zsh` to read them and log in to the App Store for checking. Do not assume lack of credentials in non-interactive shells.
+3. If a duplicate exists in the App Store without differentiation, do not proceed with the incentive path.
+4. Every port must include upstream address, license, and porting notes.
+5. Every port must provide `build.sh`, `Makefile`, `make build`, and `make install`.
+6. Prioritize OIDC or `file_handler` for suitable projects, as they affect incentives and UX.
+7. For AI-native projects, determine if they fit better as standard apps, `AI Apps`, or AI Browser Extensions.
+8. If a ported project needs a static homepage, the priority must be: `Connection Entry`, `Status Check`, `Actions`, `Feedback`. Do not put "Why use it" or "Roadmap" in running pages; use `README` or store assets.
 
 ## Workflow
 
-### 1. 搜 GitHub 候选
+### 1. Search GitHub Candidates
+- Use GitHub to find candidate projects.
+- Check license for distribution and modification.
+- Check activity, issue status, README completeness, and deployment complexity.
+- Record repository name, upstream address, license, and core features.
 
-- 使用 GitHub 搜索候选项目
-- 看许可证是否允许分发和修改
-- 看活跃度、issue 状态、README 完整度、部署复杂度
-- 记录候选仓库名、上游地址、许可证、核心功能
+### 2. Check App Store Duplicates
+- Search for candidate project names, Chinese/English aliases, and keywords in `https://appstore.ezer.heiyu.space/#/shop`.
+- App Store search usually requires MicroServer login. Use `lazycat_account` / `lazycat_password`.
+- If variables are in `~/.zshrc`, use interactive `zsh -ic` to read them.
+- `lazycat_developer_center_account` is only for the Developer Center, not App Store checks.
+- App-specific accounts (e.g., `lazycat_gitea_account`) are only for internal app testing.
+- Do not pretend to have finished the check if no session or credentials exist.
+- Record product name and overlap for any duplicates found.
 
-### 2. 查 Lazycat App Store 是否重复
+### 3. Judgment of Incentives and Feasibility
+- Check against official non-reward types.
+- Original, first-time port, or duplicate?
+- Additional incentive opportunities (OIDC, `file_handler`).
+- Can regular users obtain credentials?
+- For AI projects: evaluate `AI App` route.
 
-- 在 `https://appstore.ezer.heiyu.space/#/shop` 中搜索候选项目名、中文译名、英文别名、核心关键词
-- 当前 App Store 搜索通常需要先通过懒猫微服登录；如果本机有 `lazycat_account` / `lazycat_password`，优先用这组环境变量登录
-- 若这两个变量来自 `~/.zshrc`，使用交互式 `zsh -ic` 读取；不要误以为非交互 shell 里缺失就代表本机没有凭证
-- `lazycat_developer_center_account` / `lazycat_developer_center_password` 仅用于访问开发者中心，不用于当前 App Store 查重
-- 具体应用的 app 级账号也不用于当前查重；例如 `lazycat_gitea_account` / `lazycat_gitea_password` 只用于安装后打开 Gitea 应用做应用内登录验证
-- 如果既没有已登录会话，也没有可用环境变量，不要假装已完成查重
-- 如果搜索到已有同类移植，记录商品名、功能重叠度和差异点
-- 如果重叠度高且无明显差异化，不继续按激励移植
+### 4. Solidify Porting Repository Entries
+At minimum, add:
+- `docs/requirements/`, `docs/api-design/`, `docs/architecture/`, `docs/release-prep/`.
+- `build.sh`, `Makefile` (with `build` and `install` targets).
 
-### 3. 判断激励与可行性
+### 5. Plan Adaptation and Image Sync
+- `lzc-build.yml`, `lzc-manifest.yml`.
+- **Image Porting (Mandatory)**: 
+  1. Use `lzc-cli appstore copy-image <docker_image>` to get a private image name.
+  2. Use the returned `private.ezer.heiyu.space` image in `manifest.yml`.
+  3. Automate this via `make update`.
+- `build.sh`, `Makefile` (must include `build`, `install`, `update`, `release-prep`).
+- Add `application.oidc_redirect_path` and `application.file_handler` if applicable.
+- For AI-native: evaluate `ai-pod-service/`, `caddy-aipod`, and `extension.zip`.
+- If a static homepage is needed, check if it's essential for runtime; if only for submission/promotion, use docs or store assets instead.
 
-- 是否属于官方不奖励类型
-- 是否属于原创、首发移植，还是重复移植
-- 是否有额外激励机会，例如 OIDC 或 `file_handler`
-- 是否能让普通用户获得凭证
-- 如果是 AI 项目，是否更适合移植为懒猫算力仓 `AI应用`
-
-### 4. 固化移植仓库入口
-
-移植仓库至少补齐：
-
-- `docs/requirements/`
-- `docs/api-design/`
-- `docs/architecture/`
-- `docs/release-prep/`
-- `build.sh`
-- `Makefile`
-
-命令基线至少包括：
-
-- `make build`
-- `make install`
-
-### 5. 规划 Lazycat 适配与镜像同步
-
-- `lzc-build.yml`
-- `lzc-manifest.yml`
-- **镜像移植 (Mandatory)**: 
-  1. 使用 `lzc-cli appstore copy-image <docker_image>` 获取私有镜像名。
-  2. 将返回的 `private.ezer.heiyu.space` 镜像填入 `manifest.yml`。
-  3. 通过 `make update` 自动化此过程。
-- `build.sh`
-- `Makefile` (必须包含 `build`, `install`, `update`, `release-prep`)
-- 如果适合，补 `application.oidc_redirect_path`
-- 如果是工具类，补 `application.file_handler`
-- 如果是 AI 原生项目，评估 `ai-pod-service/`、`caddy-aipod` 和可选的 `extension.zip`
-- 如果需要增加静态首页或说明页，先判断它是不是运行时必需页面；如果只是为了提审展示或解释价值，不要写进 `web/*.html`，改写到文档或商店资料中。
-
-### 6. 交回发布与更新链路
-
-确定“值得移植”后，再交回 `lazycat:ship-app` 做打包、资料、提审和发布。若涉及后续更新，使用 `lazycat:update-app`。
-
-
-复杂任务先读 [references/market-research.md](./references/market-research.md)、[references/porting-checklist.md](./references/porting-checklist.md) 和 [references/command-conventions.md](./references/command-conventions.md)。
+### 6. Hand over to Shipping Pipeline
+Once "worth porting" is confirmed, hand over to `lazycat:ship-app` for packaging, assets, and submission. Use `lazycat:update-app` for future updates.
 
 ## Quality Gates
 
-- GitHub 搜索已完成
-- App Store 查重已完成，且不是凭空假设
-- 若本机存在商店环境变量，已优先使用真实登录态完成查重
-- 如有重复移植，已明确差异化或已终止激励路径
-- 上游地址、许可证、仓库状态已记录
-- 已规划 `build.sh`、`Makefile`、`make build`、`make install`
-- 已评估 OIDC 或 `file_handler`
-- 若目标追求激励，已明确后续必须把候选版本安装到懒猫微服并打开已安装应用做真实测试，不能只靠 OIDC 设想或页面查重下结论
-- 如果上游是 AI 项目，已评估普通应用 / `AI应用` / AI 浏览器插件路线
+- GitHub search completed.
+- App Store check completed (not an assumption).
+- Real login used for checking if local credentials exist.
+- Differentiation clarified or incentive path terminated if duplicates exist.
+- Upstream address, license, and repo status recorded.
+- `build.sh` and `Makefile` planned.
+- OIDC or `file_handler` evaluated.
+- For incentives: clarified that real installation and verification on Lazycat MicroServer is mandatory.
+- AI Pod route evaluated for AI projects.
 
 ## Red Flags
 
-- 只看 GitHub，不查 App Store
-- App Store 未登录，却假装完成了查重
-- 本机明明有 `lazycat_account` / `lazycat_password`，却没有尝试登录就宣称无法查重
-- 把 `lazycat_developer_center_account` / `lazycat_developer_center_password` 或应用内账号误当成 App Store 登录凭证
-- 已有重复移植，还继续按激励路径推进
-- 应用能力偏弱，却只想靠 OIDC 或包装话术争取激励
-- 不保留上游地址和许可证
-- 没有 `build.sh` 或 `Makefile`
-- 明明是工具类，却没评估文件关联
+- Searching GitHub without checking the App Store.
+- Claiming a check is complete without being logged into the App Store.
+- Not attempting login when `lazycat_account` / `lazycat_password` exist locally.
+- Misusing Developer Center or app-specific accounts for App Store checks.
+- Proceeding with incentives when duplicates exist.
+- Relying on marketing talk for incentives when the app is weak.
+- Missing upstream address or license.
+- No `build.sh` or `Makefile`.
+- Missing file association for tool apps.
 
 ## Bundled References
 
-- GitHub 搜索与 App Store 查重： [references/market-research.md](./references/market-research.md)
-- 移植检查清单： [references/porting-checklist.md](./references/porting-checklist.md)
-- 命令入口约定： [references/command-conventions.md](./references/command-conventions.md)
-- AI Pod 路线判断： [../lazycat:create-app/references/aipod-playbook.md](../lazycat:create-app/references/aipod-playbook.md)
-- 激励规则： [../lazycat:ship-app/references/cash-incentive.md](../lazycat:ship-app/references/cash-incentive.md)
+- Market Research: [references/market-research.md](./references/market-research.md)
+- Porting Checklist: [references/porting-checklist.md](./references/porting-checklist.md)
+- Command Conventions: [references/command-conventions.md](./references/command-conventions.md)
+- S2I (Source-to-Image) Strategy: [references/s2i-strategy.md](./references/s2i-strategy.md)
+- AI Pod Playbook: [../lazycat:create-app/references/aipod-playbook.md](../lazycat:create-app/references/aipod-playbook.md)
+- Incentive Rules: [../lazycat:ship-app/references/cash-incentive.md](../lazycat:ship-app/references/cash-incentive.md)
 
 ## Outputs
 
 ```text
-阶段: 移植评估 / 去重 / 落地准备
-目标: <普通移植 / 现金激励优先>
+Phase: Porting Evaluation / De-duplication / Preparation
+Target: <Standard Port / Incentive Priority>
 
-GitHub 候选
+GitHub Candidates
 - ...
 
-App Store 查重
+App Store Check
 - ...
 
-结论
-- 继续移植 / 换项目 / 非激励路径继续
+Conclusion
+- Proceed / Switch / Non-incentive path
 
-落地要求
+Requirements
 - build.sh
 - Makefile
 - make build
 - make install
-- 上游地址
+- Upstream address
 
-下一步
+Next Steps
 1. ...
 2. ...
 ```
