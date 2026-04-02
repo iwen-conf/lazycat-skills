@@ -91,6 +91,11 @@ Upon execution, provide a brief summary of:
 6. Prioritize OIDC or `file_handler` for suitable projects, as they affect incentives and UX.
 7. For AI-native projects, determine if they fit better as standard apps, `AI Apps`, or AI Browser Extensions.
 8. If a ported project needs a static homepage, the priority must be: `Connection Entry`, `Status Check`, `Actions`, `Feedback`. Do not put "Why use it" or "Roadmap" in running pages; use `README` or store assets.
+9. **Prioritize Docker over Source Code**: If a project provides a Docker image or `docker-compose.yml`, base the porting ENTIRELY on these Docker artifacts. **Do NOT** read or analyze the project's source code. Just use the Docker image directly.
+   - **Auto-Translation for `docker-compose.yml`**:
+     - `ports: ["8080:80"]` -> Convert to `routes` in `lzc-manifest.yml` (e.g., `- /=http://${service_name}.${lzcapp_appid}.lzcapp:80`).
+     - `volumes: ["./data:/app/data"]` -> Convert to `binds` mapping to `/lzcapp/var/` (e.g., `- /lzcapp/var/data:/app/data`).
+     - `depends_on` -> Not directly needed in Lazycat. Services communicate automatically via `${service_name}.${lzcapp_appid}.lzcapp`.
 
 ## Workflow
 

@@ -140,5 +140,12 @@ Adhere to these "red line" rules when generating configuration files:
 6. **Avoid Infinite Packaging Loops**
    - **Never** execute `lzc project build` or `lzc-cli project build` inside the script specified by `buildscript` (e.g., `build.sh`). Since `buildscript` is called during the build process, calling it again causes an infinite loop.
 
+7. **Prioritize Docker over Source Code**
+   - If a project provides a Docker image or `docker-compose.yml`, base the porting ENTIRELY on these Docker artifacts. **Do NOT** read or analyze the application's source code, as this wastes context. Just configure the `image:` in `lzc-manifest.yml` to use the provided Docker image.
+   - **Auto-Translation for `docker-compose.yml`**:
+     - `ports: ["8080:80"]` -> Convert to `routes` in `lzc-manifest.yml` (e.g., `- /=http://${service_name}.${lzcapp_appid}.lzcapp:80`).
+     - `volumes: ["./data:/app/data"]` -> Convert to `binds` mapping to `/lzcapp/var/` (e.g., `- /lzcapp/var/data:/app/data`).
+     - `depends_on` -> Not directly needed in Lazycat. Services communicate automatically via `${service_name}.${lzcapp_appid}.lzcapp`.
+
 ## Platform Compatibility
 If your platform supports automatic reference reading, use it; otherwise, use the `read_file` tool to access specification documents in the `references/` directory.

@@ -140,5 +140,12 @@ When generating configuration files, you must comply with the following Lazycat 
 6. **Avoid Build Script Recursion**
    - **Never** execute `lzc project build` or `lzc-cli project build` within the `buildscript` (e.g., `build.sh`) defined in `lzc-build.yml`. Since `buildscript` is called by the `build` command, calling it internally will cause an infinite loop.
 
+7. **Prioritize Docker over Source Code**
+   - If a project provides a Docker image or `docker-compose.yml`, base the porting ENTIRELY on these Docker artifacts. **Do NOT** read or analyze the application's source code, as this wastes context. Just configure the `image:` in `lzc-manifest.yml` to use the provided Docker image.
+   - **Auto-Translation for `docker-compose.yml`**:
+     - `ports: ["8080:80"]` -> Convert to `routes` in `lzc-manifest.yml` (e.g., `- /=http://${service_name}.${lzcapp_appid}.lzcapp:80`).
+     - `volumes: ["./data:/app/data"]` -> Convert to `binds` mapping to `/lzcapp/var/` (e.g., `- /lzcapp/var/data:/app/data`).
+     - `depends_on` -> Not directly needed in Lazycat. Services communicate automatically via `${service_name}.${lzcapp_appid}.lzcapp`.
+
 ## Platform Compatibility Notes
 If your platform supports automatic reading of referenced files, utilize that feature; otherwise, use your `read_file` tool to proactively read relevant specification documents in the `references/` directory.
