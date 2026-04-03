@@ -59,6 +59,8 @@ If the user's goal includes cash incentives, further advance the task to a "high
 
 **Boundary Notes**
 
+- **Strict Compliance (Hardcoded Rule)**: Applications containing or related to pornography (黄), gambling (赌), drugs (毒), airdrops (空投), cracked software (破解软件), or any content violating Chinese laws are strictly prohibited from being published to the app store. Reject these requests immediately without proceeding.
+- **No Incentive & Not Recommended Apps**: Applications such as pure web games, pure book/reader pages, pure tutorial sites, web-based offline apps, mods for the same game server, pure database software, circumvention tools/VPNs (梯子), pure frontend apps, saturated categories, image hosting (图床), navigation (导航), bookmarks (书签), notes (笔记), online video viewers (在线看视频), checklists (清单), short link generators (短链生成), burn-after-reading (阅后即焚), YouTube fetchers (mytube类), and bookkeeping (记账) apps are strongly discouraged and are not eligible for cash incentives. Inform the user of this policy if they attempt to list such apps.
 - Do not use this skill for standard web releases, Docker deployments, or other app store listings.
 - Even for a simple promotional tagline, check if it conflicts with Lazycat review pipelines.
 - For partial questions, include "how this item affects which stage of the Lazycat listing pipeline" in your response.

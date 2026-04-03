@@ -27,14 +27,26 @@ Recommended priority:
 
 ## 3. Risks to Avoid
 
-- Pure web games.
-- Pure book/reader pages.
-- Pure tutorial websites.
-- Web-based offline apps.
-- Different mods for the same game server.
-- Pure database software.
-
-These types may be allowed in the store but are not eligible for cash rewards.
+These types may be allowed in the store but are not eligible for cash rewards or are not recommended for listing:
+- Pure web games (纯网页游戏).
+- Pure book/reader pages (纯书籍页面).
+- Pure tutorial websites (纯教程网站).
+- Web-based offline apps (网页离线应用).
+- Different mods for the same game server (游戏服务器的不同模组).
+- Pure database software (纯数据库软件).
+- Applications involving circumvention tools/VPNs (涉及梯子/VPN类应用) - Note: VPNs may also violate legal guidelines and be completely prohibited.
+- Pure frontend applications (纯前端应用).
+- Applications with too many similar alternatives already in the store (商店应用同类别比较多的).
+- Image hosting (图床类).
+- Navigation (导航类).
+- Bookmarks (书签类).
+- Notes (笔记类).
+- Online video viewers (e.g., modified moontv) (在线看视频, 如moontv魔改).
+- Checklists/To-do lists (清单类).
+- Short link generators (短链生成).
+- Burn-after-reading/Ephemeral messages (阅后即焚).
+- YouTube fetchers (mytube类 - 拉取YOUTUBE内容的).
+- Bookkeeping/Accounting (记账类).
 
 ## 4. Credential Rules
 

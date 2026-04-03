@@ -4,6 +4,7 @@ Check items by stage. Do not skip steps.
 
 ## 1. Project Initiation & Prerequisites
 
+- [ ] **Strict Compliance Check**: Ensure the application does not contain or relate to pornography (黄), gambling (赌), drugs (毒), airdrops (空投), cracked software (破解软件), or any content violating Chinese laws. Applications violating this rule are strictly prohibited from listing and must be rejected immediately.
 - [ ] Clarify if it's a first-time launch, an update, or a re-submission after rejection.
 - [ ] Define the target version number, release date, and minimum viable release scope.
 - [ ] Verify developer certification, Developer Center permissions, and target app permissions.
@@ -14,7 +15,7 @@ Check items by stage. Do not skip steps.
 - [ ] If the project includes an admin interface, completed `lazycat:admin-ui` quality convergence or noted pending items.
 - [ ] Confirmed whether `.lpk`, `lzc-cli project publish`, or both are required.
 - [ ] If the project is an AI-native product, clarified the path for Standard App / `AI App` / AI Browser Plugin.
-- [ ] If the target is a cash incentive, clarified whether it is original or ported, and determined if it falls under non-rewarded types.
+- [ ] If the target is a cash incentive, clarified whether it is original or ported, and determined if it falls under non-rewarded/not-recommended types (e.g., pure web games, pure book pages, pure tutorials, web offline apps, game mods, pure database apps, VPNs, pure frontend apps, saturated categories, image hosting, navigation, bookmarks, notes, online video viewers, checklists, short link generators, burn-after-reading, YouTube fetchers, bookkeeping).
 
 ## 2. Local App Information
 
