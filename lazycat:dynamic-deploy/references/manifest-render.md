@@ -64,8 +64,7 @@ For a complete demo, refer to [this repository](https://gitee.com/lazycatcloud/n
 ### More Secure Internal Passwords
 
 ```yml
-package: cloud.lazycat.app.redmine
-name: Redmine
+lzc-sdk-version: '2.0'
 services:
   mysql:
     binds:
@@ -117,13 +116,12 @@ params:
 
 ```yml
 # lzc-manifest.yml
-package: org.snyh.netmap
-version: 0.0.1
-name: netmap
+lzc-sdk-version: '2.0'
 application:
   subdomain: netmap
 
   upstreams:
     - location: /
       backend_launch_command: /lzcapp/pkg/content/netmap -target={{ .U.target }} -port={{ index .U "listen.port" }}
+```
 ```

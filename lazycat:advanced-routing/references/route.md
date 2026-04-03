@@ -29,7 +29,7 @@ Requests to `https://appstore.$MicroserviceName.heiyu.space` are forwarded to `h
 Typically, HTTP routes forward to a specific port of an internal service.
 Example: `Bitwarden`
 ```yaml
-package: cloud.lazycat.app.bitwarden
+lzc-sdk-version: '2.0'
 application:
   routes:
   - /=http://bitwarden.cloud.lazycat.app.bitwarden.lzcapp:80

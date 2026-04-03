@@ -27,9 +27,7 @@ According to the [Outline official documentation](https://docs.getoutline.com/s/
 
 In `manifest.yml`, it can be configured as follows:
 ```yml
-name: Outline
-package: cloud.lazycat.app.outline
-version: 0.0.1
+lzc-sdk-version: '2.0'
 application:
   subdomain: outline
   # The official Outline documentation does not specify this, but it can be determined from error logs.

@@ -1,16 +1,5 @@
 # lzc-manifest.yml
-
-# 应用元数据
-# package: 应用的全局唯一ID，建议使用反向域名格式。
-# version: 应用版本号，遵循语义化版本规范。
-# name: 应用显示名称。
-# description: 应用的简短描述。
-# author: 应用作者。
-package: com.example.transmission
-version: 1.0.0
-name: Transmission
-description: A Fast, Easy and Free BitTorrent Client
-author: "The Transmission Project"
+lzc-sdk-version: '2.0'
 
 # 应用核心配置
 application:

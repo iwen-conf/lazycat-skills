@@ -19,9 +19,7 @@ Since `application.routes` does not support domain-based forwarding, use a speci
 3. `anything-whoami.xx.heiyu.space` behaves the same as `whoami.xx.heiyu.space`.
 
 ```yaml
-package: org.snyh.debug.whoami
-name: whoami-lazycatmicroserver
-
+lzc-sdk-version: '2.0'
 application:
   subdomain: whoami
   routes:

@@ -138,10 +138,7 @@ To display the AI Pod service startup progress, use the `caddy-aipod` middleware
 
 ```yml
 # lzc-manifest.yml
-name: ComfyUI
-package: cloud.lazycat.aipod.comfyui
-version: 1.0.5
-description: The most powerful open-source node-based generative AI application.
+lzc-sdk-version: '2.0'
 
 aipod:
   shortcut:

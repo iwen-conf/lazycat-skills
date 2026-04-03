@@ -30,9 +30,6 @@ You can overwrite the OpenResty configuration file or write Lua scripts within t
 **Simple Example:**
 ```yaml
 lzc-sdk-version: '2.0'
-name: APP Proxy Test
-package: cloud.lazycat.app.app-proxy-test
-version: 0.0.1
 application:
   routes:
     # Forward requests to APP Proxy (app-proxy service)
@@ -62,9 +59,6 @@ For example: `lzc-cli docker logs -f cloudlazycatappapp-proxy-test-app-proxy-1`.
 
 ```yaml
 lzc-sdk-version: '2.0'
-name: APP Proxy Test
-package: cloud.lazycat.app.app-proxy-test
-version: 0.0.1
 application:
   routes:
     - /=http://app-proxy:80
