@@ -2,7 +2,7 @@
 
 ## 1. Before Selection
 - [ ] GitHub search completed.
-- [ ] License allows porting.
+- [ ] License allows porting and commercial use (non-commercial projects prohibited).
 - [ ] Upstream URL recorded.
 - [ ] App Store duplication check completed.
 - [ ] If highly duplicative, terminated incentive path or clarified differentiation.

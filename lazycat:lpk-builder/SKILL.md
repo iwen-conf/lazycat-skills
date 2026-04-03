@@ -48,7 +48,7 @@ This file defines the runtime environment, services, and routing. **Static metad
 
 **Gold Porting Example (from Docker):**
 ```yaml
-lzc-sdk-version: '0.1'
+lzc-sdk-version: '2.0'
 application:
   subdomain: yourapp # Default assigned subdomain
   routes:

@@ -29,7 +29,7 @@ You can overwrite the OpenResty configuration file or write Lua scripts within t
 
 **Simple Example:**
 ```yaml
-lzc-sdk-version: '0.1'
+lzc-sdk-version: '2.0'
 name: APP Proxy Test
 package: cloud.lazycat.app.app-proxy-test
 version: 0.0.1
@@ -61,7 +61,7 @@ When using APP Proxy, you can view request logs via `lzc-cli docker logs -f`.
 For example: `lzc-cli docker logs -f cloudlazycatappapp-proxy-test-app-proxy-1`.
 
 ```yaml
-lzc-sdk-version: '0.1'
+lzc-sdk-version: '2.0'
 name: APP Proxy Test
 package: cloud.lazycat.app.app-proxy-test
 version: 0.0.1

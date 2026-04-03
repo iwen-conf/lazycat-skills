@@ -101,7 +101,7 @@ Upon execution, provide a brief summary of:
 
 ### 1. Search GitHub Candidates
 - Use GitHub to find candidate projects.
-- Check license for distribution and modification.
+- Check license for distribution and modification. Ensure the license explicitly permits commercial use; do not port projects with non-commercial licenses.
 - Check activity, issue status, README completeness, and deployment complexity.
 - Record repository name, upstream address, license, and core features.
 
