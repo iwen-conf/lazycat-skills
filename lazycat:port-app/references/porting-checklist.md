@@ -24,7 +24,7 @@
 - [ ] Evaluated `file_handler` requirement.
 - [ ] Clarified credential acquisition path for apps requiring login.
 - [ ] Distinguished credential scopes: `lazycat_account` / `lazycat_password` for Lazycat OS and App Store; `lazycat_developer_center_account` / `lazycat_developer_center_password` for the Developer Center. In-app login uses app-level variables.
-- [ ] Application supports passwordless auto-login (免密登录) as much as possible to reduce repetitive user operations.
+- [ ] Application MUST support passwordless auto-login (免密登录) via OIDC or Inject (`builtin://simple-inject-password`) to provide a seamless user experience.
 - [ ] For AI projects, determined if AI Pod or AI Browser Plugin is more suitable.
 
 ## 4. Incentive Path

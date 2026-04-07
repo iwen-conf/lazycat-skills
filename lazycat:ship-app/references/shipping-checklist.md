@@ -27,7 +27,7 @@ Check items by stage. Do not skip steps.
 - [ ] Version description or changelog is prepared.
 - [ ] If an admin interface exists, visual direction is consistent across login/registration, dashboard, lists, forms, and settings pages.
 - [ ] If the app requires a username/password, regular users can self-register, use unified login, or obtain publicly available credentials.
-- [ ] **Passwordless Login**: Application supports passwordless auto-login (免密登录) as much as possible to reduce repetitive login operations, following the [Developer Documentation](https://developer.lazycat.cloud/store-submission-guide.html).
+- [ ] **Passwordless Login**: Application MUST support passwordless auto-login (免密登录) via OIDC or Inject (`builtin://simple-inject-password` / custom scripts) to ensure a seamless, weak-perception login state, following the [Developer Documentation](https://developer.lazycat.cloud/advanced-inject-passwordless-login.html).
 
 ## 3. Packaging & Uploading
 

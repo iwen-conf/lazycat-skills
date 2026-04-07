@@ -73,8 +73,11 @@ Ensure all the following conditions are met before submission:
 - Do not change instance definitions (which changes storage paths) during upgrades unless necessary. If changed, ensure data migration and recovery procedures are in place.
 
 ### 8. Passwordless Auto-Login
-- Applications should support passwordless auto-login (免密登录) as much as possible to reduce repetitive user login operations.
-- For implementation details, refer to the "Store Submission Guide" chapter in the [Developer Documentation](https://developer.lazycat.cloud/store-submission-guide.html).
+- Applications MUST support passwordless auto-login (免密登录) to provide a seamless user experience, ensuring users do not need to manually enter credentials upon first launch or subsequent visits.
+- **Implementation Methods:**
+  1. **OIDC Standard Flow:** Integrate with Lazycat MicroServer's identity authentication system to achieve automatic user identification based on ingress injection.
+  2. **Inject Autofill:** Use `builtin://simple-inject-password` or custom inject scripts to automatically fill and learn login credentials.
+- For implementation details, refer to the "Store Submission Guide" and [Advanced Inject Passwordless Login](https://developer.lazycat.cloud/advanced-inject-passwordless-login.html) in the Developer Documentation.
 
 ## III. Prohibited Application Types
 
