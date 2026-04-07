@@ -41,7 +41,7 @@ lzc-cli appstore publish ./your-app.lpk
 Ensure all the following conditions are met before submission:
 
 ### 1. Metadata Completeness
-- `package.yml` must be complete with `package`, `version`, `name`, `description`, `author`, and `license`.
+- `package.yml` must be complete with `package`, `version`, `name`, `description`, `author`, and `license`. **For ported applications, the `author` field MUST exactly match the original project's author.**
 - App Icon and screenshots must be provided in the Developer Center.
 - Names, descriptions, and "Notes for Use" **must support multiple languages** via the `locales` configuration in `package.yml`.
 - Language key standards should follow [BCP 47](https://en.wikipedia.org/wiki/IETF_language_tag).
@@ -71,6 +71,10 @@ Ensure all the following conditions are met before submission:
 - Applications requiring persistent data must be tested to ensure data is correctly saved.
 - **Ensure data is not lost after app restarts or upgrades.**
 - Do not change instance definitions (which changes storage paths) during upgrades unless necessary. If changed, ensure data migration and recovery procedures are in place.
+
+### 8. Passwordless Auto-Login
+- Applications should support passwordless auto-login (免密登录) as much as possible to reduce repetitive user login operations.
+- For implementation details, refer to the "Store Submission Guide" chapter in the [Developer Documentation](https://developer.lazycat.cloud/store-submission-guide.html).
 
 ## III. Prohibited Application Types
 

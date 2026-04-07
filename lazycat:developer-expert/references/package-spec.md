@@ -12,7 +12,7 @@ The following fields are mandatory or recommended for inclusion in `package.yml`
 | `version` | `string` | **Mandatory**. Semantic versioning (e.g., `1.0.0`). |
 | `name` | `string` | **Mandatory**. Application display name. |
 | `description` | `string` | **Mandatory**. Brief application description. |
-| `author` | `string` | **Mandatory**. Author or organization name. |
+| `author` | `string` | **Mandatory**. Author or organization name. For ported apps, this MUST exactly match the original project's author. |
 | `license` | `string` | **Mandatory**. Software license (e.g., `MIT`, `GPL-3.0`). |
 | `homepage` | `string` | **Optional**. Official website or repository URL. |
 | `locales` | `map` | **Optional**. Localization for name, description, and usage. |

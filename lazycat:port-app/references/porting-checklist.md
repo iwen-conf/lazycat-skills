@@ -24,12 +24,13 @@
 - [ ] Evaluated `file_handler` requirement.
 - [ ] Clarified credential acquisition path for apps requiring login.
 - [ ] Distinguished credential scopes: `lazycat_account` / `lazycat_password` for Lazycat OS and App Store; `lazycat_developer_center_account` / `lazycat_developer_center_password` for the Developer Center. In-app login uses app-level variables.
+- [ ] Application supports passwordless auto-login (免密登录) as much as possible to reduce repetitive user operations.
 - [ ] For AI projects, determined if AI Pod or AI Browser Plugin is more suitable.
 
 ## 4. Incentive Path
 - [ ] Does not belong to non-rewarded types.
 - [ ] Original/Porting path clarified.
-- [ ] Prepared upstream attribution (for ports).
+- [ ] Prepared upstream attribution (for ports) and ensured the `author` field strictly matches the original project's author.
 - [ ] Planned OIDC or `file_handler` if applicable.
 - [ ] Planned to verify core capabilities by installing and opening the app within Lazycat OS.
 - [ ] Planned Standard App / AI Pod / AI Browser Plugin route for AI-native projects.

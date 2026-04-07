@@ -27,6 +27,7 @@ Check items by stage. Do not skip steps.
 - [ ] Version description or changelog is prepared.
 - [ ] If an admin interface exists, visual direction is consistent across login/registration, dashboard, lists, forms, and settings pages.
 - [ ] If the app requires a username/password, regular users can self-register, use unified login, or obtain publicly available credentials.
+- [ ] **Passwordless Login**: Application supports passwordless auto-login (免密登录) as much as possible to reduce repetitive login operations, following the [Developer Documentation](https://developer.lazycat.cloud/store-submission-guide.html).
 
 ## 3. Packaging & Uploading
 
@@ -35,7 +36,7 @@ Check items by stage. Do not skip steps.
 - [ ] Recorded release commands, CLI output, or upload page status.
 - [ ] Confirmed current field and format requirements in the Developer Center before uploading.
 - [ ] If using `.lpk`, confirmed the version in the package matches the store profile.
-- [ ] If porting open-source software, prepared the upstream author's URL.
+- [ ] If porting open-source software, prepared the upstream author's URL and ensured the `author` field exactly matches the original author's name.
 - [ ] For `AI Apps`, checked that structures like `ai-pod-service/`, `caddy-aipod/`, and `extension.zip` are complete.
 
 ## 4. Store Metadata & Screenshots
