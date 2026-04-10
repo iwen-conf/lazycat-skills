@@ -78,4 +78,4 @@ application:
 
 ## 平台兼容性说明
 如果需要查看详细的内置模板函数列表、系统参数列表（`SysParams`）或了解脚本注入的 `builtin://simple-inject-password` 的详细参数配置，请读取 `references/injects.md`。
-如果是处理免密登录的【三阶段联动】，**必须**读取 `references/advanced-inject.md`。
+如果是处理免密登录的【三阶段联动】，请读取 `references/advanced-inject.md` (AI 剧本) 或 `references/advanced-inject-passwordless-login.md` (详细教程)。
