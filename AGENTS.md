@@ -4,7 +4,7 @@
 
 ## 1. 项目定位
 
-这是一个面向懒猫微服 (LazyCat MicroServer) 平台的 **AI 技能包仓库**，通过 `npx skills add whoamihappyhacking/lazycat-skills` 安装。技能包的消费者是 **AI 智能体**，而非终端用户。
+这是一个面向懒猫微服 (LazyCat MicroServer) 平台的 **AI 技能包仓库**，通过 `npx skills add iwen-conf/lazycat-skills` 安装。技能包的消费者是 **AI 智能体**，而非终端用户。
 
 ## 2. 项目结构约束
 
@@ -95,4 +95,4 @@ description: 一句话描述（用于触发匹配，务必精准）
 1. 当需要 `<微服名>` 时，主动执行 `lzc-cli box default` 获取，不要询问用户
 2. 当需要查看已部署应用状态时，使用 `lzc-cli docker` 前缀命令
 3. 修改技能内容后，使用 changelog-maintenance 技能更新 CHANGELOG.md
-4. 每次提交推送前，确认远程地址为 `git@github.com:whoamihappyhacking/lazycat-skills.git`
+4. 每次提交推送前，确认远程地址为 `git@github.com:iwen-conf/lazycat-skills.git`

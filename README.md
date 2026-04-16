@@ -45,7 +45,7 @@ lazycat-skills/
 ## 安装
 
 ```bash
-npx skills add whoamihappyhacking/lazycat-skills
+npx skills add iwen-conf/lazycat-skills
 ```
 
 安装后，AI 会自动发现这些技能。常见入口包括：
