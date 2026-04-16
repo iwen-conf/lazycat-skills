@@ -1,6 +1,6 @@
 ---
 name: lazycat:ship-app
-description: 面向懒猫应用上架的端到端交付 skill。只要用户提到 Lazycat、懒猫、developer.lazycat.cloud、懒猫开发者中心、lpk、lzc-cli、应用简介、应用截图、应用图标、项目创建、Go、Vue、Element Plus、后台管理、Admin、控制台、管理台、登录、注册、access_token、refresh_token、现金激励、微服账户系统、网盘右键菜单、移植应用、GitHub 选型、重复移植、build.sh、Makefile、攻略文章、提审、审核、上架、发布、版本更新、官方源、商店资料、发布后核验、懒猫算力仓、AI应用、AI 浏览器插件、ai-pod-service、caddy-aipod、extension.zip 等相关请求，就必须使用此 skill。覆盖从 idea/scoping、应用创建与配置整理、技术栈与认证基线、后台管理 UI 质量、激励资格判断、移植去重、脚本入口、`lpk` / `AI应用` 打包和上传、元数据、图标和截图准备、自测和安装验证、提审与审核跟进，到正式发布后的可见性和安装检查。
+description: 面向懒猫应用上架的端到端交付 skill。当用户需要将已开发完成的应用推进到"打包、提审、发布、发布后验证"状态时触发。覆盖 lpk 打包上传、商店元数据与截图准备、自测安装验证、提审与审核跟进、发布后可见性检查。不负责项目创建（用 create-app）、移植选型（用 port-app）、后台 UI 收敛（用 admin-ui）或图标生成（用 prepare-icon）。
 compatibility:
   tools:
     - shell

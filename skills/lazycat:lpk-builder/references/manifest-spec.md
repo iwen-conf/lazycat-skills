@@ -81,25 +81,28 @@ Entry titles support multi-language localization via `locales` using the key `en
 `injects` is used to inject scripts into HTML pages at specific paths, ideal for minimal-intrusion adaptation of third-party apps.
 
 Matching Rules:
-- Uses `include` (whitelist) and `exclude` (blacklist).
-- `include` is required; any match enters candidacy.
+- Uses `when` (whitelist) and `exclude` (blacklist).
+- `when` is required; any match enters candidacy.
 - `exclude` is optional; any match excludes the request.
-- Final Result: `matched = includeMatched && !excludeMatched`.
+- Final Result: `matched = whenMatched && !excludeMatched`.
 - If `prefix_domain` is not empty, it only matches requests with the `<prefix>-` domain prefix.
 - `mode` supports `exact` or `prefix` (default: `exact`), applied to `path/hash`.
-- Injection only occurs for HTML responses.
+- For `on: request` or `on: response` phases, hash routing is NOT matched.
+- `auth_required` dictates if the execution requires the request to be authenticated.
 
-Multiple `injects` entries are processed in order. `scripts` within each entry are also injected sequentially.
+Multiple `injects` entries are processed in order. The `do` actions within each entry are also executed sequentially.
 
 #### InjectConfig
 | Field Name | Type | Description |
 | ---- | ---- | ---- |
 | `id` | `string` | Unique ID for the injection config. |
+| `on` | `string` | Phase: `request`, `response`, or `browser` (default). |
+| `auth_required` | `bool` | Default true. Set false if intercepting unauthenticated API calls (like login). |
 | `prefix_domain` | `string` | Domain prefix (optional). |
 | `mode` | `string` | Matching mode: `exact` or `prefix`. |
-| `include` | `[]string` | Whitelist rules (at least one). |
+| `when` | `[]string` | Whitelist rules (at least one). |
 | `exclude` | `[]string` | Blacklist rules (optional). |
-| `scripts` | `[]InjectScriptConfig` | List of scripts to inject. |
+| `do` | `[]any` \| `string` | List of actions or inline JS code to execute. |
 
 #### InjectScriptConfig
 | Field Name | Type | Description |
@@ -125,14 +128,14 @@ application:
   injects:
     - id: login-autofill
       mode: exact
-      include:
+      when:
         - /login
         - /signin?channel=stable
         - /#login
       exclude:
         - /api
         - /#debug
-      scripts:
+      do:
         - src: builtin://hello
           params:
             message: "hello world"

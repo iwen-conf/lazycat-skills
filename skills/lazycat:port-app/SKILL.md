@@ -30,11 +30,30 @@ To verify apps installed on Lazycat MicroServer, use `lazycat_account` / `lazyca
 - **Quality Gate**: Must complete GitHub search and App Store de-duplication. If local `lazycat_account` / `lazycat_password` are present, prioritize real login before checking. If a duplicate exists without differentiation, do not proceed with the incentive path. Deliverables must include `build.sh` and `Makefile`. AI projects must define a route (Standard, AI App, or Browser Ext).
 ## Decision Tree
 
-- **Identify Strategy**: Determine if the project is high-complexity (SaaS, multi-stage Docker build) or low-complexity (simple script, static site).
-- **Identify S2I Route**: If a `Dockerfile` exists but no remote image is available:
-    - For **Complex Apps**: Recommend Strategy A (Build locally for `linux/amd64` -> Push to Hub -> `lzc-cli appstore copy-image`).
-    - For **Simple Apps**: Recommend Strategy B (Extract source -> Direct build/run in LPK using `exec://` or generic base images).
-- **Check Project Type**: Perform GitHub search, App Store check, incentive judgment, integration assessment, and AI Pod route judgment. Finally, decide to proceed or switch projects.
+- **Step 0 — Does a usable remote image exist?**
+  - If the project publishes official Docker images on Docker Hub / GHCR / Quay (check README or Docker Hub page): **skip building entirely**. Use `lzc-cli appstore copy-image <image>` directly. This is the fastest and most reliable path.
+  - If no remote image exists but a `Dockerfile` is provided: proceed to Step 1.
+  - If neither exists: evaluate if the project is worth the build effort before proceeding.
+
+- **Step 1 — Classify Complexity** (only when you must build from Dockerfile):
+
+  | Signal | Points to Strategy A (Complex) | Points to Strategy B (Simple) |
+  |--------|-------------------------------|-------------------------------|
+  | Multi-stage Dockerfile | Yes | — |
+  | Requires database (Postgres, MySQL, Redis, etc.) | Yes | — |
+  | Multi-service `docker-compose.yml` (3+ services) | Yes | — |
+  | Build output > 500MB image | Yes | — |
+  | Single binary or static files only | — | Yes |
+  | No external service dependencies | — | Yes |
+  | Can run with `exec://` or a generic base image (alpine, nginx) | — | Yes |
+  | Build completes in < 2 minutes on a standard machine | — | Yes |
+
+  If 2+ signals point to Strategy A, use Strategy A. Otherwise, use Strategy B.
+
+- **Strategy A** (Complex): Build locally for `linux/amd64` → Push to Docker Hub → `lzc-cli appstore copy-image` → Use returned `registry.lazycat.cloud/...` address in `lzc-manifest.yml`.
+- **Strategy B** (Simple): Extract source → Direct build/run in LPK using `exec://` or generic base images. No Docker Hub round-trip needed.
+
+- **Step 2 — Check Project Type**: Perform GitHub search, App Store check, incentive judgment, integration assessment, and AI Pod route judgment. Finally, decide to proceed or switch projects.
 
 
 ## When to Use
@@ -129,9 +148,10 @@ At minimum, add:
 ### 5. Plan Adaptation and Image Sync
 - `lzc-build.yml`, `lzc-manifest.yml`.
 - **Image Porting (Mandatory)**: 
-  1. Use `lzc-cli appstore copy-image <docker_image>` to get a private image name.
-  2. Use the returned `private.ezer.heiyu.space` image in `manifest.yml`.
-  3. Automate this via `make update`.
+  1. If the image is custom-built, first build it locally for `linux/amd64` and push it to Docker Hub.
+  2. Use `lzc-cli appstore copy-image <docker_image>` to get an official `registry.lazycat.cloud/...` image name.
+  3. Use the returned image in `lzc-manifest.yml`.
+  4. Automate this via `make update`.
 - `build.sh`, `Makefile` (must include `build`, `install`, `update`, `release-prep`).
 - Add `application.oidc_redirect_path` and `application.file_handler` if applicable.
 - For AI-native: evaluate `ai-pod-service/`, `caddy-aipod`, and `extension.zip`.
@@ -169,6 +189,7 @@ Once "worth porting" is confirmed, hand over to `lazycat:ship-app` for packaging
 - Market Research: [references/market-research.md](./references/market-research.md)
 - Porting Checklist: [references/porting-checklist.md](./references/porting-checklist.md)
 - Command Conventions: [references/command-conventions.md](./references/command-conventions.md)
+- Native Batch Copy CLI (Go): [references/lzc-copy-image-go/README.md](./references/lzc-copy-image-go/README.md)
 - S2I (Source-to-Image) Strategy: [references/s2i-strategy.md](./references/s2i-strategy.md)
 - AI Pod Playbook: [../lazycat:create-app/references/aipod-playbook.md](../lazycat:create-app/references/aipod-playbook.md)
 - Incentive Rules: [../lazycat:ship-app/references/cash-incentive.md](../lazycat:ship-app/references/cash-incentive.md)

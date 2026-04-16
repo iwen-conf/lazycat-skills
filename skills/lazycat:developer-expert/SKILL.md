@@ -35,6 +35,46 @@ When a user presents a requirement, strictly follow the classification below and
 **Scenario:** The developer has completed development and testing and needs to list the app on the Lazycat App Store, or needs to understand review rules and the process for pushing images to the official registry.
 **Action:** Read and follow the specifications in `references/store-publish.md`.
 
+### 6. New Project Creation and Baseline (Project Init)
+**Scenario:** Creating a Lazycat app from scratch, initializing scaffolds, unifying Go + Vue + Element Plus baseline, adding login/registration with dual tokens and silent refresh, or establishing the `docs/` tree and command entries.
+**Action:** Delegate to `lazycat:create-app`.
+
+### 7. Application Porting and Selection (Porting)
+**Scenario:** Porting open-source or self-hosted projects from GitHub to Lazycat, including candidate search, App Store de-duplication, incentive assessment, S2I strategy, and `build.sh`/`Makefile` setup.
+**Action:** Delegate to `lazycat:port-app`.
+
+### 8. Admin UI Quality Convergence (Admin UI)
+**Scenario:** Upgrading admin interfaces, operational consoles, or B-side workspaces to high-quality, screenshot-ready, submission-ready standards using Vue + Element Plus.
+**Action:** Delegate to `lazycat:admin-ui`.
+
+### 9. AI Pod Application Development (AI Pod)
+**Scenario:** Building applications for the Lazycat Computing Power Cabin (AI Pod), including `ai-pod-service` Docker Compose, Traefik routing, AI browser extensions, and GPU container configuration.
+**Action:** Delegate to `lazycat:aipod-developer`.
+
+### 10. Application Version Updates (App Update)
+**Scenario:** Updating an already-listed app: image sync via `copy-image`, manifest version bump, LPK rebuild, upgrade path verification, and Developer Center re-submission.
+**Action:** Delegate to `lazycat:update-app`.
+
+### 11. End-to-End Shipping and Delivery (Shipping)
+**Scenario:** Advancing an app from "ready" to "submitted, reviewed, and published" on the Lazycat App Store, including packaging, store assets, submission, and post-release verification.
+**Action:** Delegate to `lazycat:ship-app`.
+
+### 12. App Icon Preparation (Icon)
+**Scenario:** Preparing a 1024x1024 PNG app icon for store listing, including semantic extraction, prompt generation for external image models, and post-generation verification.
+**Action:** Delegate to `lazycat:prepare-icon`.
+
+### 13. Guide and Article Creation (Guides)
+**Scenario:** Writing application guides, usage tutorials, porting retrospectives, or integration articles that meet Lazycat creation incentive standards.
+**Action:** Delegate to `lazycat:write-guide`.
+
+### 14. UI/UX Design Intelligence (Design)
+**Scenario:** Needing design system recommendations, color palettes, typography, UX guidelines, or stack-specific best practices for the app's frontend.
+**Action:** Delegate to `lazycat:ui-ux-pro-max`.
+
+### 15. Application Troubleshooting (Debug)
+**Scenario:** App won't start, blank page, 404/502 errors, container exited, health check failures, inject not working, OIDC callback failures, permission denied, or any post-install runtime issues.
+**Action:** Delegate to `lazycat:troubleshoot`.
+
 ---
 **Mandatory Constraints for AI Engine:**
-You must read the above sub-documents on a "Lazy-load" basis. For example, if a user asks "how to let users enter a password during installation," only read `references/dynamic-deploy.md`. Do not read routing or SDK documentation. This protects the context window and improves answer accuracy.
+You must read the above sub-documents on a "Lazy-load" basis. For example, if a user asks "how to let users enter a password during installation," only read `references/dynamic-deploy.md`. Do not read routing or SDK documentation. For scenarios matching items 6–14, delegate to the corresponding skill rather than attempting to answer from this skill's references. This protects the context window and improves answer accuracy.

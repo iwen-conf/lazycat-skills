@@ -38,20 +38,25 @@ services:
 ```
 
 ## 2. Web Script Injection (`application.injects`) (v1.5.0+)
-Use this to forcibly inject JS scripts into specific web pages (e.g., to auto-fill default passwords) without modifying third-party Docker frontend code.
+Use this to forcibly inject JS scripts into specific web pages (e.g., to auto-fill default passwords) without modifying third-party Docker frontend code. For passwordless login scenarios where users can change their passwords within the app, always prefer the **Three-Phase Linkage** approach (intercepting password on request, persisting on response, and auto-filling on browser hash routes).
 
-**Core Logic:** Scripts are injected only when `include` (whitelist) is met and `exclude` (blacklist) is not.
+### Mandatory Decision Order
 
-**Example: Auto-login for third-party systems**
+1. If the current repository is the application source and the login / password-change flow is editable, prefer an **app-native three-phase implementation** over adding a runtime sidecar or token-exchange proxy.
+2. Only default to runtime inject linkage when the upstream frontend cannot be cleanly modified.
+3. Before writing inject config, confirm which syntax generation the target box supports. If installation expects `when`, or build lint reports unknown `mode/include/scripts`, use the legacy `on/when/do` form.
+
+**Core Logic:** Scripts are injected only when the `when` condition is met.
+
+**Example: Auto-login for third-party systems (Simple Autofill)**
 ```yaml
 application:
   injects:
     - id: auto-login
-      mode: exact # Supports exact or prefix
-      include:
+      when:
         - "/login"      # Inject when visiting /login
         - "/#signin"    # Also matches hash routes
-      scripts:
+      do:
         # Use Lazycat's built-in form-filling script
         - src: builtin://simple-inject-password
           params:

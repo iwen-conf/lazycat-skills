@@ -7,6 +7,44 @@
 1. 简单场景：使用 `builtin://simple-inject-password` + 部署参数，自动填充半固定账号密码。
 2. 高级场景：三阶段联动（request/response/browser），自动记录用户设置的新密码，并在登录页和修改密码页自动填充。
 
+## 先做方案选择，不要直接写 inject
+
+在开始写 `lzc-manifest.yml` 前，先判断当前问题属于哪一类：
+
+1. **源码可改**：如果你手上的仓库就是应用源码，而且登录页、登录成功动作、改密成功动作都可以直接改，优先做**应用内三阶段联动**：
+   - 登录成功后持久化当前凭据
+   - 改密成功后更新持久化密码
+   - 登录页读取最新凭据并自动填充 / 自动提交
+   这种情况不要优先引入 sidecar、代理换 token 页面或额外 auth 服务。
+2. **源码不可改**：如果只是移植第三方镜像，或者上游前端不方便维护，再使用本文的 inject 三阶段联动。
+
+## inject 语法兼容性优先检查
+
+现场存在两代 `application.injects` 语法，不能想当然地只写新版：
+
+1. **如果目标盒子 / 安装器要求 `when` 字段**，或者 `lzc-cli project build` 对 `mode/include/scripts` 报 unknown fields，就必须使用旧语法：
+   - `on`
+   - `when`
+   - `do`
+2. **如果没有明确确认新版可用，不要默认写 `mode/include/scripts`**。
+3. **构建通过不代表安装通过**。inject 相关字段只要有 lint warning，就必须继续修到 warning 消失。
+
+旧语法示例：
+
+```yml
+application:
+  injects:
+    - id: login-autofill
+      on: browser
+      when:
+        - /app/login
+      do:
+        - src: builtin://simple-inject-password
+          params:
+            user: admin
+            password: secret
+```
+
 ## 常见方式
 
 在微服应用里，常见的“免密/弱感知登录”大致有以下几种方式：
@@ -229,6 +267,8 @@ services:
 1. `on=request/response` 时写了 hash 规则（`#...`），导致规则不生效。
 2. request 阶段直接把密码写入 `persist`，未在 response 成功后再提交，导致失败请求污染数据。
 3. `simple-inject-password` 未指定选择器，页面字段命名特殊时可能只填充部分输入框。
+4. 在源码可改的项目里，先上 runtime sidecar 或代理换 token 链，结果把问题做重，还引入 404、裸 JSON 和退出回登问题。
+5. 目标盒子仍然要求旧 inject 语法，却直接提交 `mode/include/scripts`，导致 `make install` 失败并提示 `application.injects.0 when is required`。
 
 ## 下一步
 

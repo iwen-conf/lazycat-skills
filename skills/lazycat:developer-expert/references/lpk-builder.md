@@ -106,6 +106,14 @@ If pulling images from external registries (e.g., Docker Hub) is slow or fails, 
 3. Push the image: `docker push dev.<box_name>.heiyu.space/<image_name>:<version>`
 4. Use this test image address in `lzc-manifest.yml`.
 
+**Remote Image Bridge (Recommended):**
+If the upstream only provides a `Dockerfile`, or if the user needs a custom image with local modifications, use this route by default:
+1. Build the image locally for `linux/amd64`: `docker buildx build --platform linux/amd64 -t your-hub-user/app-name:v1.0 --load .`
+2. Push the validated image to Docker Hub: `docker push your-hub-user/app-name:v1.0`
+3. Sync it to the official Lazycat registry: `lzc-cli appstore copy-image your-hub-user/app-name:v1.0`
+4. Replace `services.<name>.image` in `lzc-manifest.yml` with the returned `registry.lazycat.cloud/...` address.
+5. Keep the `lpk` focused on `package.yml`, `lzc-build.yml`, `lzc-manifest.yml`, icons, runtime scripts, and static assets. Do **not** attempt to pack the application image layers into the `lpk`.
+
 **Official Release Phase:**
 Before publishing to the App Store, images must be copied to the official managed registry:
 1. Execute: `lzc-cli appstore copy-image <public_image_name>`

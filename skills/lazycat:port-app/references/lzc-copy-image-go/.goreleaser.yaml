@@ -1,0 +1,65 @@
+version: 2
+
+project_name: lzc-copy-image
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: lzc-copy-image
+    main: .
+    binary: lzc-copy-image
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+
+archives:
+  - id: binary-archives
+    ids:
+      - lzc-copy-image
+    formats:
+      - tar.gz
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_
+      {{- if eq .Os "darwin" }}Darwin{{ else if eq .Os "linux" }}Linux{{ else }}{{ .Os }}{{ end }}_
+      {{- if eq .Arch "amd64" }}x86_64{{ else if eq .Arch "arm64" }}arm64{{ else }}{{ .Arch }}{{ end }}
+
+checksum:
+  name_template: checksums.txt
+
+snapshot:
+  version_template: 0.0.0-next
+
+release:
+  github:
+    owner: your-github-user
+    name: lzc-copy-image
+
+brews:
+  - name: lzc-copy-image
+    ids:
+      - binary-archives
+    directory: Formula
+    homepage: https://github.com/your-github-user/lzc-copy-image
+    description: Batch wrapper for lzc-cli appstore copy-image
+    license: REPLACE-WITH-SPDX-ID
+    repository:
+      owner: your-github-user
+      name: homebrew-tap
+      branch: main
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    commit_author:
+      name: release-bot
+      email: release-bot@example.com
+    test: |
+      system "#{bin}/lzc-copy-image", "--help"

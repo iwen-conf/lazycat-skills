@@ -43,8 +43,8 @@ description: 一句话描述（用于触发匹配，务必精准）
 4. **中文优先**：本技能包面向中文开发者，所有文档使用中文编写
 
 ### 修改技能时的同步规则
-- `lazycat-lpk-builder/SKILL.md` 和 `lazycat-developer-expert/references/lpk-builder.md` 内容高度重叠，**修改其一时必须同步修改另一个**
-- `references/` 下的文件如果在多个技能中共享（如 `build-spec.md`、`manifest-spec.md`、`store-publish.md`），修改时必须同步所有副本
+- 以下文档的**单一源**位于 `lazycat:lpk-builder/references/`：`manifest-spec.md`、`build-spec.md`、`package-spec.md`、`store-publish.md`、`troubleshooting.md`。`lazycat:developer-expert/references/` 下的同名文件仅为引用指针，**修改时只改 lpk-builder 下的源文件**。
+- `references/` 下的其他共享文件（如 `aipod-playbook.md`、`cash-incentive.md`、`command-conventions.md`）如果在多个技能中被引用，修改时必须同步所有引用方的路径。
 
 ## 4. 敏感信息约束（红线）
 

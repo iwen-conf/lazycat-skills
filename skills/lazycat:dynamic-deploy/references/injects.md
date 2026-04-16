@@ -5,17 +5,50 @@
 `injects` is used to inject scripts into HTML pages matching specific URLs, suitable for minimal-intrusion adaptation of third-party applications. This feature requires lzcos 1.5.0+.
 For field definitions, please refer to [manifest.md#injects](./spec/manifest.md#injects); this document focuses on behavioral details and practical recommendations.
 
+## Compatibility First
+
+There are at least two inject syntaxes in the field, and you must not assume the newer one is available:
+
+- **Legacy syntax**: `on / when / do`
+- **Newer syntax in newer docs**: `mode / include / exclude / scripts`
+
+Operational rule:
+
+1. If the target box, installer, or `lzc-cli project build` reports unknown fields for `mode/include/scripts`, immediately fall back to `on/when/do`.
+2. If installation fails with `application.injects.0 when is required`, that is a strong signal the target environment expects the legacy syntax.
+3. Do not treat a successful build as proof that the inject fields will install correctly.
+
+Legacy syntax example:
+
+```yml
+application:
+  injects:
+    - id: login-autofill
+      on: browser
+      when:
+        - "/login"
+        - "/#login"
+      do:
+        - src: builtin://simple-inject-password
+          params:
+            user: "admin"
+            password: "admin123"
+```
+
+Only use the newer `mode/include/scripts` form after confirming the target box really supports it.
+
 ## Quick Example
 
 ```yml
 application:
   injects:
     - id: login-autofill
-      include:
+      on: browser
+      when:
         - "/"
         - "/?version=1.2&channel=stable"
         - "/#login"
-      scripts:
+      do:
         - src: builtin://simple-inject-password
           params:
             user: "admin"
@@ -23,6 +56,8 @@ application:
 ```
 
 ## Rule Model
+
+The rest of this document describes the matching semantics conceptually. If you are targeting a box that only supports legacy syntax, map those concepts back to `when/do` instead of emitting unsupported fields.
 
 - `include`: Whitelist rules; any match enters candidacy.
 - `exclude`: Blacklist rules; any match results in exclusion.

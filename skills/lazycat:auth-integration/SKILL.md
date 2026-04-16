@@ -64,3 +64,32 @@ hc api_auth_token gen --uid admin
 
 ## Platform Compatibility Notes
 For more complex OIDC configurations or header interception issues, proactively read the relevant Markdown documents in the `references/` directory of this skill (`oidc.md`, `http-request-headers.md`, `public-api.md`, `api-auth-token.md`).
+
+## 5. OIDC Troubleshooting Quick Reference
+
+When OIDC integration fails, diagnose in this order:
+
+### Callback 404
+1. Verify `application.oidc_redirect_path` in `lzc-manifest.yml` exactly matches the path the app expects (e.g., `/auth/oidc.callback` vs `/auth/oidc/callback` — trailing slashes and dots matter).
+2. Confirm the app's web framework is actually listening on that callback path and not behind a route prefix that gets stripped by `application.routes`.
+3. If using `application.upstreams` with `disable_trim_location: false` (default), the prefix is stripped before reaching the app — the callback path must account for this.
+
+### redirect_uri Mismatch
+1. The OIDC provider auto-generates the redirect URI from `oidc_redirect_path` + the app's subdomain. If the app hardcodes a different redirect URI, the provider will reject it.
+2. Check the app's OIDC config for any hardcoded `redirect_uri` and ensure it matches `https://<subdomain>.<box-domain>/<oidc_redirect_path>`.
+3. Some apps require the redirect URI to be registered in their own config file — ensure both sides agree.
+
+### Token Refresh Failures
+1. Verify the app stores and uses the `refresh_token` returned by the OIDC provider.
+2. Check if the OIDC token endpoint (`LAZYCAT_AUTH_OIDC_TOKEN_URI`) is reachable from inside the container: `lzc-cli docker exec <container> curl -s $LAZYCAT_AUTH_OIDC_TOKEN_URI`.
+3. Some apps silently discard refresh tokens — check the app's OIDC library configuration for `offline_access` scope.
+
+### Role Mapping Not Working
+1. `X-HC-User-Role` is injected by `lzc-ingress` and has values `ADMIN` or `NORMAL` (uppercase). If the app expects lowercase or different role names, add a mapping layer.
+2. If the request goes through `public_path`, the header may be empty for unauthenticated users — this is expected behavior.
+3. Verify the app reads `X-HC-User-Role` from the HTTP headers, not from the OIDC userinfo endpoint (which uses a different field).
+
+### User ID Not Received
+1. `X-HC-User-ID` is only injected for authenticated requests. If the path is in `public_path` and the user is not logged in, the header is cleared.
+2. Check that the app reads the header name exactly as `X-HC-User-ID` (case-sensitive in some frameworks).
+3. If using `app-proxy` (Nginx), ensure `proxy_pass` preserves upstream headers — custom Nginx configs can accidentally strip them.
