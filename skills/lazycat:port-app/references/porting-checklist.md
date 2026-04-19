@@ -20,6 +20,7 @@
 ## 3. Lazycat Adaptation
 - [ ] Prepared `lzc-build.yml`.
 - [ ] Prepared `lzc-manifest.yml`.
+- [ ] If the app uses bridged images, the final pullable image refs have already been written back to `lzc-manifest.yml` before `make install`.
 - [ ] Evaluated OIDC requirement.
 - [ ] Evaluated `file_handler` requirement.
 - [ ] Clarified credential acquisition path for apps requiring login.

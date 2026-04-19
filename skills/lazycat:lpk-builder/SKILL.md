@@ -77,6 +77,8 @@ lzc-cli project build -o release.lpk
 lzc-cli app install release.lpk
 ```
 
+These packaging and install entrypoints must consume an already-correct `lzc-manifest.yml`. Do **not** redesign `make install` or `lzc-cli app install` wrappers to perform `docker push`, `lzc-cli appstore copy-image`, or manifest rewrites on the fly.
+
 **Entering Devshell (Development & Debugging Environment):**
 If the user needs to debug locally or within a container, guide them into the devshell.
 ```bash
@@ -113,6 +115,7 @@ If the upstream only provides a `Dockerfile`, or if the user needs to publish a 
 3. Sync it to the official Lazycat registry: `lzc-cli appstore copy-image your-hub-user/app-name:v1.0`
 4. Replace `services.<name>.image` in `lzc-manifest.yml` with the returned `registry.lazycat.cloud/...` address.
 5. Keep the `lpk` focused on `package.yml`, `lzc-build.yml`, `lzc-manifest.yml`, icons, runtime scripts, and static assets. Do **not** attempt to pack the application image layers into the `lpk`.
+6. Finish this image-sync and manifest-backfill work during migration, `make update`, or release preparation. By the time the user runs `make build` or `make install`, the manifest should already reference the final pullable image addresses.
 
 **Official Publishing Phase:**
 Before listing on the store, copy the image to the official managed registry for stability:
@@ -156,6 +159,10 @@ When generating configuration files, you must comply with the following Lazycat 
      - `ports: ["8080:80"]` -> Convert to `routes` in `lzc-manifest.yml` (e.g., `- /=http://service_name:80`).
      - `volumes: ["./data:/app/data"]` -> Convert to `binds` mapping to `/lzcapp/var/` (e.g., `- /lzcapp/var/data:/app/data`).
      - `depends_on` -> Not directly needed in Lazycat. Services usually communicate via `http://service_name:port`; use the full internal domain only for the special cases above.
+
+8. **Settle Final Image Refs Before Install**
+   - If the app depends on copied or bridged images, the returned test/official registry addresses must be written into `lzc-manifest.yml` before `make build` / `make install`.
+   - `make install` is for packaging + installing the current LPK. It must not silently own image upload, `copy-image`, or manifest backfill responsibilities.
 
 ## Platform Compatibility Notes
 If your platform supports automatic reading of referenced files, utilize that feature; otherwise, use your `read_file` tool to proactively read relevant specification documents in the `references/` directory.

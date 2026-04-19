@@ -16,6 +16,7 @@ This skill is for porting open-source or self-hosted software to Lazycat. Defaul
 - If `lazycat_account` and `lazycat_password` exist on the local machine, prioritize using them to log in to the App Store before checking for duplicates. These variables are for MicroServer and App Store access, not the Developer Center or internal app accounts.
 - If a similar port exists with no added value, do not proceed with a duplicate path.
 - Implementation must provide `build.sh`, `Makefile`, `make build`, and `make install`.
+- For image-based ports, settle final pullable image refs in `lzc-manifest.yml` during migration or `make update`; do not make `make install` responsible for `docker push`, `copy-image`, or manifest rewrite work.
 - Must retain upstream address, license, and porting notes.
 
 For tool-based apps or those requiring unified login, evaluate `file_handler` and Microservice OIDC. If the project is AI-native, determine if it should be ported as a Computing Power Cabin `AI App` or AI Browser Extension.
@@ -110,11 +111,12 @@ Upon execution, provide a brief summary of:
 6. Prioritize OIDC or `file_handler` for suitable projects, as they affect incentives and UX.
 7. For AI-native projects, determine if they fit better as standard apps, `AI Apps`, or AI Browser Extensions.
 8. If a ported project needs a static homepage, the priority must be: `Connection Entry`, `Status Check`, `Actions`, `Feedback`. Do not put "Why use it" or "Roadmap" in running pages; use `README` or store assets.
-9. **Prioritize Docker over Source Code**: If a project provides a Docker image or `docker-compose.yml`, base the porting ENTIRELY on these Docker artifacts. **Do NOT** read or analyze the project's source code. Just use the Docker image directly.
-   - **Auto-Translation for `docker-compose.yml`**:
-     - `ports: ["8080:80"]` -> Convert to `routes` in `lzc-manifest.yml` (e.g., `- /=http://${service_name}.${lzcapp_appid}.lzcapp:80`).
-     - `volumes: ["./data:/app/data"]` -> Convert to `binds` mapping to `/lzcapp/var/` (e.g., `- /lzcapp/var/data:/app/data`).
-     - `depends_on` -> Not directly needed in Lazycat. Services communicate automatically via `${service_name}.${lzcapp_appid}.lzcapp`.
+9. If the port relies on bridged images, the returned registry address must be written back into `lzc-manifest.yml` before `make build` / `make install`. `make install` is only for building and installing the ready LPK.
+10. **Prioritize Docker over Source Code**: If a project provides a Docker image or `docker-compose.yml`, base the porting ENTIRELY on these Docker artifacts. **Do NOT** read or analyze the project's source code. Just use the Docker image directly.
+    - **Auto-Translation for `docker-compose.yml`**:
+      - `ports: ["8080:80"]` -> Convert to `routes` in `lzc-manifest.yml` (e.g., `- /=http://${service_name}.${lzcapp_appid}.lzcapp:80`).
+      - `volumes: ["./data:/app/data"]` -> Convert to `binds` mapping to `/lzcapp/var/` (e.g., `- /lzcapp/var/data:/app/data`).
+      - `depends_on` -> Not directly needed in Lazycat. Services communicate automatically via `${service_name}.${lzcapp_appid}.lzcapp`.
 
 ## Workflow
 
@@ -151,7 +153,8 @@ At minimum, add:
   1. If the image is custom-built, first build it locally for `linux/amd64` and push it to Docker Hub.
   2. Use `lzc-cli appstore copy-image <docker_image>` to get an official `registry.lazycat.cloud/...` image name.
   3. Use the returned image in `lzc-manifest.yml`.
-  4. Automate this via `make update`.
+  4. Put this sync + manifest-backfill step in migration flow or `make update`, not in `make install`.
+  5. By the time `make build` / `make install` runs, `lzc-manifest.yml` should already contain the final pullable image refs.
 - `build.sh`, `Makefile` (must include `build`, `install`, `update`, `release-prep`).
 - Add `application.oidc_redirect_path` and `application.file_handler` if applicable.
 - For AI-native: evaluate `ai-pod-service/`, `caddy-aipod`, and `extension.zip`.

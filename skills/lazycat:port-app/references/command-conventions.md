@@ -12,7 +12,7 @@
 当项目采用“本地构建镜像 -> Docker Hub -> `lzc-cli appstore copy-image` -> 回填 manifest”这条路线时，职责必须固定：
 
 - `build.sh`：不要构建应用主镜像，只处理 `runtime/`、静态资源和 `lpk` 交付内容。
-- `Makefile`：负责 `docker-build`、`docker-push`、`copy-image`、`update`、`build`、`install`。
+- `Makefile`：负责 `docker-build`、`docker-push`、`copy-image`、`update`、`build`、`install`，但职责必须分层：`copy-image` / manifest 回填属于迁移或更新阶段，`install` 只消费已经准备好的 `lpk`。
 - `lzc-manifest.yml`：正式发布时只保留 `registry.lazycat.cloud/...` 镜像地址。
 - `lpk`：只保留 manifest、runtime、图标、静态资源，不内嵌应用主镜像。
 
@@ -125,7 +125,7 @@ fi
 
 ## 3. 核心目标说明
 
-- `make install`：本地打包并安装到当前 Lazycat 环境，提审前必须真实执行。
+- `make install`：本地打包并安装到当前 Lazycat 环境，提审前必须真实执行；不要在这个目标里偷偷做 `docker push`、`copy-image` 或 `lzc-manifest.yml` 回填。
 - `make update`：适用于镜像升级或同步上游，负责 `copy-image`、回填 `lzc-manifest.yml`、重新打包。
 - `make release-prep`：提审前的最终步骤，包含测试、截图和交付证据整理。
 - `make verify`：无副作用校验入口，适合 CI/CD。
@@ -139,6 +139,7 @@ fi
 2. 使用 `lzc-cli appstore copy-image` 同步到 Lazycat 官方镜像仓。
 3. 将返回的 `registry.lazycat.cloud/...` 地址写回 `lzc-manifest.yml`。
 4. `make update` 应自动化或半自动完成上述流程。
+5. 在进入 `make build` / `make install` 之前，manifest 中的镜像地址必须已经是最终可拉取地址；不要把这一步延期到安装阶段。
 
 如果需要一次同步多个镜像，优先使用原生 CLI 包装器，不要依赖 `npx` 常驻进程。仓库内提供了一个 Go 参考实现：
 
