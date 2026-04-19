@@ -17,9 +17,11 @@ Suitable for most standard HTTP proxy scenarios.
 **Behavior:** By default, the `URL_PATH` prefix is **stripped**. For example, with `- /api/=http://backend:80`, a request to `/api/v1` reaches the backend as `/v1`.
 
 Three upstream protocols are supported:
-- `http(s)://$hostname/$path` (Most common; forwards to a container. Domain format must be `$service_name.$appid.lzcapp`).
+- `http(s)://$hostname/$path` (Most common; for same-app services prefer `http://backend:80`. Use the full `$service_name.$appid.lzcapp` form only when exact `Host` handling or name disambiguation is required).
 - `file:///$dir_path` (Directly hosts static files).
 - `exec://$port,$exec_file_path` (Starts an executable and proxies to a local port).
+
+`lzc-manifest.yml` is a plain manifest, not a shell template. Do not leave `${lzcapp_appid}` or other `${...}` placeholders in `application.routes`.
 
 ### 2. Advanced HTTP Routing (`application.upstreams`) (v1.3.8+)
 Suitable for scenarios requiring fine-grained control over HTTP requests.
@@ -34,7 +36,7 @@ Suitable for scenarios requiring fine-grained control over HTTP requests.
 ```yaml
 upstreams:
   - location: /api
-    backend: http://backend.cloud.lazycat.app.demo.lzcapp:80
+    backend: http://backend:80
     disable_trim_location: true # Preserves the /api prefix
 ```
 
@@ -71,7 +73,7 @@ application:
   secondary_domains:
     - myadmin
   routes:
-    - /=http://app-proxy.cloud.lazycat.app.myapp.lzcapp:80
+    - /=http://app-proxy:80
 services:
   app-proxy:
     image: registry.lazycat.cloud/app-proxy:v0.1.0

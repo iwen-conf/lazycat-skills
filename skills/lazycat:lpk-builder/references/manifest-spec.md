@@ -61,7 +61,7 @@
 | `health_check` | `AppHealthCheckExt` | Health check for the `app` container. Setting `disable` is only recommended during development; do not replace it otherwise, or auto-dependency logic may be lost. |
 | `oidc_redirect_path` | `string` | Valid OIDC redirect path. The full domain is automatically concatenated based on the subdomain. |
 
-Note: `routes` strips the path prefix by default during forwarding. To retain the prefix, use `upstreams` and set `disable_trim_location: true` (lzcos v1.3.9+).
+Note: `routes` strips the path prefix by default during forwarding. To retain the prefix, use `upstreams` and set `disable_trim_location: true` (lzcos v1.3.9+). For internal HTTP routing, prefer concrete service targets such as `http://backend:80`. `lzc-manifest.yml` is not shell-interpolated, so `${lzcapp_appid}` and other `${...}` placeholders must not appear literally in `application.routes`.
 
 ### 4.3 Multiple Entries Configuration {#entries}
 

@@ -52,7 +52,7 @@ lzc-sdk-version: '2.0'
 application:
   subdomain: yourapp # Default assigned subdomain
   routes:
-    - /=http://your_service_name.cloud.lazycat.app.com.example.myapp.lzcapp:80
+    - /=http://your_service_name:80
 services:
   your_service_name:
     image: nginx:latest # Image to run
@@ -128,8 +128,10 @@ When the user needs to formally list the app on the Lazycat App Store, read `ref
 When generating configuration files, you must comply with the following Lazycat MicroServer red-line rules:
 
 1. **Inter-Service Communication Domains**
-   - Never use `localhost` or plain Service names for cross-container communication unless the app explicitly supports a single-container setup.
-   - The standard domain format for cross-service calls is: `${service_name}.${lzcapp_appid}.lzcapp`. E.g., `db.cloud.lazycat.app.demo.lzcapp`.
+   - Never use `localhost` for cross-container communication.
+   - For `application.routes` and most intra-app HTTP forwarding, prefer concrete service upstreams such as `http://your_service_name:80`.
+   - Use the full internal domain `$service_name.$appid.lzcapp` only when you explicitly need the backend to receive that host or must disambiguate conflicting service names.
+   - `lzc-manifest.yml` is not shell-templated. Do not leave `${lzcapp_appid}` or any other `${...}` placeholder in committed route targets.
 
 2. **Persistent Storage Path Constraints**
    - Any application data that needs persistence **must** be mounted under `/lzcapp/var`.
@@ -151,9 +153,9 @@ When generating configuration files, you must comply with the following Lazycat 
 7. **Prioritize Docker over Source Code**
    - If a project provides a Docker image or `docker-compose.yml`, base the porting ENTIRELY on these Docker artifacts. **Do NOT** read or analyze the application's source code, as this wastes context. Just configure the `image:` in `lzc-manifest.yml` to use the provided Docker image.
    - **Auto-Translation for `docker-compose.yml`**:
-     - `ports: ["8080:80"]` -> Convert to `routes` in `lzc-manifest.yml` (e.g., `- /=http://${service_name}.${lzcapp_appid}.lzcapp:80`).
+     - `ports: ["8080:80"]` -> Convert to `routes` in `lzc-manifest.yml` (e.g., `- /=http://service_name:80`).
      - `volumes: ["./data:/app/data"]` -> Convert to `binds` mapping to `/lzcapp/var/` (e.g., `- /lzcapp/var/data:/app/data`).
-     - `depends_on` -> Not directly needed in Lazycat. Services communicate automatically via `${service_name}.${lzcapp_appid}.lzcapp`.
+     - `depends_on` -> Not directly needed in Lazycat. Services usually communicate via `http://service_name:port`; use the full internal domain only for the special cases above.
 
 ## Platform Compatibility Notes
 If your platform supports automatic reading of referenced files, utilize that feature; otherwise, use your `read_file` tool to proactively read relevant specification documents in the `references/` directory.

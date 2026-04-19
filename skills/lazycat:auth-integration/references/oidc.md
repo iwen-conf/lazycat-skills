@@ -33,7 +33,7 @@ application:
   # The official Outline documentation does not specify this, but it can be determined from error logs.
   oidc_redirect_path: /auth/oidc.callback
   routes:
-    - /=http://outline.cloud.lazycat.app.outline.lzcapp:3000
+    - /=http://outline:3000
 services:
   outline:
     image: registry.lazycat.cloud/tx1ee/outlinewiki/outline:fb0e2ef4f32f3601

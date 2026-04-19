@@ -108,7 +108,7 @@ Example routing:
 ```yaml
 application:
   routes:
-    - /=http://app-proxy.cloud.lazycat.app.app-proxy-test.lzcapp:80
+    - /=http://app-proxy:80
   subdomain: app-proxy-test
   secondary_domains:
     - portainer

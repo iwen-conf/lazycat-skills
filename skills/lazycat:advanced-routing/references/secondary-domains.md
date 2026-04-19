@@ -11,7 +11,7 @@ While `lzc-manifest.yml:application.subdomain` defines the developer's desired d
 
 v1.3.8+ supports [domain-based traffic forwarding](./advanced-route#upstreamconfig).
 
-Since `application.routes` does not support domain-based forwarding, use a special route rule like `- /=http://nginx.$appid.lzcapp` for fine-grained control. Note: You must use the `$service.$appid.lzcapp` format to ensure the upstream receives the complete hostname. [See details here](advanced-route.html#p2).
+Since `application.routes` does not branch by domain on its own, prefer `application.upstreams` with `domain_prefix` or front the app with `app-proxy` for fine-grained control. When routing to another service in the same app, default to `http://service:port`; only switch to the full `$service.$appid.lzcapp` form if the backend must receive that exact host. Do not leave `${...}` placeholders in a plain `lzc-manifest.yml`.
 
 **Example Configuration:**
 1. Default domain opened from the app list: `whoami.xx.heiyu.space` (assuming the assigned subdomain is `whoami`).
@@ -23,7 +23,7 @@ lzc-sdk-version: '2.0'
 application:
   subdomain: whoami
   routes:
-    - /=http://nginx.org.snyh.debug.whoami.lzcapp:80
+    - /=http://nginx:80
 
 services:
   nginx:

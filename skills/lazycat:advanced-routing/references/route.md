@@ -17,6 +17,7 @@ routes:
   - /api/=http://backend:80
 ```
 A request to `/api/v1` will be received by the backend as `/v1`. To preserve the prefix, use `application.upstreams` and set `disable_trim_location: true` (lzcos v1.3.9+).
+For same-app HTTP routing, prefer concrete service upstreams such as `http://backend:80`. `lzc-manifest.yml` does not interpolate shell-style `${...}` placeholders.
 
 ## HTTP Upstream
 Supports both internal and external services. For example, the built-in App Store lzcapp uses a single line:
@@ -32,15 +33,15 @@ Example: `Bitwarden`
 lzc-sdk-version: '2.0'
 application:
   routes:
-  - /=http://bitwarden.cloud.lazycat.app.bitwarden.lzcapp:80
-  - /short=http://bitwarden:80
+  - /=http://bitwarden:80
   subdomain: bitwarden
 services:
   bitwarden:
     image: bitwarden/nginx:1.44.1
 ```
-1. `bitwarden:80` uses the service name, which resolves to the container's IP at runtime.
-2. The full format is `$service_name.$appid.lzcapp`.
+1. `bitwarden:80` uses the service name, which resolves to the container's IP at runtime and is the recommended default in lzcos 1.3.x+.
+2. The full format is `$service_name.$appid.lzcapp`, but only use it when you need an exact upstream `Host` value or must avoid service-name conflicts.
+3. Do not commit `${lzcapp_appid}` literally into `application.routes`; plain manifests will not expand it.
 
 **Important Considerations:**
 - In lzcos 1.3.x+, application isolation is enforced. Directly using the `service_name` is recommended for simplicity and ease of appid modification.
@@ -86,7 +87,7 @@ The `application.upstreams` field allows for more granular control:
 ```yaml
 subdomain: debug
 routes:
-  - /=http://app1.org.snyh.debug.whoami.lzcapp:80
+  - /=http://app1:80
 
 upstreams:
   - location: /search
@@ -104,7 +105,7 @@ upstreams:
 
   - location: /
     domain_prefix: config
-    backend: http://config.snyh.debug.lzcapp:80
+    backend: http://config:80
 
   - location: /api
     backend: http://127.0.0.1:3001/
