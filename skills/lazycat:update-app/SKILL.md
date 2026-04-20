@@ -10,9 +10,9 @@ You are responsible for progressing a "new version or image" to the state of "su
 ## Overview
 
 This skill handles the lifecycle updates of Lazycat apps. The core workflow includes:
-1. **Image Update**: Use `lzc-cli appstore copy-image` to sync DockerHub images to Lazycat and obtain the internal image name.
-1. **Configuration Update**: Modify `package.yml` to update the version and `manifest.yml` to update the image address to the synced version.
-3. **Build and Verify**: Run `make update` and `make install` to verify the new version in a real Lazycat environment.
+1. **Image Update**: Build the updated image, push it to a public registry, then use `lzc-cli appstore copy-image` to sync it to Lazycat and obtain the internal image name.
+2. **Configuration Update**: Modify `package.yml` to update the version and backwrite `lzc-manifest.yml` to the copied Lazycat registry address. If packaging uses manifest templates, update those sources too.
+3. **Build and Verify**: Build the `.lpk` from the backwritten manifest, then run `make install` or the repo's dedicated release-install target to verify the new version in a real Lazycat environment.
 4. **Prepare Submission**: Run `make release-prep` to generate screenshots and reports.
 5. **Submit Update**: Ensure metadata in `package.yml` (name, tagline, description, keywords) is complete and submit to the Developer Center.
 
@@ -20,27 +20,29 @@ This skill handles the lifecycle updates of Lazycat apps. The core workflow incl
 
 - **Trigger**: Updating an app, upgrading a version, image upgrade, copy-image, make update, submitting LPK, Developer Center updates, manifest image modification.
 - **Inputs**: Original image name, version number, repository path, Developer Center credentials, Lazycat MicroServer credentials.
-- **Outputs**: Updated manifest.yml, new LPK file, Developer Center submission record, verification report.
+- **Outputs**: Updated `lzc-manifest.yml`, new LPK file, Developer Center submission record, verification report.
 - **Quality Gate**: **You must run `make install` to verify the updated app before submission; unverified submissions are strictly prohibited.** All metadata must be complete upon submission.
 - **Decision Tree**: Determine if it's a code update, image update, or both, and decide if `copy-image` is required.
 
 ## The Iron Law
 
-1. **Image Sync First**: New images must be synced via `lzc-cli appstore copy-image`; using external DockerHub addresses directly in `manifest.yml` is prohibited.
+1. **Image Sync First**: New images must be synced via `lzc-cli appstore copy-image`; using external DockerHub addresses directly in `lzc-manifest.yml` is prohibited.
 2. **Real Environment Verification**: After an update, you must install it via `make install` on Lazycat MicroServer for functional verification and upgrade path checks (e.g., database migrations).
 3. **Metadata Integrity**: When submitting to the Developer Center, the app name, tagline, detailed description, and keywords must be complete and consistent with the local manifest.
-4. **Makefile Driven**: Use `make update` to automate image syncing and packaging, and `make release-prep` to prepare submission assets.
+4. **Makefile Driven**: Prefer the repo's dedicated release target when it exists. If the repo is image-only and the user asks for the full closure, the standard sequence is `build image -> push public image -> copy-image -> backwrite source manifest -> build lpk -> install lpk`.
 
 ## Workflow
 
-### 1. Image Sync and Manifest Update
-- Obtain the latest upstream image name (e.g., `bitnami/gitea:latest`).
-- Execute `lzc-cli appstore copy-image <image_name>`.
+### 1. Image Build, Sync, and Manifest Update
+- Obtain the latest upstream image name or build output.
+- If the image is locally modified, push it to a public registry first.
+- Execute `lzc-cli appstore copy-image <public_image_name>`.
 - Retrieve the returned Lazycat private image address.
-- Update the `image` field in `manifest.yml`.
+- Backwrite the `image` field in the source `lzc-manifest.yml`. If the repo packages from manifest templates, backwrite those sources too.
 
 ### 2. Automated Build
-- Run `make update`: This target should include image syncing (if supported by script) and `lzc-cli project build`.
+- Prefer an explicit release target such as `make release-build` / `make release-install` when the repo already supports the full chain.
+- If the repo lacks that target but the user requests end-to-end closure, add or fix one instead of overloading `make install`.
 - Confirm the version number in the generated `.lpk` file has incremented.
 
 ### 3. Installation and Verification

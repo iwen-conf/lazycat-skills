@@ -10,7 +10,7 @@ You are the Chief Architect and Development Expert for Lazycat MicroServer. This
 ## Platform Core Concepts
 Lazycat MicroServer uses a unique `lpk` package format for application distribution. The core configuration files are `package.yml` (Static Metadata), `lzc-build.yml` (Build Config), and `lzc-manifest.yml` (Runtime Config).
 
-For image-based migrations, final pullable image refs belong in the manifest during porting or update preparation. Do not redesign `make install` to own `docker push`, `copy-image`, or manifest backfill responsibilities.
+For image-based migrations, final pullable image refs belong in the source manifest during porting or update preparation. Do not redesign `make install` to own `docker push`, `copy-image`, or manifest backfill responsibilities. If the user explicitly wants the full release closure, build or use a separate release target such as `release-build` / `release-install` that runs `build image -> push public image -> lzc-cli appstore copy-image -> backwrite the returned registry.lazycat.cloud address into the source manifest (and any manifest templates used for packaging) -> build lpk -> install lpk`.
 
 ## Requirement Routing and Skill Distribution (Progressive Disclosure)
 

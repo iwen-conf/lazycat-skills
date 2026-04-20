@@ -32,8 +32,10 @@ Check items by stage. Do not skip steps.
 ## 3. Packaging & Uploading
 
 - [ ] Generated release artifacts using the actual build pipeline.
+- [ ] For image-based apps, executed the real release chain in order: build image, push public image, `copy-image`, backwrite source manifest, build `.lpk`, install `.lpk`.
 - [ ] Recorded package path, filename, size, and version number.
 - [ ] Recorded release commands, CLI output, or upload page status.
+- [ ] Verified that the source manifest and any manifest templates used by packaging now contain the final `registry.lazycat.cloud/...` image refs.
 - [ ] Confirmed current field and format requirements in the Developer Center before uploading.
 - [ ] If using `.lpk`, confirmed the version in the package matches the store profile.
 - [ ] If porting open-source software, prepared the upstream author's URL and ensured the `author` field exactly matches the original author's name.

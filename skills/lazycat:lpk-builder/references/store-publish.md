@@ -39,10 +39,11 @@ lzc-cli appstore copy-image your-hub-user/app-name:v1.0
 Rules for this path:
 1. `copy-image` must receive a registry address that the server can pull. A local-only image tag is invalid.
 2. Prefer Docker Hub for the public handoff unless the user explicitly provides another public registry.
-3. After `copy-image` succeeds, replace `services.<name>.image` in `lzc-manifest.yml` with the returned `registry.lazycat.cloud/...` value.
+3. After `copy-image` succeeds, backwrite `services.<name>.image` in the source `lzc-manifest.yml` with the returned `registry.lazycat.cloud/...` value. If the repo packages from manifest templates or staged manifests, backwrite those source files too.
 4. The `lpk` should only retain manifests, runtime scripts, icons, and static assets. Do **not** try to embed the application image itself into the package.
+5. If the user wants the full release closure, prefer a dedicated release target such as `release-build` / `release-install` that runs build image -> push public image -> `copy-image` -> backwrite source manifest -> build `.lpk` -> install `.lpk`.
 
-After uploading, you **must manually update the image address in `lzc-manifest.yml`** to the official `registry.lazycat.cloud/...` address returned.
+After uploading, you **must manually update the image address in the source `lzc-manifest.yml`** to the official `registry.lazycat.cloud/...` address returned before packaging or publishing.
 
 ### 3. Submit for Review
 Use `lzc-cli` (v1.2.54 or above) to submit:

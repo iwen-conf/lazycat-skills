@@ -106,15 +106,17 @@ Don't just say "I'll take a look." Let the user know you are advancing a specifi
 3. For volatile info like CLI params, page fields, or review rules, prioritize official docs or actual Dev Center pages over memory.
 4. Do not pretend to have submitted, passed review, or released. Every milestone requires verifiable evidence: command logs, package files, screenshots, page states, versions, submission times.
 5. Do not skip minimal functional verification. Lazycat reviews reject crashes, config failures, missing icons, broken links, misleading descriptions, etc.; all shipping tasks must involve real installation and verification on Lazycat MicroServer.
-6. For cash incentives, prioritize original, high-quality, real-world apps; inform the user early if a type is not rewarded.
-7. Apps requiring login must ensure users can obtain credentials (registration, OIDC, or public test accounts).
-8. For tool apps, prioritize disk file association; for account-based apps, prioritize OIDC.
-9. Do not mix environment variables: `lazycat_account` is for the MicroServer; `lazycat_developer_center_account` is for the Dev Center; app-level tests use specific variables like `lazycat_gitea_account`.
-10. Admin apps must pass `lazycat:admin-ui` quality gates before screenshots and submission; do not use default templates.
-11. Standard business web apps with AI use the `BaseURL` scheme; do not add AI Pod structures unless required.
-12. Use official AI Pod docs/structure only when explicitly targeting Computing Power Cabin `AI Apps` or AI Browser Extensions.
-13. Distinguish between running app pages and store/submission assets. Content like "Why choose this," "Roadmap," or "Value proposition" belongs in `README`, `docs/release-prep/`, or store descriptions, not in running `web/*.html` pages (unless requested).
-14. For tool/console apps, the homepage priority must be: `Connection Config`, `Current Status`, `Actions`, `Feedback`. Do not put promotional text before functional entries.
+6. For image-based apps, verify that the source manifest used for packaging already contains `registry.lazycat.cloud/...` refs returned by `lzc-cli appstore copy-image`. Do not ship packages that still reference local-only tags or unreconciled placeholders.
+7. When the user wants the whole release closure, prefer a dedicated release target such as `release-build` / `release-install` that runs build image, push, copy-image, manifest backwrite, LPK build, and installation as one explicit pipeline.
+8. For cash incentives, prioritize original, high-quality, real-world apps; inform the user early if a type is not rewarded.
+9. Apps requiring login must ensure users can obtain credentials (registration, OIDC, or public test accounts).
+10. For tool apps, prioritize disk file association; for account-based apps, prioritize OIDC.
+11. Do not mix environment variables: `lazycat_account` is for the MicroServer; `lazycat_developer_center_account` is for the Dev Center; app-level tests use specific variables like `lazycat_gitea_account`.
+12. Admin apps must pass `lazycat:admin-ui` quality gates before screenshots and submission; do not use default templates.
+13. Standard business web apps with AI use the `BaseURL` scheme; do not add AI Pod structures unless required.
+14. Use official AI Pod docs/structure only when explicitly targeting Computing Power Cabin `AI Apps` or AI Browser Extensions.
+15. Distinguish between running app pages and store/submission assets. Content like "Why choose this," "Roadmap," or "Value proposition" belongs in `README`, `docs/release-prep/`, or store descriptions, not in running `web/*.html` pages (unless requested).
+16. For tool/console apps, the homepage priority must be: `Connection Config`, `Current Status`, `Actions`, `Feedback`. Do not put promotional text before functional entries.
 
 ## Delivery Decision Table
 
@@ -135,7 +137,7 @@ Determine delivery type (First release, Update, Re-submit, or Asset completion).
 Ensure standard baseline (Go/Vue/Element Plus/Auth) using `lazycat:create-app` if needed. Establish the `docs/` tree. Ensure `build.sh` and `Makefile` entries. If an admin UI exists, use `lazycat:admin-ui` to meet quality gates. For porting, use `lazycat:port-app`.
 
 ### 3. Packaging, Uploading, and Evidence
-Identify the deliverable (official publish, `.lpk`, `AI App` package, or Dev Center upload). Record time, version, artifact path, size, and checksum. Log success via CLI or page status. For AI Pod routes, verify the existence and version of `ai-pod-service/`, `caddy-aipod`, and extensions.
+Identify the deliverable (official publish, `.lpk`, `AI App` package, or Dev Center upload). For image-based apps, verify the real release chain is closed: build image, push public image, `copy-image`, backwrite the source manifest, build `.lpk`, install `.lpk`. Record time, version, artifact path, size, and checksum. Log success via CLI or page status. For AI Pod routes, verify the existence and version of `ai-pod-service/`, `caddy-aipod`, and extensions.
 
 ### 4. Store Assets and Screenshots
 Sync local source data first, then update web forms. Prepare taglines and descriptions with real functional highlights. Screenshots must come from the actual running app without debug info or sensitive data. For admin apps, ensure they pass the quality gate before taking screenshots. Use `lazycat:prepare-icon` for professional icons.
@@ -155,6 +157,7 @@ Confirm store visibility and searchability. Verify that the installed version fr
 - `docs/` tree established with requirements, API design, etc.
 - `build.sh` and `Makefile` with standard targets exist.
 - Versions, changelogs, and artifacts are consistent.
+- Image-based apps have source manifests backwritten to the final `registry.lazycat.cloud/...` refs before packaging.
 - Screenshots are from the real version, clean of debug/sensitive data.
 - Artifact verified by real installation and core flow test on Lazycat MicroServer.
 - Admin UIs pass `lazycat:admin-ui` gates (no default template branding).

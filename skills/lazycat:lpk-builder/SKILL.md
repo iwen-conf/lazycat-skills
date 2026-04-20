@@ -77,7 +77,7 @@ lzc-cli project build -o release.lpk
 lzc-cli app install release.lpk
 ```
 
-These packaging and install entrypoints must consume an already-correct `lzc-manifest.yml`. Do **not** redesign `make install` or `lzc-cli app install` wrappers to perform `docker push`, `lzc-cli appstore copy-image`, or manifest rewrites on the fly.
+These packaging and install entrypoints must consume an already-correct `lzc-manifest.yml`. Do **not** redesign `make install` or `lzc-cli app install` wrappers to perform `docker push`, `lzc-cli appstore copy-image`, or manifest rewrites on the fly. If the user explicitly requests an end-to-end release/install chain, implement or use a **separate** release target such as `release-build` / `release-install` that finishes image build, public push, `copy-image`, manifest backwrite, LPK build, and installation before returning.
 
 **Entering Devshell (Development & Debugging Environment):**
 If the user needs to debug locally or within a container, guide them into the devshell.
@@ -109,19 +109,27 @@ If pulling from native registries (like Docker Hub) is slow or fails, push the i
 4. Use this test image address in `lzc-manifest.yml`.
 
 **Remote Image Bridge (Recommended):**
-If the upstream only provides a `Dockerfile`, or if the user needs to publish a custom image containing local modifications, prefer this release path by default:
+
+*When to choose this path — judge intelligently before packaging:*
+- Upstream only provides a `Dockerfile`, or the user needs to publish a custom image containing local modifications.
+- The project's build output is large (heavy artifacts, big `node_modules`/`vendor`/model weights, multi-GB image layers) — do **not** try to stuff that into the `lpk`.
+- The project has many system-level or language-level dependencies (e.g. extensive `apt` / `yum` packages, multiple runtimes stacked, C extensions, CUDA/ML toolchains) where reproducing the build inside `lpk` would be fragile or slow.
+- The build toolchain differs from the Lazycat runtime environment, or the user has already built a working image locally.
+
+In any of these cases, do **not** try to pack the full build into the `lpk`. Take the image route:
 1. Build the image locally for `linux/amd64`: `docker buildx build --platform linux/amd64 -t your-hub-user/app-name:v1.0 --load .`
 2. Push the validated image to Docker Hub: `docker push your-hub-user/app-name:v1.0`
 3. Sync it to the official Lazycat registry: `lzc-cli appstore copy-image your-hub-user/app-name:v1.0`
-4. Replace `services.<name>.image` in `lzc-manifest.yml` with the returned `registry.lazycat.cloud/...` address.
+4. Backwrite `services.<name>.image` in the **source** `lzc-manifest.yml` with the returned `registry.lazycat.cloud/...` address. If the repo uses additional manifest templates or staged manifests during packaging, backwrite those sources too.
 5. Keep the `lpk` focused on `package.yml`, `lzc-build.yml`, `lzc-manifest.yml`, icons, runtime scripts, and static assets. Do **not** attempt to pack the application image layers into the `lpk`.
-6. Finish this image-sync and manifest-backfill work during migration, `make update`, or release preparation. By the time the user runs `make build` or `make install`, the manifest should already reference the final pullable image addresses.
+6. Finish this image-sync and manifest-backfill work during migration, `make update`, or release preparation. By the time the user runs `make build` or `make install`, the source manifest used by packaging should already reference the final pullable image addresses.
+7. When the user explicitly wants the whole release path to be executable in one command, prefer adding or using a dedicated `release-build` / `release-install` style command that runs: build image -> push public image -> `copy-image` -> backwrite source manifest -> build `.lpk` -> install `.lpk`.
 
 **Official Publishing Phase:**
 Before listing on the store, copy the image to the official managed registry for stability:
 1. Execute: `lzc-cli appstore copy-image <public_image_name>`
 2. Upon success, the tool returns a `registry.lazycat.cloud/...` address.
-3. **Must** replace the image address in `lzc-manifest.yml` with this official address.
+3. **Must** backwrite the image address in the source `lzc-manifest.yml` with this official address before packaging or publishing.
 
 ### 7. Store Listing and Review
 When the user needs to formally list the app on the Lazycat App Store, read `references/store-publish.md` for the complete workflow and review rules.
@@ -161,8 +169,9 @@ When generating configuration files, you must comply with the following Lazycat 
      - `depends_on` -> Not directly needed in Lazycat. Services usually communicate via `http://service_name:port`; use the full internal domain only for the special cases above.
 
 8. **Settle Final Image Refs Before Install**
-   - If the app depends on copied or bridged images, the returned test/official registry addresses must be written into `lzc-manifest.yml` before `make build` / `make install`.
+   - If the app depends on copied or bridged images, the returned test/official registry addresses must be written into the source `lzc-manifest.yml` and any manifest templates used by packaging before `make build` / `make install`.
    - `make install` is for packaging + installing the current LPK. It must not silently own image upload, `copy-image`, or manifest backfill responsibilities.
+   - If the user asks for a complete release closure, add or use a separate release target instead of overloading `make install`.
 
 ## Platform Compatibility Notes
 If your platform supports automatic reading of referenced files, utilize that feature; otherwise, use your `read_file` tool to proactively read relevant specification documents in the `references/` directory.
