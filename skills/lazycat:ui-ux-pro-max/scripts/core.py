@@ -55,11 +55,6 @@ CSV_CONFIG = {
         "search_cols": ["Category", "Icon Name", "Keywords", "Best For"],
         "output_cols": ["Category", "Icon Name", "Keywords", "Library", "Import Code", "Usage", "Best For", "Style"]
     },
-    "react": {
-        "file": "react-performance.csv",
-        "search_cols": ["Category", "Issue", "Keywords", "Description"],
-        "output_cols": ["Category", "Issue", "Platform", "Description", "Do", "Don't", "Code Example Good", "Code Example Bad", "Severity"]
-    },
     "web": {
         "file": "web-interface.csv",
         "search_cols": ["Category", "Issue", "Keywords", "Description"],
@@ -68,16 +63,7 @@ CSV_CONFIG = {
 }
 
 STACK_CONFIG = {
-    "html-tailwind": {"file": "stacks/html-tailwind.csv"},
-    "react": {"file": "stacks/react.csv"},
-    "nextjs": {"file": "stacks/nextjs.csv"},
-    "astro": {"file": "stacks/astro.csv"},
-    "svelte": {"file": "stacks/svelte.csv"},
-    "swiftui": {"file": "stacks/swiftui.csv"},
-    "react-native": {"file": "stacks/react-native.csv"},
-    "flutter": {"file": "stacks/flutter.csv"},
     "shadcn": {"file": "stacks/shadcn.csv"},
-    "jetpack-compose": {"file": "stacks/jetpack-compose.csv"}
 }
 
 # Common columns for all stacks
@@ -197,7 +183,6 @@ def detect_domain(query):
         "ux": ["ux", "usability", "accessibility", "wcag", "touch", "scroll", "animation", "keyboard", "navigation", "mobile"],
         "typography": ["font", "typography", "heading", "serif", "sans"],
         "icons": ["icon", "icons", "lucide", "heroicons", "symbol", "glyph", "pictogram", "svg icon"],
-        "react": ["react", "next.js", "nextjs", "suspense", "memo", "usecallback", "useeffect", "rerender", "bundle", "waterfall", "barrel", "dynamic import", "rsc", "server component"],
         "web": ["aria", "focus", "outline", "semantic", "virtualize", "autocomplete", "form", "input type", "preconnect"]
     }
 

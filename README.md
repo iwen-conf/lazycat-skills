@@ -23,7 +23,7 @@
 - `lazycat:admin-ui`：收敛后台管理界面质量。
 - `lazycat:prepare-icon`：生成应用图标设计提示词。
 - `lazycat:write-guide`：生成应用攻略和官方风格文档。
-- `lazycat:ui-ux-pro-max`：提供可检索的 UI/UX 设计知识库。
+- `lazycat:ui-ux-pro-max`：提供面向 `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion` 的 UI/UX 设计知识库。
 
 ## 仓库结构
 

@@ -44,7 +44,7 @@ docs/
 
 ### `docs/architecture/`
 - `system-overview.md`: High-level architecture, module relationships, and deployment boundaries.
-- `frontend.md`: React + Vite + TypeScript + Tailwind CSS + shadcn/ui, plus Zustand for client state, TanStack Query for server state, React Router for navigation, React Hook Form + Zod for forms, and Framer Motion for animation; document the chosen low-saturation palette and the auth flow.
+- `frontend.md`: React + Vite + Tailwind CSS + shadcn/ui, plus Zustand for client state, TanStack Query for server state, React Router for navigation, React Hook Form + Zod for forms, and Framer Motion for animation; document the chosen low-saturation palette and the auth flow.
 - `backend.md`: Go service structure, authentication chain, database, and external dependencies.
 - `lazycat-integration.md`: Manifest constraints, OIDC / `file_handler` mapping, and internal route resolution.
 - `aipod-integration.md`: (Optional) Planning for Computing Warehouse `AI Applications`, AI Browser Extensions, `ai-pod-service`, `caddy-aipod`, and extension packages.

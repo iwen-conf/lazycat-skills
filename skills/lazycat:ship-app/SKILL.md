@@ -134,7 +134,7 @@ Don't just say "I'll take a look." Let the user know you are advancing a specifi
 Determine delivery type (First release, Update, Re-submit, or Asset completion). Rapidly gather info on goals, repository, documentation, version, and credentials. Access MicroServer via `lazycat_account` and Dev Center via `lazycat_developer_center_account`. For AI projects, distinguish between standard apps and AI Pod routes. Evaluate incentive eligibility for rewarded targets.
 
 ### 2. App Creation and Organization
-Ensure standard baseline (Go backend + `frontend-stack-baseline` React stack / Auth) using `lazycat:create-app` if needed. Establish the `docs/` tree. Ensure `build.sh` and `Makefile` entries. If an admin UI exists, use `lazycat:admin-ui` to meet quality gates. For porting, use `lazycat:port-app`.
+Ensure standard baseline (Go backend + `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion` / Auth) using `lazycat:create-app` if needed. Establish the `docs/` tree. Ensure `build.sh` and `Makefile` entries. If an admin UI exists, use `lazycat:admin-ui` to meet quality gates. For porting, use `lazycat:port-app`.
 
 ### 3. Packaging, Uploading, and Evidence
 Identify the deliverable (official publish, `.lpk`, `AI App` package, or Dev Center upload). For image-based apps, verify the real release chain is closed: build image, push public image, `copy-image`, backwrite the source manifest, build `.lpk`, install `.lpk`. Record time, version, artifact path, size, and checksum. Log success via CLI or page status. For AI Pod routes, verify the existence and version of `ai-pod-service/`, `caddy-aipod`, and extensions.

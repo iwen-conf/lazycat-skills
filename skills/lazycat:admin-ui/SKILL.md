@@ -1,6 +1,6 @@
 ---
 name: lazycat:admin-ui
-description: 面向 Lazycat 应用后台管理、控制台和管理工作台 UI 收敛的 skill。只要用户提到后台管理、Admin、管理台、控制台、仪表盘、运营后台、React 后台、shadcn/ui 管理界面、Tailwind 主题、后台模板、管理端改版、后台页面美化、管理列表、数据工作台、提审前页面升级、高质量后台等请求，就必须使用此 skill。负责把后台管理界面收敛成高质量、可截图、可提审的 React + Vite + Tailwind + shadcn/ui 管理体验（遵循 `frontend-stack-baseline` 的栈与五套低饱和配色 token），允许以成熟模板为起点但必须完成品牌化和业务化改造。
+description: 面向 Lazycat 应用后台管理、控制台和管理工作台 UI 收敛的 skill。只要用户提到后台管理、Admin、管理台、控制台、仪表盘、运营后台、React 后台、shadcn/ui 管理界面、Tailwind 主题、后台模板、管理端改版、后台页面美化、管理列表、数据工作台、提审前页面升级、高质量后台等请求，就必须使用此 skill。负责把后台管理界面收敛成高质量、可截图、可提审的 `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion` 管理体验，允许以成熟模板为起点但必须完成品牌化和业务化改造。
 ---
 
 # Lazycat Admin UI Quality Baseline
@@ -11,7 +11,7 @@ You are responsible for progressing admin interfaces, operational consoles, and 
 
 This skill is used for the design convergence and implementation constraints of admin-type pages. The default standards are:
 
-- Keep the `frontend-stack-baseline` stack: Vite + React + TypeScript + Tailwind CSS + shadcn/ui; do not swap in a different UI framework without authorization.
+- Keep the required frontend stack: React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion; do not swap in a different UI framework without authorization.
 - Mature admin templates are allowed as a starting point, but delivering raw templates is prohibited.
 - Establish a real brand color, navigation structure, page hierarchy, and business module partitioning.
 - Ensure workspaces, list pages, detail pages, form pages, settings pages, and login pages form a unified visual system.
@@ -34,7 +34,7 @@ If a project does not have an admin interface—only a few settings pages or sta
 
 - User requests a high-quality upgrade for an admin section.
 - User wants to use a template to build an admin interface but doesn't want it to look like a template.
-- User specifies React + shadcn/ui (frontend-stack-baseline) and needs a console, workspace, or dashboard.
+- User specifies the required React frontend baseline and needs a console, workspace, or dashboard.
 - User is preparing for submission or screenshots, but the admin pages are immature.
 - User needs to transform a "functional but ugly" admin UI into a release-level interface.
 
@@ -74,7 +74,7 @@ Upon execution, provide a brief summary of:
 
 ## The Iron Law
 
-1. Admin projects default to the `frontend-stack-baseline` stack — Vite + React + Tailwind + shadcn/ui; do not switch without explicit constraints. Pick one of the five low-saturation palettes from `frontend-stack-baseline/references/color-tokens.md` before iterating on visuals.
+1. Admin projects default to the required frontend stack `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion`; do not switch without explicit constraints. Pick one of the five approved low-saturation palettes (① Slate, ② Warm Sand, ③ Dark Slate, ④ Sage, ⑤ Rose Mist) before iterating on visuals.
 2. Templates are allowed as scaffolds only; default branding, copy, icons, menus, charts, and data must be replaced.
 3. An admin UI is not just a sidebar full of features. Navigation, grouping, and hierarchy must reflect real business flows.
 4. Workspace, list, detail, form, settings, and login pages must share the same visual system.
@@ -99,7 +99,7 @@ Upon execution, provide a brief summary of:
 
 ### 3. Determine Template Strategy
 If a template is needed, select one that:
-- Is compatible with React + Vite + Tailwind + shadcn/ui (or can be trivially ported to them).
+- Is compatible with React + Vite + Tailwind CSS + shadcn/ui and can be cleanly wired into Zustand, TanStack Query, React Router, React Hook Form, Zod, and Framer Motion.
 - Is friendly to tables, forms, and detail panels.
 - Has clear licensing.
 - Is restrained enough to allow for business customization.

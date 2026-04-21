@@ -38,7 +38,7 @@ When a user presents a requirement, strictly follow the classification below and
 **Action:** Read and follow the specifications in `references/store-publish.md`.
 
 ### 6. New Project Creation and Baseline (Project Init)
-**Scenario:** Creating a Lazycat app from scratch, initializing scaffolds, unifying the Go + `frontend-stack-baseline` (React + Vite + Tailwind + shadcn/ui) baseline, adding login/registration with dual tokens and silent refresh, or establishing the `docs/` tree and command entries.
+**Scenario:** Creating a Lazycat app from scratch, initializing scaffolds, unifying the Go + `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion` baseline, adding login/registration with dual tokens and silent refresh, or establishing the `docs/` tree and command entries.
 **Action:** Delegate to `lazycat:create-app`.
 
 ### 7. Application Porting and Selection (Porting)
@@ -46,7 +46,7 @@ When a user presents a requirement, strictly follow the classification below and
 **Action:** Delegate to `lazycat:port-app`.
 
 ### 8. Admin UI Quality Convergence (Admin UI)
-**Scenario:** Upgrading admin interfaces, operational consoles, or B-side workspaces to high-quality, screenshot-ready, submission-ready standards using React + Vite + Tailwind + shadcn/ui (the `frontend-stack-baseline` stack).
+**Scenario:** Upgrading admin interfaces, operational consoles, or B-side workspaces to high-quality, screenshot-ready, submission-ready standards using `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion`.
 **Action:** Delegate to `lazycat:admin-ui`.
 
 ### 9. AI Pod Application Development (AI Pod)

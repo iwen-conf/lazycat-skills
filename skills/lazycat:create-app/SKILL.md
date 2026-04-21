@@ -1,6 +1,6 @@
 ---
 name: lazycat:create-app
-description: 面向 Lazycat 新项目创建和项目基线统一的 skill。只要用户提到从 0 创建懒猫应用、初始化项目、脚手架、项目标准、Go 后端、React、Vite、Tailwind、shadcn/ui、Zustand、TanStack Query、React Router、React Hook Form、Zod、Framer Motion、前端配色、低饱和配色、后台管理、Admin、管理台、登录、注册、JWT、access_token、refresh_token、无感刷新、认证改造、现金激励、对接微服账户系统、网盘右键菜单、需求分析文档、API 设计文档、原创应用如何融入 Lazycat 原生系统、AI 配置面板、模型配置、懒猫算力仓、AI 应用、AI 浏览器插件等请求，就必须使用此 skill。负责把项目创建阶段收敛到统一规范：第一步先建立 `docs/` 文档树，再落 Go 后端 + `frontend-stack-baseline` 声明的 React 前端基线，默认具备登录、注册、双 token 和无感刷新；普通业务型 Web 应用接 AI 时默认走 `BaseURL` 配置方案，只有明确做懒猫算力仓 / `AI应用` / AI 浏览器插件时才走官方 AI Pod 路线；若项目包含后台管理面，则进一步把它接到 `lazycat:admin-ui` 的高质量管理 UI 质量链路，并在用户以现金激励为目标时优先满足官方激励门槛。
+description: 面向 Lazycat 新项目创建和项目基线统一的 skill。只要用户提到从 0 创建懒猫应用、初始化项目、脚手架、项目标准、Go 后端、React、Vite、Tailwind、shadcn/ui、Zustand、TanStack Query、React Router、React Hook Form、Zod、Framer Motion、前端配色、低饱和配色、后台管理、Admin、管理台、登录、注册、JWT、access_token、refresh_token、无感刷新、认证改造、现金激励、对接微服账户系统、网盘右键菜单、需求分析文档、API 设计文档、原创应用如何融入 Lazycat 原生系统、AI 配置面板、模型配置、懒猫算力仓、AI 应用、AI 浏览器插件等请求，就必须使用此 skill。负责把项目创建阶段收敛到统一规范：第一步先建立 `docs/` 文档树，再落 Go 后端 + `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion` 前端基线，默认具备登录、注册、双 token 和无感刷新；普通业务型 Web 应用接 AI 时默认走 `BaseURL` 配置方案，只有明确做懒猫算力仓 / `AI应用` / AI 浏览器插件时才走官方 AI Pod 路线；若项目包含后台管理面，则进一步把它接到 `lazycat:admin-ui` 的高质量管理 UI 质量链路，并在用户以现金激励为目标时优先满足官方激励门槛。
 ---
 
 # Lazycat Project Creation Baseline
@@ -14,7 +14,7 @@ This skill is used for creating new projects or aligning existing projects with 
 - First, create the `docs/` directory and split it into multiple subdirectories and Markdown documents for requirements analysis, API design, etc.
 - Provide executable script entries, such as `build.sh` and `Makefile`.
 - Use Go for the backend.
-- Use the React stack declared by the `frontend-stack-baseline` skill: Vite + React + TypeScript + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion. Pick one of the five low-saturation palettes defined there before shipping.
+- Use the required frontend stack exactly as specified: React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion. Before shipping, define one low-saturation palette in project CSS variables from the approved set: ① Slate, ② Warm Sand, ③ Dark Slate, ④ Sage, ⑤ Rose Mist.
 - If the project includes an admin interface, a high-quality admin UI is required by default. Mature templates can be used as a starting point but must undergo business-specific customization.
 - All projects must include login and registration by default.
 - Authentication uses `access_token + refresh_token`.
@@ -36,10 +36,10 @@ If the user's goal includes Lazycat Cash Incentives, further align with official
 
 ## Quick Contract
 
-- **Trigger**: User mentions creating a Lazycat project, initializing scaffolds, unifying project standards, adding login/registration, integrating dual tokens, implementing silent refresh, Go + React + Tailwind + shadcn/ui baseline, admin interfaces, cash incentives, Microservice Account System, Disk Context Menu, making original apps more "native," AI configuration pages, model configuration, Lazycat Computing Power Cabin, AI Apps, AI Browser Extensions.
+- **Trigger**: User mentions creating a Lazycat project, initializing scaffolds, unifying project standards, adding login/registration, integrating dual tokens, implementing silent refresh, the required frontend stack `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion`, admin interfaces, cash incentives, Microservice Account System, Disk Context Menu, making original apps more "native," AI configuration pages, model configuration, Lazycat Computing Power Cabin, AI Apps, AI Browser Extensions.
 - **Inputs**: Project goals, current repository state, whether it's a new project, existing stack, authentication status, existing user system, presence of an admin interface, incentive targets, originality, planned native integrations, AI suitability, AI Pod suitability.
 - **Outputs**: Documentation blueprint, command entry blueprint, project baseline summary, stack and directory recommendations, authentication scheme, native integration strategy, AI configuration baseline, AI Pod integration judgment, admin UI baseline, incentive eligibility path, mandatory module list, and release preparation interfaces for `lazycat:ship-app`.
-- **Quality Gate**: The final solution must first define the `docs/` directory structure and split documents, `build.sh` and `Makefile` entries, then specify Go backend, `frontend-stack-baseline` (React + Vite + Tailwind + shadcn/ui + Zustand + TanStack Query + React Router + RHF + Zod + Framer Motion) for the frontend with one palette selected, login/registration, `access_token + refresh_token`, and silent refresh. Original apps must define native integration points. AI-suitable projects must define a unified AI config panel. AI Pod judgment is only required for specific targets. Admin interfaces must define high-quality UI routes. Incentive modes must address credential accessibility and compliance.
+- **Quality Gate**: The final solution must first define the `docs/` directory structure and split documents, `build.sh` and `Makefile` entries, then specify Go backend and the required frontend stack `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion`, with one approved palette selected, login/registration, `access_token + refresh_token`, and silent refresh. Original apps must define native integration points. AI-suitable projects must define a unified AI config panel. AI Pod judgment is only required for specific targets. Admin interfaces must define high-quality UI routes. Incentive modes must address credential accessibility and compliance.
 - **Decision Tree**: Determine if it's a new project or an update, then decide on a full baseline, authentication only, or structure alignment. Further evaluate native integration, AI config, AI Pod paths, or admin UI quality.
 
 ## When to Use
@@ -47,7 +47,7 @@ If the user's goal includes Lazycat Cash Incentives, further align with official
 **Primary Triggers**
 
 - User wants to create a Lazycat project from scratch.
-- User specifies Go + React (frontend-stack-baseline) for the project.
+- User specifies Go + the required React frontend baseline for the project.
 - User requires admin consoles or dashboards to follow unified baselines.
 - User requires login, registration, dual tokens, and silent refresh for all projects.
 - User wants the app to meet Lazycat Cash Incentive thresholds.
@@ -82,7 +82,7 @@ Upon execution, provide a brief summary of:
 
 - Whether this is a new project or an update.
 - Which `docs/` subdirectories you will create or complete.
-- How you will verify the implementation of Go backend and the `frontend-stack-baseline` frontend (React + Vite + Tailwind + shadcn/ui + state / data / router / forms / motion libs).
+- How you will verify the implementation of the Go backend and the required frontend stack (React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion).
 - Whether the current auth gap is in pages, APIs, token mechanisms, or silent refresh.
 - Which Lazycat native capabilities the original app will integrate with.
 - Whether a unified AI config panel is needed and which fields will be prioritized.
@@ -96,7 +96,7 @@ Upon execution, provide a brief summary of:
 | --- | --- | --- | --- |
 | `project_mode` | enum(`New Project`/`Update Existing`/`Auth Only`) | Recommended | Determines if it's a full init or a structural reinforcement. |
 | `backend_stack` | string | Recommended | Defaults to Go; do not deviate unless requested. |
-| `frontend_stack` | string | Recommended | Defaults to `frontend-stack-baseline` (React + Vite + Tailwind + shadcn/ui + Zustand + TanStack Query + React Router + RHF + Zod + Framer Motion); upgrade existing React projects to the missing pieces before deviating. |
+| `frontend_stack` | string | Recommended | Defaults to `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion`; upgrade existing React projects to the missing pieces before deviating. |
 | `auth_state` | enum(`None`/`Login Only`/`Single Token`/`Incomplete Dual Token`/`Complete`) | Recommended | Determines the depth of auth refactoring. |
 | `user_system_state` | enum(`No User Table`/`Has User Table`/`Third-party Auth`) | Optional | Determines registration flow and minimal user fields. |
 | `admin_surface_state` | enum(`No Admin`/`Needs Design`/`Needs Upgrade`) | Optional | Determines if admin UI quality path is needed. |
@@ -110,7 +110,7 @@ Upon execution, provide a brief summary of:
 
 ## The Iron Law
 
-1. All new projects default to Go backend plus the `frontend-stack-baseline` frontend (Vite + React + TypeScript + Tailwind + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion); do not switch to other frontend stacks without evidence.
+1. All new projects default to Go backend plus the required frontend stack `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion`; do not switch to other frontend stacks without evidence.
 2. All projects must have login and registration; if registration is not needed, clarify it as a business exemption.
 3. Authentication defaults to `access_token + refresh_token`; a single long-lived token is insufficient.
 4. Frontend must implement silent refresh and failure fallback; manual re-login after token expiry is not the end state.
@@ -151,7 +151,7 @@ For incentive goals, determine originality and native value. Avoid excluded app 
 For original apps, answer "why install this in Lazycat?" Prioritize OIDC, `file_handler`, and local workflows. Mark weak integration points as risks.
 
 ### 6. Solidify Technical Baseline
-Backend: Go. Frontend: follow `frontend-stack-baseline` (Vite + React + Tailwind + shadcn/ui + Zustand + TanStack Query + React Router + RHF + Zod + Framer Motion) and pick one of the five low-saturation palettes via shadcn CSS variables. Keep state management and auth in a single store (Zustand slice). Define anonymous vs. authenticated route boundaries.
+Backend: Go. Frontend: use `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion`, and implement one approved low-saturation palette via shadcn CSS variables. Keep state management and auth in a single store (Zustand slice). Define anonymous vs. authenticated route boundaries.
 
 ### 7. Implement Auth Baseline
 Required: Login/Register pages, state persistence, `access_token`, `refresh_token`, silent refresh, and failure fallback to login. Recommended: Short-lived access token, long-lived refresh token with rotation.
@@ -176,7 +176,7 @@ Once the baseline (dev-ready, login, dual token) is established, hand over to `l
 
 - `docs/` tree established with content in requirements, API design, etc.
 - `build.sh` and `Makefile` created.
-- Go backend plus `frontend-stack-baseline` frontend implemented; one palette applied via `:root` CSS variables.
+- Go backend plus the required frontend stack implemented; one approved palette applied via `:root` CSS variables.
 - Login and registration present.
 - `access_token + refresh_token` implemented.
 - Silent refresh and fallback flow verified.
@@ -237,7 +237,7 @@ Command Entries
 
 Project Baseline
 - Backend: Go
-- Frontend: Vite + React + Tailwind + shadcn/ui + Zustand + TanStack Query + React Router + RHF + Zod + Framer Motion (palette: <①/②/③/④/⑤>)
+- Frontend: React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion (palette: <①/②/③/④/⑤>)
 - Auth: access_token + refresh_token + Silent Refresh
 - Admin UI: <N/A / lazycat:admin-ui / High Quality>
 

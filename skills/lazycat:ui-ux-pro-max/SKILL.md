@@ -1,10 +1,10 @@
 ---
 name: lazycat:ui-ux-pro-max
-description: 带有可搜索数据库的 UI/UX 设计智能，包含 Web 和移动应用的综合设计指南、13 种技术栈的最佳实践和优先级建议。
+description: 面向 Lazycat Web 应用的 React UI/UX 设计知识库。默认且仅服务 `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion` 这一套前端基线，不提供任何其他实现分支。
 ---
 # ui-ux-pro-max
 
-Comprehensive design guide for web and mobile applications. Contains 67 styles, 96 color palettes, 57 font pairings, 99 UX guidelines, and 25 chart types across 13 technology stacks. Searchable database with priority-based recommendations.
+面向 Lazycat Web 应用的 React UI/UX 设计指南。提供可检索的风格、配色、字体、UX、图表与前端实现建议，但所有实现建议都必须落到 `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion` 这一套基线，不给出任何其他实现方案。
 
 ## Prerequisites
 
@@ -35,15 +35,15 @@ winget install Python.Python.3.12
 
 ## How to Use This Skill
 
-When user requests UI/UX work (design, build, create, implement, review, fix, improve), follow this workflow:
+当用户请求 UI/UX 设计、界面实现、页面美化、设计评审或前端体验优化时，按以下流程执行。默认前提是项目必须遵循 Lazycat 的唯一前端基线：`React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion`。
 
 ### Step 1: Analyze User Requirements
 
-Extract key information from user request:
+提取以下关键信息：
 - **Product type**: SaaS, e-commerce, portfolio, dashboard, landing page, etc.
 - **Style keywords**: minimal, playful, professional, elegant, dark mode, etc.
 - **Industry**: healthcare, fintech, gaming, education, etc.
-- **Stack**: `shadcn` (React + Tailwind + shadcn/ui, matching `frontend-stack-baseline`), `react`, or `nextjs`
+- **Stack**: 固定为 `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion`
 
 ### Step 2: Generate Design System (REQUIRED)
 
@@ -109,13 +109,13 @@ python3 lazycat:ui-ux-pro-max/scripts/search.py "<keyword>" --domain <domain> [-
 
 ### Step 4: Stack Guidelines (Default: shadcn)
 
-Get implementation-specific best practices. If the user doesn't specify a stack, **default to `shadcn`** (React + Tailwind + shadcn/ui — the `frontend-stack-baseline` default). Only fall back to `html-tailwind` for static landing pages or prototypes.
+获取实现层最佳实践时，只允许输出与 `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion` 相容的实现建议。命令层只使用 `--stack shadcn` 作为组件与样式约束入口，不再提供其他栈分支。
 
 ```bash
 python3 lazycat:ui-ux-pro-max/scripts/search.py "<keyword>" --stack shadcn
 ```
 
-Available stacks: `shadcn`, `react`, `nextjs`, `html-tailwind`, `svelte`, `swiftui`, `react-native`, `flutter`, `jetpack-compose`
+Available stacks: `shadcn`
 
 ---
 
@@ -132,7 +132,6 @@ Available stacks: `shadcn`, `react`, `nextjs`, `html-tailwind`, `svelte`, `swift
 | `landing` | Page structure, CTA strategies | hero, hero-centric, testimonial, pricing, social-proof |
 | `chart` | Chart types, library recommendations | trend, comparison, timeline, funnel, pie |
 | `ux` | Best practices, anti-patterns | animation, accessibility, z-index, loading |
-| `react` | React/Next.js performance | waterfall, bundle, suspense, memo, rerender, cache |
 | `web` | Web interface guidelines | aria, focus, keyboard, semantic, virtualize |
 | `prompt` | AI prompts, CSS keywords | (style name) |
 
@@ -140,15 +139,7 @@ Available stacks: `shadcn`, `react`, `nextjs`, `html-tailwind`, `svelte`, `swift
 
 | Stack | Focus |
 |-------|-------|
-| `shadcn` | shadcn/ui components, theming, forms, patterns (DEFAULT) |
-| `react` | State, hooks, performance, patterns |
-| `nextjs` | SSR, routing, images, API routes |
-| `html-tailwind` | Tailwind utilities, responsive, a11y (static pages only) |
-| `svelte` | Runes, stores, SvelteKit |
-| `swiftui` | Views, State, Navigation, Animation |
-| `react-native` | Components, Navigation, Lists |
-| `flutter` | Widgets, State, Layout, Theming |
-| `jetpack-compose` | Composables, Modifiers, State Hoisting, Recomposition |
+| `shadcn` | 与唯一前端基线配套的 shadcn/ui 组件、主题、表单与页面模式 |
 
 ---
 
@@ -160,7 +151,7 @@ Available stacks: `shadcn`, `react`, `nextjs`, `html-tailwind`, `svelte`, `swift
 - Product type: Beauty/Spa service
 - Style keywords: elegant, professional, soft
 - Industry: Beauty/Wellness
-- Stack: html-tailwind (default)
+- Stack: the required frontend baseline (via `--stack shadcn`)
 
 ### Step 2: Generate Design System (REQUIRED)
 
@@ -183,7 +174,7 @@ python3 lazycat:ui-ux-pro-max/scripts/search.py "elegant luxury serif" --domain 
 ### Step 4: Stack Guidelines
 
 ```bash
-python3 lazycat:ui-ux-pro-max/scripts/search.py "layout responsive form" --stack html-tailwind
+python3 lazycat:ui-ux-pro-max/scripts/search.py "layout responsive form" --stack shadcn
 ```
 
 **Then:** Synthesize design system + detailed searches and implement the design.
