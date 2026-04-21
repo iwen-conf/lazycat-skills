@@ -43,7 +43,7 @@ Extract key information from user request:
 - **Product type**: SaaS, e-commerce, portfolio, dashboard, landing page, etc.
 - **Style keywords**: minimal, playful, professional, elegant, dark mode, etc.
 - **Industry**: healthcare, fintech, gaming, education, etc.
-- **Stack**: React, Vue, Next.js, or default to `html-tailwind`
+- **Stack**: `shadcn` (React + Tailwind + shadcn/ui, matching `frontend-stack-baseline`), `react`, or `nextjs`
 
 ### Step 2: Generate Design System (REQUIRED)
 
@@ -107,15 +107,15 @@ python3 lazycat:ui-ux-pro-max/scripts/search.py "<keyword>" --domain <domain> [-
 | Alternative fonts | `typography` | `--domain typography "elegant luxury"` |
 | Landing structure | `landing` | `--domain landing "hero social-proof"` |
 
-### Step 4: Stack Guidelines (Default: html-tailwind)
+### Step 4: Stack Guidelines (Default: shadcn)
 
-Get implementation-specific best practices. If user doesn't specify a stack, **default to `html-tailwind`**.
+Get implementation-specific best practices. If the user doesn't specify a stack, **default to `shadcn`** (React + Tailwind + shadcn/ui — the `frontend-stack-baseline` default). Only fall back to `html-tailwind` for static landing pages or prototypes.
 
 ```bash
-python3 lazycat:ui-ux-pro-max/scripts/search.py "<keyword>" --stack html-tailwind
+python3 lazycat:ui-ux-pro-max/scripts/search.py "<keyword>" --stack shadcn
 ```
 
-Available stacks: `html-tailwind`, `react`, `nextjs`, `vue`, `svelte`, `swiftui`, `react-native`, `flutter`, `shadcn`, `jetpack-compose`
+Available stacks: `shadcn`, `react`, `nextjs`, `html-tailwind`, `svelte`, `swiftui`, `react-native`, `flutter`, `jetpack-compose`
 
 ---
 
@@ -140,15 +140,14 @@ Available stacks: `html-tailwind`, `react`, `nextjs`, `vue`, `svelte`, `swiftui`
 
 | Stack | Focus |
 |-------|-------|
-| `html-tailwind` | Tailwind utilities, responsive, a11y (DEFAULT) |
+| `shadcn` | shadcn/ui components, theming, forms, patterns (DEFAULT) |
 | `react` | State, hooks, performance, patterns |
 | `nextjs` | SSR, routing, images, API routes |
-| `vue` | Composition API, Pinia, Vue Router |
+| `html-tailwind` | Tailwind utilities, responsive, a11y (static pages only) |
 | `svelte` | Runes, stores, SvelteKit |
 | `swiftui` | Views, State, Navigation, Animation |
 | `react-native` | Components, Navigation, Lists |
 | `flutter` | Widgets, State, Layout, Theming |
-| `shadcn` | shadcn/ui components, theming, forms, patterns |
 | `jetpack-compose` | Composables, Modifiers, State Hoisting, Recomposition |
 
 ---

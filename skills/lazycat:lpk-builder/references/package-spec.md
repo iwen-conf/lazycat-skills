@@ -9,7 +9,7 @@ The following fields are mandatory or recommended for inclusion in `package.yml`
 | Field Name | Type | Description |
 | ---- | ---- | ---- |
 | `package` | `string` | **Mandatory**. Unique application ID. Must be globally unique (e.g., `com.example.myapp`). |
-| `version` | `string` | **Mandatory**. Semantic versioning (e.g., `1.0.0`). |
+| `version` | `string` | **Mandatory**. Semantic versioning. The format MUST strictly follow `x.x.x` (e.g., `1.0.0`). |
 | `name` | `string` | **Mandatory**. Application display name. |
 | `description` | `string` | **Mandatory**. Brief application description. |
 | `author` | `string` | **Mandatory**. Author or organization name. For ported apps, this MUST exactly match the original project's author. |

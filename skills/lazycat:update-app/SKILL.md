@@ -11,7 +11,7 @@ You are responsible for progressing a "new version or image" to the state of "su
 
 This skill handles the lifecycle updates of Lazycat apps. The core workflow includes:
 1. **Image Update**: Build the updated image, push it to a public registry, then use `lzc-cli appstore copy-image` to sync it to Lazycat and obtain the internal image name.
-2. **Configuration Update**: Modify `package.yml` to update the version and backwrite `lzc-manifest.yml` to the copied Lazycat registry address. If packaging uses manifest templates, update those sources too.
+2. **Configuration Update**: Modify `package.yml` to update the version (must strictly be `x.x.x` format) and backwrite `lzc-manifest.yml` to the copied Lazycat registry address. If packaging uses manifest templates, update those sources too.
 3. **Build and Verify**: Build the `.lpk` from the backwritten manifest, then run `make install` or the repo's dedicated release-install target to verify the new version in a real Lazycat environment.
 4. **Prepare Submission**: Run `make release-prep` to generate screenshots and reports.
 5. **Submit Update**: Ensure metadata in `package.yml` (name, tagline, description, keywords) is complete and submit to the Developer Center.

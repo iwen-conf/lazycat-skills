@@ -1,6 +1,6 @@
 ---
 name: lazycat:admin-ui
-description: 面向 Lazycat 应用后台管理、控制台和管理工作台 UI 收敛的 skill。只要用户提到后台管理、Admin、管理台、控制台、仪表盘、运营后台、Vue 后台、Element Plus 管理界面、后台模板、管理端改版、后台页面美化、管理列表、数据工作台、提审前页面升级、高质量后台等请求，就必须使用此 skill。负责把后台管理界面收敛成高质量、可截图、可提审的 Vue + Element Plus 管理体验，并允许以成熟模板为起点但必须完成品牌化和业务化改造。
+description: 面向 Lazycat 应用后台管理、控制台和管理工作台 UI 收敛的 skill。只要用户提到后台管理、Admin、管理台、控制台、仪表盘、运营后台、React 后台、shadcn/ui 管理界面、Tailwind 主题、后台模板、管理端改版、后台页面美化、管理列表、数据工作台、提审前页面升级、高质量后台等请求，就必须使用此 skill。负责把后台管理界面收敛成高质量、可截图、可提审的 React + Vite + Tailwind + shadcn/ui 管理体验（遵循 `frontend-stack-baseline` 的栈与五套低饱和配色 token），允许以成熟模板为起点但必须完成品牌化和业务化改造。
 ---
 
 # Lazycat Admin UI Quality Baseline
@@ -11,7 +11,7 @@ You are responsible for progressing admin interfaces, operational consoles, and 
 
 This skill is used for the design convergence and implementation constraints of admin-type pages. The default standards are:
 
-- Maintain a Vue + Element Plus stack; do not switch to other UI frameworks without authorization.
+- Keep the `frontend-stack-baseline` stack: Vite + React + TypeScript + Tailwind CSS + shadcn/ui; do not swap in a different UI framework without authorization.
 - Mature admin templates are allowed as a starting point, but delivering raw templates is prohibited.
 - Establish a real brand color, navigation structure, page hierarchy, and business module partitioning.
 - Ensure workspaces, list pages, detail pages, form pages, settings pages, and login pages form a unified visual system.
@@ -22,7 +22,7 @@ If a project does not have an admin interface—only a few settings pages or sta
 
 ## Quick Contract
 
-- **Trigger**: User mentions admin interface, "Admin," management console, dashboard, back-office template, Vue Admin, Element Plus management UI, operational backend, workspace, dashboard, admin UI upgrade, high-quality UI.
+- **Trigger**: User mentions admin interface, "Admin," management console, dashboard, back-office template, React Admin, shadcn/ui management UI, Tailwind theming, operational backend, workspace, dashboard, admin UI upgrade, high-quality UI.
 - **Inputs**: Project directory, current admin state, page list, template presence, target screenshot scenarios, brand direction, core business flows.
 - **Outputs**: Admin information architecture recommendations, template strategy, core page patterns, visual quality requirements, screenshot checklist, and UI quality conclusions for `lazycat:ship-app`.
 - **Quality Gate**: Admin interfaces must undergo branding and business-specific customization. If a template is used, default branding, copy, data, and boilerplate charts must be removed. Core pages (workspace, list, detail, form, settings, login) must form a unified, high-quality, and screenshot-ready experience.
@@ -34,7 +34,7 @@ If a project does not have an admin interface—only a few settings pages or sta
 
 - User requests a high-quality upgrade for an admin section.
 - User wants to use a template to build an admin interface but doesn't want it to look like a template.
-- User specifies Vue + Element Plus and needs a console, workspace, or dashboard.
+- User specifies React + shadcn/ui (frontend-stack-baseline) and needs a console, workspace, or dashboard.
 - User is preparing for submission or screenshots, but the admin pages are immature.
 - User needs to transform a "functional but ugly" admin UI into a release-level interface.
 
@@ -44,7 +44,7 @@ If a project does not have an admin interface—only a few settings pages or sta
 - A template is already in use, but still retains default logos, layouts, and sample charts.
 - Business logic exists, but the UI hierarchy is messy, tables are hard to use, forms are too long, and screenshots look poor.
 - Preparing to list on the store and needing admin screenshots that actually showcase product value.
-- Enhancing branding and professionalism for an Element Plus admin UI without changing the tech stack.
+- Enhancing branding and professionalism for a shadcn/ui admin UI without changing the tech stack.
 
 **Boundary Notes**
 
@@ -74,7 +74,7 @@ Upon execution, provide a brief summary of:
 
 ## The Iron Law
 
-1. Admin projects default to Vue + Element Plus; do not switch without explicit constraints.
+1. Admin projects default to the `frontend-stack-baseline` stack — Vite + React + Tailwind + shadcn/ui; do not switch without explicit constraints. Pick one of the five low-saturation palettes from `frontend-stack-baseline/references/color-tokens.md` before iterating on visuals.
 2. Templates are allowed as scaffolds only; default branding, copy, icons, menus, charts, and data must be replaced.
 3. An admin UI is not just a sidebar full of features. Navigation, grouping, and hierarchy must reflect real business flows.
 4. Workspace, list, detail, form, settings, and login pages must share the same visual system.
@@ -99,7 +99,7 @@ Upon execution, provide a brief summary of:
 
 ### 3. Determine Template Strategy
 If a template is needed, select one that:
-- Is compatible with Vue + Element Plus.
+- Is compatible with React + Vite + Tailwind + shadcn/ui (or can be trivially ported to them).
 - Is friendly to tables, forms, and detail panels.
 - Has clear licensing.
 - Is restrained enough to allow for business customization.

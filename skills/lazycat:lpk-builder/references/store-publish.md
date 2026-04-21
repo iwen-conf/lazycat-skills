@@ -57,7 +57,7 @@ lzc-cli appstore publish ./your-app.lpk
 Before submitting, ensure all the following conditions are met:
 
 ### 1. Completeness of App Information
-- `package.yml` must be complete with `package`, `version`, `name`, `description`, `author`, and `license`.
+- `package.yml` must be complete with `package`, `version` (strictly `x.x.x` format), `name`, `description`, `author`, and `license`.
 - App Icon and screenshots must be provided in the Developer Center.
 - The name, description, and usage instructions **must support multiple languages** via the `locales` configuration in `package.yml`.
 - Language key specifications follow the [BCP 47 standard](https://en.wikipedia.org/wiki/IETF_language_tag).

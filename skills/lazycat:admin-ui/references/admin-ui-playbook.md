@@ -13,7 +13,7 @@ Create an admin interface that:
 ## 2. Template Usage Rules
 
 ### Prerequisites for Using Templates
-- The template stack is compatible with Vue + Element Plus.
+- The template stack is compatible with React + Vite + Tailwind + shadcn/ui (the `frontend-stack-baseline` default).
 - Licenses are clear and permit current usage.
 - The template is optimized for admin scenarios rather than marketing sites or BI dashboards.
 - The structure is easy to prune and can be quickly replaced with real business pages.
@@ -63,7 +63,7 @@ If a project lacks a workbench, screenshots and the landing experience often app
 - Provide explanations, default values, and rollback hints for high-risk configurations.
 
 ## 7. Visual System Recommendations
-- Establish your own color tokens instead of using Element Plus's default blue or template defaults.
+- Pick one of the five low-saturation palettes from `frontend-stack-baseline/references/color-tokens.md` (① Slate, ② Warm Sand, ③ Dark Slate, ④ Sage, ⑤ Rose Mist) and drive everything through shadcn CSS variables (`--background`, `--primary`, `--border`, …). Do **not** hand-roll hex values or rely on shadcn's default palette.
 - Maintain a consistent spacing rhythm (e.g., 8/16/24px) to avoid density fluctuations.
 - Standardize borders and shadow intensities across cards, tables, drawers, and modals.
 - Unify icon styles; avoid mixing too many different icon sets.

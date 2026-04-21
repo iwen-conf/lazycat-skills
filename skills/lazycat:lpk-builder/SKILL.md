@@ -12,7 +12,7 @@ You are a professional Lazycat MicroServer Application Ecosystem Developer. Your
 Packaging and porting a Lazycat MicroServer application (LPK v2) involves writing three core configuration files: `package.yml`, `lzc-build.yml`, and `lzc-manifest.yml`.
 
 ### 1. Static Metadata (`package.yml`)
-Define the application's identity, version, and localization.
+Define the application's identity, version (must strictly be `x.x.x` format), and localization.
 - For field definitions and BCP 47 localization rules, read `references/package-spec.md`.
 
 **Standard Template:**
@@ -166,12 +166,48 @@ When generating configuration files, you must comply with the following Lazycat 
    - **Auto-Translation for `docker-compose.yml`**:
      - `ports: ["8080:80"]` -> Convert to `routes` in `lzc-manifest.yml` (e.g., `- /=http://service_name:80`).
      - `volumes: ["./data:/app/data"]` -> Convert to `binds` mapping to `/lzcapp/var/` (e.g., `- /lzcapp/var/data:/app/data`).
-     - `depends_on` -> Not directly needed in Lazycat. Services usually communicate via `http://service_name:port`; use the full internal domain only for the special cases above.
+     - `depends_on` -> **Keep it**, and convert the list form to the map form with `condition: service_healthy` per rule 9. Do not drop it; without gating, dependents boot against half-ready infra and crash. Service-to-service HTTP still uses `http://service_name:port` — the `depends_on` block is only about startup ordering.
 
 8. **Settle Final Image Refs Before Install**
    - If the app depends on copied or bridged images, the returned test/official registry addresses must be written into the source `lzc-manifest.yml` and any manifest templates used by packaging before `make build` / `make install`.
    - `make install` is for packaging + installing the current LPK. It must not silently own image upload, `copy-image`, or manifest backfill responsibilities.
    - If the user asks for a complete release closure, add or use a separate release target instead of overloading `make install`.
+
+9. **Gate Dependents on Healthchecks, Not Just Start Order**
+   - **Enforce a layered startup order**: classify every service into infra (MySQL/PostgreSQL/Redis/ZooKeeper/etcd), middleware (Nacos/Consul/Kafka/RocketMQ/MinIO), one-shot seeds (schema import, config push, bucket init), and business (gateway/auth/api/workers). Each layer must be gated `service_healthy` on the layers below it; never let a business container race against a still-booting infra container. Seed containers sit between infra and middleware/business — business waits on the seed's terminal healthcheck, not on its mere start.
+   - A bare `depends_on: [svc_a, svc_b]` (list form) only waits for the dependency to be **started**, not **healthy**. For slow-starting stacks (MySQL, Nacos, RocketMQ, Redis with ACL init, Kafka, ZooKeeper, any JVM service) this lets dependents boot against a half-ready infra and crash with "connection refused" / "auth not ready" / "topic missing" / "schema not initialized".
+   - Use the **map form** with an explicit `condition: service_healthy` (compose-style):
+     ```yaml
+     depends_on:
+       mysql:
+         condition: service_healthy
+       nacos:
+         condition: service_healthy
+     ```
+     For one-shot seed containers (schema import, config push), define a terminal healthcheck (`test -f /tmp/<name>-ready`) and gate with `condition: service_healthy` so dependents actually wait until the seed finishes.
+   - **Every** long-running service must define a `healthcheck` whose `test` command actually probes the ready state, not just process liveness:
+     - HTTP/Java: `curl -fsS http://127.0.0.1:<port>/actuator/health` (or equivalent ready endpoint).
+     - MySQL: `mysqladmin ping -h 127.0.0.1 -p"$${MYSQL_ROOT_PASSWORD}"`.
+     - Redis: `redis-cli -a "$$PASS" ping | grep -q PONG`.
+     - RocketMQ: probe the actual listener port with `nc -z` or grep the running command, not just `pgrep`.
+     - Nacos/Consul/etcd: hit the readiness endpoint, not the liveness one.
+   - **Do not guess the actuator / readiness path.** Read the service's actual config before writing the healthcheck URL:
+     - Spring Boot: check `server.servlet.context-path`, `management.server.base-path`, `management.endpoints.web.base-path`. A service with `context-path: /api` exposes actuator at `/api/actuator/health`; a service without a context path exposes it at `/actuator/health`.
+     - **Gateway / BFF / API-aggregator services need special care**: the `/api/*` prefix in such services is usually a downstream routing rule, **not** a prefix on the gateway's own actuator. Probing `/api/actuator/health` on the gateway will 404 forever even though the gateway itself is healthy, which starves every dependent. Probe the gateway's own actuator directly (`/actuator/health`) and verify by the startup log line (`Exposing N endpoints beneath base path '/actuator'`).
+     - Do not blindly copy a healthcheck line from a sibling service — two Spring Boot services in the same stack may have different `context-path` settings.
+     - When in doubt, `curl` the candidate path from inside the container during verification and confirm `{"status":"UP"}` before committing the manifest.
+   - Tune `start_period`, `interval`, `timeout`, `retries` to the service's real cold-start budget. JVM services routinely need `start_period: 30s–60s`; MySQL first-boot initialization can need minutes (`start_period: 5m+`). Do not copy a generic `start_period: 5s` from a web-app template onto a Spring Boot service.
+   - Main business services (gateway, auth, api, business logic) must list **every** infra dependency they talk to at boot, each gated on `service_healthy`. "Only one container has the issue" is usually because a sibling forgot to gate on the same infra.
+   - If a dependency is genuinely optional and the app should survive its absence, mark it with `condition: service_started` plus in-app retry/backoff — do **not** use `service_healthy` on an optional dep (the whole stack will hang when that dep naturally fails).
+
+10. **No Cross-Runtime Artifacts in the LPK**
+   - Do **not** compile language-specific artifacts on the host (`.class`, `.pyc`, Go/Rust native binaries, `.so`/`.dylib`, CGO outputs) and drop them into the `lpk` to be executed inside a service container whose runtime differs from the host. This is how you produce `UnsupportedClassVersionError` / `GLIBC_X.Y not found` / wrong-arch crashes the moment a container loads them.
+   - The lpk is a neutral carrier for `package.yml`, `lzc-build.yml`, `lzc-manifest.yml`, icons, shell scripts, static assets, and config. Anything that needs a specific language runtime belongs **inside the service image**.
+   - Preferred order for helpers and healthchecks:
+     1. Use tools already present in the service image (`curl`, `wget`, `sh`, `nc`) — no cross-env handoff at all.
+     2. If a custom helper is unavoidable, build it **inside the service image's Dockerfile** (`RUN javac ...`, `RUN go build ...`) so it's produced by the matching runtime.
+     3. Host-side compilation is a last resort and must pin the output to the lowest runtime that will execute it (`javac --release <service_jre>`, `GOOS/GOARCH` matching the image, static-linked binaries), and the produced artifact's target level must be verified, not assumed.
+   - When auditing an existing repo, flag any `javac` / `pip install` / `go build` / `cargo build` step in host-facing scripts (`build.sh`, `Makefile`, `scripts/*.sh`) that writes into the lpk payload rather than into an image build context. That is a regression waiting to happen.
 
 ## Platform Compatibility Notes
 If your platform supports automatic reading of referenced files, utilize that feature; otherwise, use your `read_file` tool to proactively read relevant specification documents in the `references/` directory.

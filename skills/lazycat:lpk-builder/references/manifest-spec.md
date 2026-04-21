@@ -3,7 +3,7 @@
 ## I. Overview
 `lzc-manifest.yml` is the configuration file used to define application deployment settings. This document details its structure and the meaning of each field.
 
-**Note (LPK v2):** Static metadata such as `package`, `version`, `name`, `description`, `locales`, `author`, `license`, `homepage`, `min_os_version`, and `unsupported_platforms` are now moved to `package.yml`. `lzc-manifest.yml` focuses solely on runtime execution and service configuration.
+**Note (LPK v2):** Static metadata such as `package`, `version` (strictly `x.x.x`), `name`, `description`, `locales`, `author`, `license`, `homepage`, `min_os_version`, and `unsupported_platforms` are now moved to `package.yml`. `lzc-manifest.yml` focuses solely on runtime execution and service configuration.
 
 ## II. Top-Level Data Structure `ManifestConfig`
 

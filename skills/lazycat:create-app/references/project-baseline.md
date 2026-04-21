@@ -40,15 +40,15 @@ Commands must be directly executable from the repository root, not just buried i
 ## 1. Default Tech Stack
 
 - **Backend:** Go
-- **Frontend:** Vue
-- **UI:** Element Plus
+- **Frontend:** follow the `frontend-stack-baseline` skill — Vite + React + TypeScript + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion.
+- **Theme:** pick one of the five low-saturation palettes from `frontend-stack-baseline/references/color-tokens.md` and apply it via shadcn CSS variables; do not hand-roll hex colors inside components.
 
 If there are existing team-specific standards, they can be refined within this baseline, but do not deviate from the core stack.
 
 ## 1.2 Admin UI Baseline
 
 If the project includes an admin panel, operation console, or management dashboard:
-- Keep the main stack as Vue + Element Plus.
+- Keep the frontend stack aligned with `frontend-stack-baseline`: React + Vite + Tailwind + shadcn/ui.
 - You may use mature templates, but remove default branding, menus, and example charts.
 - Implement standard page patterns: Login/Register, Dashboard, Lists, Details/Forms, and Settings.
 - Ensure admin pages are ready for screenshots and review (not just a collection of unstyled features).

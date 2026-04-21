@@ -38,3 +38,8 @@ Must include the following three sections:
 ## 5. Changelog (Changelog) - Updates Only
 *   **Standard**: Clearly state what has been "Added", "Optimized", or "Fixed".
 *   **Example**: Added OIDC login support; Optimized image loading speed; Fixed crash issue when exporting PDFs.
+
+## 6. Version
+*   **Standard**: The `version` string must strictly follow `x.x.x` semantic versioning. Suffixes or prefixes like `v1.0.0` or `1.0.0-beta` should be mapped carefully, but the `package.yml` field requires strict `x.x.x` format.
+*   **Requirement**: Exactly three dot-separated numbers.
+*   **Example**: `1.0.0`, `2.4.12`
