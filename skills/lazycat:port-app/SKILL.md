@@ -31,28 +31,11 @@ To verify apps installed on Lazycat MicroServer, use `lazycat_account` / `lazyca
 - **Quality Gate**: Must complete GitHub search and App Store de-duplication. If local `lazycat_account` / `lazycat_password` are present, prioritize real login before checking. If a duplicate exists without differentiation, do not proceed with the incentive path. Deliverables must include `build.sh` and `Makefile`. AI projects must define a route (Standard, AI App, or Browser Ext).
 ## Decision Tree
 
-- **Step 0 — Does a usable remote image exist?**
-  - If the project publishes official Docker images on Docker Hub / GHCR / Quay (check README or Docker Hub page): **skip building entirely**. Use `lzc-cli appstore copy-image <image>` directly. This is the fastest and most reliable path.
-  - If no remote image exists but a `Dockerfile` is provided: proceed to Step 1.
-  - If neither exists: evaluate if the project is worth the build effort before proceeding.
-
-- **Step 1 — Classify Complexity** (only when you must build from Dockerfile):
-
-  | Signal | Points to Strategy A (Complex) | Points to Strategy B (Simple) |
-  |--------|-------------------------------|-------------------------------|
-  | Multi-stage Dockerfile | Yes | — |
-  | Requires database (Postgres, MySQL, Redis, etc.) | Yes | — |
-  | Multi-service `docker-compose.yml` (3+ services) | Yes | — |
-  | Build output > 500MB image | Yes | — |
-  | Single binary or static files only | — | Yes |
-  | No external service dependencies | — | Yes |
-  | Can run with `exec://` or a generic base image (alpine, nginx) | — | Yes |
-  | Build completes in < 2 minutes on a standard machine | — | Yes |
-
-  If 2+ signals point to Strategy A, use Strategy A. Otherwise, use Strategy B.
-
-- **Strategy A** (Complex): Build locally for `linux/amd64` → Push to Docker Hub → `lzc-cli appstore copy-image` → Use returned `registry.lazycat.cloud/...` address in `lzc-manifest.yml`.
-- **Strategy B** (Simple): Extract source → Direct build/run in LPK using `exec://` or generic base images. No Docker Hub round-trip needed.
+- **Rule 1 — Never Modify Original Source Code**: The entire porting process must rely on Docker images and manifest configurations. Do not edit or modify the original upstream code under any circumstances.
+- **Rule 2 — Use Existing Image**: If the project publishes official Docker images (Docker Hub, GHCR, Quay, etc.), use the image directly. Run `lzc-cli appstore copy-image <image>`. This is the fastest and most reliable path.
+- **Rule 3 — Build Image if Needed**: If no remote image exists but a `Dockerfile` is provided, build the image locally for `linux/amd64`, and then run `lzc-cli appstore copy-image <image>`.
+- **Rule 4 — Write Back to YML**: Take the returned `registry.lazycat.cloud/...` address from the copy command and write it back into `lzc-manifest.yml`.
+- **Rule 5 — Build LPK**: Once the `lzc-manifest.yml` is updated with the correct image addresses, run `make build` and `make install` to build the `.lpk` package.
 
 - **Step 2 — Check Project Type**: Perform GitHub search, App Store check, incentive judgment, integration assessment, and AI Pod route judgment. Finally, decide to proceed or switch projects.
 
@@ -111,12 +94,15 @@ Upon execution, provide a brief summary of:
 6. Prioritize OIDC or `file_handler` for suitable projects, as they affect incentives and UX.
 7. For AI-native projects, determine if they fit better as standard apps, `AI Apps`, or AI Browser Extensions.
 8. If a ported project needs a static homepage, the priority must be: `Connection Entry`, `Status Check`, `Actions`, `Feedback`. Do not put "Why use it" or "Roadmap" in running pages; use `README` or store assets.
-9. If the port relies on bridged images, the returned registry address must be written back into `lzc-manifest.yml` before `make build` / `make install`. `make install` is only for building and installing the ready LPK.
-10. **Prioritize Docker over Source Code**: If a project provides a Docker image or `docker-compose.yml`, base the porting ENTIRELY on these Docker artifacts. **Do NOT** read or analyze the project's source code. Just use the Docker image directly.
+9. **Zero Modification to Original Code**: Absolutely DO NOT modify the original source code under any circumstances.
+10. **Image-Based Porting Flow**: If a project provides a Docker image, use the image directly. If no image exists but a Dockerfile is provided, build the image first. Once an image is available (remote or locally built), use `lzc-cli appstore copy-image <image>` to copy the image to the Lazycat registry.
+11. **Write Back to YML and Build LPK**: After copying the image, the returned `registry.lazycat.cloud/...` address MUST be written back into `lzc-manifest.yml`. Only after this is done, run `make build` and `make install` to build the `.lpk` package.
+12. **Strict Health Check and Startup Order**: You MUST configure `healthcheck` (with `test`, `start_period`, `interval`, `timeout`, `retries`) for all dependencies (like MySQL, Redis, etc.) and map `depends_on` with `condition: service_healthy`. Business containers must wait for infrastructure containers to be fully healthy to avoid startup crashes.
     - **Auto-Translation for `docker-compose.yml`**:
       - `ports: ["8080:80"]` -> Convert to `routes` in `lzc-manifest.yml` (e.g., `- /=http://${service_name}.${lzcapp_appid}.lzcapp:80`).
       - `volumes: ["./data:/app/data"]` -> Convert to `binds` mapping to `/lzcapp/var/` (e.g., `- /lzcapp/var/data:/app/data`).
-      - `depends_on` -> Not directly needed in Lazycat. Services communicate automatically via `${service_name}.${lzcapp_appid}.lzcapp`.
+      - `depends_on` -> **KEEP IT**. Convert list form to map form with `condition: service_healthy` to guarantee correct startup sequences (e.g., app waits for DB to be healthy). DO NOT drop it, or apps will crash on boot.
+      - `healthcheck` -> **MANDATORY FOR DEPENDENCIES**. If a service is depended upon, you MUST define a `healthcheck` with a robust `test` command (like `curl` or `mysqladmin ping`), and generous `start_period`, `interval`, `timeout`, and `retries`. Without health checks, `service_healthy` conditions will fail and dependents will hang forever.
 
 ## Workflow
 
@@ -150,12 +136,12 @@ At minimum, add:
 ### 5. Plan Adaptation and Image Sync
 - `lzc-build.yml`, `lzc-manifest.yml`.
 - **Image Porting (Mandatory)**: 
-  1. If the image is custom-built, first build it locally for `linux/amd64` and push it to Docker Hub.
-  2. Use `lzc-cli appstore copy-image <docker_image>` to get an official `registry.lazycat.cloud/...` image name.
-  3. Use the returned image in `lzc-manifest.yml`.
-  4. Put this sync + manifest-backfill step in migration flow or `make update`, not in `make install`.
-  5. By the time `make build` / `make install` runs, `lzc-manifest.yml` should already contain the final pullable image refs.
-- `build.sh`, `Makefile` (must include `build`, `install`, `update`, `release-prep`).
+  1. **Zero Source Code Modification**: Only use existing Docker images or build directly from a provided Dockerfile.
+  2. If the image needs to be built, build it locally first.
+  3. Use `lzc-cli appstore copy-image <docker_image>` to get an official `registry.lazycat.cloud/...` image name.
+  4. Write the returned image address back into `lzc-manifest.yml`.
+  5. Put this sync + manifest-backfill step in migration flow or `make update`, not in `make install`.
+  6. By the time `make build` / `make install` runs to build the LPK, `lzc-manifest.yml` must already contain the final pullable image refs.- `build.sh`, `Makefile` (must include `build`, `install`, `update`, `release-prep`).
 - Add `application.oidc_redirect_path` and `application.file_handler` if applicable.
 - For AI-native: evaluate `ai-pod-service/`, `caddy-aipod`, and `extension.zip`.
 - If a static homepage is needed, check if it's essential for runtime; if only for submission/promotion, use docs or store assets instead.

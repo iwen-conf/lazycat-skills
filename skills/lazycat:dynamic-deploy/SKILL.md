@@ -48,18 +48,21 @@ services:
 ### AI 强制决策顺序 (必须先判断，不能跳过)
 当用户要求“免密登录 / 自动登录 / 自动填充密码”时，必须按下面顺序做决策：
 
-1. **先判断源码是否可改**：如果当前仓库就是应用源码，或者登录页与改密页都在可修改的应用代码里，默认优先做**应用内三阶段联动**，不要先造 sidecar、代理换 token 页面或额外认证服务。
-2. **只有源码不可改时，才优先走 inject**：inject 适合第三方镜像、闭源前端、或无法稳定改上游代码的场景。
+1. **禁止修改源码**：绝对不要尝试修改应用自身的源代码来实现免密登录，无论是前端还是后端代码。
+2. **统一使用 inject 三阶段联动**：始终采用 `application.injects` 机制，即参考 Jellyfin 示例的“三阶段联动”方案（Request拦截 -> Response确认持久化 -> Browser自动填充）。
 3. **写 manifest 前先判断 inject 语法代际**：如果目标盒子或安装日志提示 `application.injects.0 when is required`，或者 `lzc-cli project build` 对 `mode/include/scripts` 报 unknown fields，就必须立刻回退到旧语法 `on / when / do`，不要继续赌新版字段会生效。
 4. **禁止带着 lint warning 直接交付**：manifest 构建通过不代表安装能通过。只要 inject 字段出现 unknown field warning，就必须先解决兼容性再继续。
 
 ### AI 智能决策逻辑 (AI Decision Logic)
-当用户要求实现“免密登录”或“自动填充密码”时，你**必须**首先分析上游应用的情况。**根据实际经验，大部分应用都应优先采用“三阶段联动”。** 具体策略如下：
+当用户要求实现“免密登录”或“自动填充密码”时，你**必须**统一且唯一地优先采用 **inject 三阶段联动**，并在不需要改动代码的前提下实现。具体策略如下：
 
-1. **应用内三阶段联动 (App-native Three-Phase Linkage) - 👑源码可改时优先**：如果当前项目的登录页、登录成功动作、改密成功动作都可修改，就直接在应用代码内实现三阶段：登录成功持久化 -> 改密成功更新 -> 登录页自动填充/自动提交。这个方案通常比 runtime sidecar 更稳定，也更容易回退。
-2. **inject 三阶段联动 (Three-Phase Linkage) - 👑第三方镜像的最常见方案**：应用拥有复杂 UI，允许用户在应用内首次创建账号或**自主修改密码**（如 Jellyfin），但源码不可改。你必须监听并联动三个阶段：在 `request` 阶段拦截登录/注册/改密请求并提取密码 -> 在 `response` 阶段确认请求成功后持久化 (`ctx.persist`) -> 在 `browser` 阶段从持久化存储读取并自动填充。这种方案适配绝大多数第三方现代应用。
-3. **简单自动填充 (Simple Autofill)**：应用有登录页面，且密码在部署后**固定不变**（例如通过部署参数传入固定管理员密码）。直接在 `browser` 阶段使用 `builtin://simple-inject-password` 填充。
-4. **基础 Auth 注入 (Basic Auth)**：上游没有 HTML 登录页，仅仅使用标准的 HTTP Basic Auth。只需要在 `request` 阶段注入 `Authorization` HTTP 头即可。
+1. **inject 三阶段联动 (Three-Phase Linkage - 👑 唯一首选方案)**：应用拥有复杂 UI，允许用户在应用内首次创建账号或自主修改密码（如 Jellyfin）。在不修改源码的前提下，你必须监听并联动三个阶段：
+   - **第一阶段 (Request)**：在请求阶段拦截登录/注册/改密请求，提取用户名和密码存入临时变量 `ctx.flow`。
+   - **第二阶段 (Response)**：在响应阶段检查 HTTP 状态码是否成功（2xx），只有成功时才将 `ctx.flow` 中的数据转存到持久化存储 `ctx.persist`。
+   - **第三阶段 (Browser)**：在浏览器阶段从 `ctx.persist` 读取账号密码，并利用内置插件 `builtin://simple-inject-password` 自动填充到输入框。
+   详细示例参考：https://developer.lazycat.cloud/advanced-inject-passwordless-login.html#%E7%A4%BA%E4%BE%8B%E4%B8%89-%E4%B8%89%E9%98%B6%E6%AE%B5%E8%81%94%E5%8A%A8-jellyfin
+2. **简单自动填充 (Simple Autofill)**：如果密码在部署后**绝对固定不变**（例如通过部署参数传入固定管理员密码），可退化为直接在 `browser` 阶段使用 `builtin://simple-inject-password` 填充。
+3. **基础 Auth 注入 (Basic Auth)**：上游没有 HTML 登录页，仅仅使用标准的 HTTP Basic Auth 时，直接在 `request` 阶段注入 `Authorization` HTTP 头即可。
 
 > **🛑 强制红线 (STOP)**: 既然“三阶段联动”是主流方案，**绝对不要**凭空捏造 API 路径和选择器！你**必须**主动读取 `references/advanced-inject-passwordless-login.md`（或 `advanced-inject.md`）中的教程模板，并在写代码前主动向用户询问或确认相关的 初始化/登录/改密 API 接口路径及表单选择器。
 
@@ -89,3 +92,12 @@ application:
 如果需要查看详细的内置模板函数列表、系统参数列表（`SysParams`）或了解脚本注入的 `builtin://simple-inject-password` 的详细参数配置，请读取 `references/injects.md`。
 如果是处理免密登录的【三阶段联动】，请读取 `references/advanced-inject.md` (AI 剧本) 或 `references/advanced-inject-passwordless-login.md` (详细教程)。
 如果目标盒子存在 inject 新旧语法兼容问题，也必须读取 `references/injects.md` 中的兼容性说明，再决定用 `mode/include/scripts` 还是 `on/when/do`。
+
+## 官方规范参考文档 (Official Specifications)
+在进行打包、构建、配置清单、设置部署参数及免密登录脚本注入时，必须严格参考并遵循以下官方规范文档：
+- **Build Spec**: https://developer.lazycat.cloud/spec/build.html
+- **Package Spec**: https://developer.lazycat.cloud/spec/package.html
+- **Manifest Spec**: https://developer.lazycat.cloud/spec/manifest.html
+- **Inject Context (免密登录抓取与持久化变量)**: https://developer.lazycat.cloud/spec/inject-ctx.html
+- **Deploy Params**: https://developer.lazycat.cloud/spec/deploy-params.html
+- **LPK Format**: https://developer.lazycat.cloud/spec/lpk-format.html

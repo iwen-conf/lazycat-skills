@@ -80,3 +80,18 @@ When a user presents a requirement, strictly follow the classification below and
 ---
 **Mandatory Constraints for AI Engine:**
 You must read the above sub-documents on a "Lazy-load" basis. For example, if a user asks "how to let users enter a password during installation," only read `references/dynamic-deploy.md`. Do not read routing or SDK documentation. For scenarios matching items 6–14, delegate to the corresponding skill rather than attempting to answer from this skill's references. This protects the context window and improves answer accuracy.
+
+## 本地知识库检索机制 (Local Knowledge Base Search)
+You have access to a local, offline knowledge base containing 87 fully parsed Lazycat Developer Documentation files located in the `references/docs/` directory. You **MUST NOT** answer technical questions about Lazycat configurations, APIs, or specifications from memory to avoid hallucination.
+
+1. **URL-based Search**: If the user provides a specific URL (e.g., `https://developer.lazycat.cloud/...`), read `references/docs/INDEX.md` to map it to the exact local file path, then read that file using `read_file`.
+2. **Topic-based Search**: If the user asks a general question (e.g., "How to configure OIDC?", "What are the rules for GPU acceleration?", "How to use application.injects?"), you MUST use the `grep_search` tool inside the `references/docs/` directory with relevant keywords to locate the authoritative source files. Read the full context from the found files to provide an accurate, hallucination-free response.
+
+## 官方规范参考文档 (Official Specifications)
+在进行应用打包、构建、配置清单、设置部署参数及免密登录脚本注入时，必须严格参考并遵循以下官方规范文档，不要凭空臆造字段（请先通过 `references/docs/INDEX.md` 找到对应的本地 Markdown 文件阅读其细节）：
+- **Build Spec**: https://developer.lazycat.cloud/spec/build.html
+- **Package Spec**: https://developer.lazycat.cloud/spec/package.html
+- **Manifest Spec**: https://developer.lazycat.cloud/spec/manifest.html
+- **Inject Context (免密登录抓取与持久化变量)**: https://developer.lazycat.cloud/spec/inject-ctx.html
+- **Deploy Params**: https://developer.lazycat.cloud/spec/deploy-params.html
+- **LPK Format**: https://developer.lazycat.cloud/spec/lpk-format.html

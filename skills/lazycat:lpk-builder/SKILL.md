@@ -211,3 +211,12 @@ When generating configuration files, you must comply with the following Lazycat 
 
 ## Platform Compatibility Notes
 If your platform supports automatic reading of referenced files, utilize that feature; otherwise, use your `read_file` tool to proactively read relevant specification documents in the `references/` directory.
+
+## 官方规范参考文档 (Official Specifications)
+在进行打包、构建、配置清单、设置部署参数及免密登录脚本注入时，必须严格参考并遵循以下官方规范文档：
+- **Build Spec**: https://developer.lazycat.cloud/spec/build.html
+- **Package Spec**: https://developer.lazycat.cloud/spec/package.html
+- **Manifest Spec**: https://developer.lazycat.cloud/spec/manifest.html
+- **Inject Context (免密登录抓取与持久化变量)**: https://developer.lazycat.cloud/spec/inject-ctx.html
+- **Deploy Params**: https://developer.lazycat.cloud/spec/deploy-params.html
+- **LPK Format**: https://developer.lazycat.cloud/spec/lpk-format.html
