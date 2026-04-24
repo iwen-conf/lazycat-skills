@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-04-24
+
+- docs: 收紧懒猫项目的 `Makefile` 约定，明确 `make build` 只负责基于已准备好的镜像引用与交付物打包 `lpk`，不承担源码级构建。
+- docs: 明确 `make install` 依赖一次 `make build` 后执行 `lzc-cli app install <lpk>`，并同步 `lazycat:lpk-builder` 与 `developer-expert` 的安装说明。
+- docs: 强化 `lazycat:port-app`，要求 AI 在确认迁移后实际完成仓库里的 `Makefile`，不能只停留在建议或待办。
+
 ## 2026-04-21
 
 - fix: 收紧 `lazycat:ui-ux-pro-max`，仅保留 `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion` 这一套前端基线入口。

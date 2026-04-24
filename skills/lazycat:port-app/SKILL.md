@@ -16,6 +16,7 @@ This skill is for porting open-source or self-hosted software to Lazycat. Defaul
 - If `lazycat_account` and `lazycat_password` exist on the local machine, prioritize using them to log in to the App Store before checking for duplicates. These variables are for MicroServer and App Store access, not the Developer Center or internal app accounts.
 - If a similar port exists with no added value, do not proceed with a duplicate path.
 - Implementation must provide `build.sh`, `Makefile`, `make build`, and `make install`.
+- Once migration is confirmed, the agent must actually create or complete the repository `Makefile`; do not stop at giving advice, TODOs, or pseudo-targets.
 - For image-based ports, settle final pullable image refs in `lzc-manifest.yml` during migration or `make update`; do not make `make install` responsible for `docker push`, `copy-image`, or manifest rewrite work.
 - Must retain upstream address, license, and porting notes.
 
@@ -27,8 +28,8 @@ To verify apps installed on Lazycat MicroServer, use `lazycat_account` / `lazyca
 
 - **Trigger**: User mentions porting, "port," finding projects on GitHub, checking for duplicates, avoiding duplicate porting, porting incentives, upstream repository, Makefile, build.sh, file_handler, OIDC, store login, lazycat_account, lazycat_password, Computing Power Cabin, `AI App`, AI Browser Extension.
 - **Inputs**: Candidate project keywords, target category, incentive goals, GitHub upstream info, App Store access status, local MicroServer credentials status, login/file association needs, AI-native status.
-- **Outputs**: Candidate project list, de-duplication conclusion, incentive judgment, porting requirements, script entry requirements, AI Pod route judgment, and release entry for `lazycat:ship-app`.
-- **Quality Gate**: Must complete GitHub search and App Store de-duplication. If local `lazycat_account` / `lazycat_password` are present, prioritize real login before checking. If a duplicate exists without differentiation, do not proceed with the incentive path. Deliverables must include `build.sh` and `Makefile`. AI projects must define a route (Standard, AI App, or Browser Ext).
+- **Outputs**: Candidate project list, de-duplication conclusion, incentive judgment, completed porting entry files (`build.sh`, `Makefile`), AI Pod route judgment, and release entry for `lazycat:ship-app`.
+- **Quality Gate**: Must complete GitHub search and App Store de-duplication. If local `lazycat_account` / `lazycat_password` are present, prioritize real login before checking. If a duplicate exists without differentiation, do not proceed with the incentive path. Deliverables must include an actually completed `build.sh` and `Makefile`, not just a suggested template. AI projects must define a route (Standard, AI App, or Browser Ext).
 ## Decision Tree
 
 - **Rule 1 — Never Modify Original Source Code**: The entire porting process must rely on Docker images and manifest configurations. Do not edit or modify the original upstream code under any circumstances.
@@ -91,13 +92,14 @@ Upon execution, provide a brief summary of:
 3. If a duplicate exists in the App Store without differentiation, do not proceed with the incentive path.
 4. Every port must include upstream address, license, and porting notes.
 5. Every port must provide `build.sh`, `Makefile`, `make build`, and `make install`.
-6. Prioritize OIDC or `file_handler` for suitable projects, as they affect incentives and UX.
-7. For AI-native projects, determine if they fit better as standard apps, `AI Apps`, or AI Browser Extensions.
-8. If a ported project needs a static homepage, the priority must be: `Connection Entry`, `Status Check`, `Actions`, `Feedback`. Do not put "Why use it" or "Roadmap" in running pages; use `README` or store assets.
-9. **Zero Modification to Original Code**: Absolutely DO NOT modify the original source code under any circumstances.
-10. **Image-Based Porting Flow**: If a project provides a Docker image, use the image directly. If no image exists but a Dockerfile is provided, build the image first. Once an image is available (remote or locally built), use `lzc-cli appstore copy-image <image>` to copy the image to the Lazycat registry.
-11. **Write Back to YML and Build LPK**: After copying the image, the returned `registry.lazycat.cloud/...` address MUST be written back into `lzc-manifest.yml`. Only after this is done, run `make build` and `make install` to build the `.lpk` package.
-12. **Strict Health Check and Startup Order**: You MUST configure `healthcheck` (with `test`, `start_period`, `interval`, `timeout`, `retries`) for all dependencies (like MySQL, Redis, etc.) and map `depends_on` with `condition: service_healthy`. Business containers must wait for infrastructure containers to be fully healthy to avoid startup crashes.
+6. After migration is selected, you must finish the repo's `Makefile` yourself. Do not hand off with "please add a Makefile later" or leave placeholder targets unimplemented.
+7. Prioritize OIDC or `file_handler` for suitable projects, as they affect incentives and UX.
+8. For AI-native projects, determine if they fit better as standard apps, `AI Apps`, or AI Browser Extensions.
+9. If a ported project needs a static homepage, the priority must be: `Connection Entry`, `Status Check`, `Actions`, `Feedback`. Do not put "Why use it" or "Roadmap" in running pages; use `README` or store assets.
+10. **Zero Modification to Original Code**: Absolutely DO NOT modify the original source code under any circumstances.
+11. **Image-Based Porting Flow**: If a project provides a Docker image, use the image directly. If no image exists but a Dockerfile is provided, build the image first. Once an image is available (remote or locally built), use `lzc-cli appstore copy-image <image>` to copy the image to the Lazycat registry.
+12. **Write Back to YML and Build LPK**: After copying the image, the returned `registry.lazycat.cloud/...` address MUST be written back into `lzc-manifest.yml`. Only after this is done, run `make build` and `make install` to build the `.lpk` package.
+13. **Strict Health Check and Startup Order**: You MUST configure `healthcheck` (with `test`, `start_period`, `interval`, `timeout`, `retries`) for all dependencies (like MySQL, Redis, etc.) and map `depends_on` with `condition: service_healthy`. Business containers must wait for infrastructure containers to be fully healthy to avoid startup crashes.
     - **Auto-Translation for `docker-compose.yml`**:
       - `ports: ["8080:80"]` -> Convert to `routes` in `lzc-manifest.yml` (e.g., `- /=http://${service_name}.${lzcapp_appid}.lzcapp:80`).
       - `volumes: ["./data:/app/data"]` -> Convert to `binds` mapping to `/lzcapp/var/` (e.g., `- /lzcapp/var/data:/app/data`).
@@ -132,6 +134,7 @@ Upon execution, provide a brief summary of:
 At minimum, add:
 - `docs/requirements/`, `docs/api-design/`, `docs/architecture/`, `docs/release-prep/`.
 - `build.sh`, `Makefile` (with `build` and `install` targets).
+- After migration lands, actually write or fix the `Makefile` in the repo so it can be executed immediately; do not leave the port in a "Makefile pending" state.
 
 ### 5. Plan Adaptation and Image Sync
 - `lzc-build.yml`, `lzc-manifest.yml`.
@@ -156,7 +159,7 @@ Once "worth porting" is confirmed, hand over to `lazycat:ship-app` for packaging
 - Real login used for checking if local credentials exist.
 - Differentiation clarified or incentive path terminated if duplicates exist.
 - Upstream address, license, and repo status recorded.
-- `build.sh` and `Makefile` planned.
+- `build.sh` and `Makefile` completed in the repo.
 - OIDC or `file_handler` evaluated.
 - For incentives: clarified that real installation and verification on Lazycat MicroServer is mandatory.
 - AI Pod route evaluated for AI projects.

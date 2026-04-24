@@ -65,6 +65,10 @@ services:
 ### 4. Building and Installing with lzc-cli
 Guide the user to use the `lzc-cli` command-line tool for packaging and installation.
 
+If the repo needs a `Makefile`, keep the two core targets image-level:
+- `make build`: only package the current `lpk` from already-prepared delivery inputs and final image refs. Do **not** compile app source code, build business images, `docker push`, or `copy-image` here.
+- `make install`: depend on `make build`, then run `lzc-cli app install <lpk>` to install the current package into Lazycat MicroServer.
+
 **Build the application:**
 ```bash
 # Execute in the project root containing lzc-build.yml

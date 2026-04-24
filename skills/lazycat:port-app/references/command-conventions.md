@@ -12,7 +12,7 @@
 当项目采用“本地构建镜像 -> Docker Hub -> `lzc-cli appstore copy-image` -> 回填 manifest”这条路线时，职责必须固定：
 
 - `build.sh`：不要构建应用主镜像，只处理 `runtime/`、静态资源和 `lpk` 交付内容。
-- `Makefile`：负责 `docker-build`、`docker-push`、`copy-image`、`update`、`build`、`install`，但职责必须分层：`copy-image` / manifest 回填属于迁移或更新阶段，`install` 只消费已经准备好的 `lpk`。
+- `Makefile`：负责 `docker-build`、`docker-push`、`copy-image`、`update`、`build`、`install`，但职责必须分层：`copy-image` / manifest 回填属于迁移或更新阶段；`build` / `install` 只面向已经准备好的镜像引用和 `lpk` 交付物，不负责源码级构建。
 - `lzc-manifest.yml`：正式发布时只保留 `registry.lazycat.cloud/...` 镜像地址。
 - `lpk`：只保留 manifest、runtime、图标、静态资源，不内嵌应用主镜像。
 
@@ -84,13 +84,13 @@ release-prep: verify capture-screenshots
 > @echo "Submission assets generated"
 
 build:
-> @echo "Building LPK..."
+> @echo "Packaging current image-level release inputs into LPK..."
 > lzc-cli project build -o $(LPK_FILE)
 
 install: build
-> @echo "Installing..."
+> @echo "Installing current LPK into Lazycat MicroServer..."
 > lzc-cli app install $(LPK_FILE)
-> @echo "Build complete and app installed"
+> @echo "LPK build and install complete"
 
 update: copy-image
 > @echo "Executing update workflow..."
@@ -125,7 +125,8 @@ fi
 
 ## 3. 核心目标说明
 
-- `make install`：本地打包并安装到当前 Lazycat 环境，提审前必须真实执行；不要在这个目标里偷偷做 `docker push`、`copy-image` 或 `lzc-manifest.yml` 回填。
+- `make build`：只负责把当前已经准备好的 `package.yml`、`lzc-build.yml`、`lzc-manifest.yml`、runtime/静态资源等交付物打成 `lpk`；不要在这里做源码编译、业务镜像构建、`docker push` 或 `copy-image`。
+- `make install`：通过依赖 `make build` 先生成一次当前 `lpk`，再执行 `lzc-cli app install $(LPK_FILE)` 安装到当前 Lazycat 环境；提审前必须真实执行，且不要在这个目标里偷偷做 `docker push`、`copy-image` 或 `lzc-manifest.yml` 回填。
 - `make update`：适用于镜像升级或同步上游，负责 `copy-image`、回填 `lzc-manifest.yml`、重新打包。
 - `make release-prep`：提审前的最终步骤，包含测试、截图和交付证据整理。
 - `make verify`：无副作用校验入口，适合 CI/CD。

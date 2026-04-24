@@ -13,7 +13,7 @@
 - [ ] Created `docs/architecture`.
 - [ ] Created `docs/release-prep`.
 - [ ] Created `build.sh`.
-- [ ] Created `Makefile`.
+- [ ] Created or completed `Makefile` in the repo after migration, not just as a proposed template.
 - [ ] `make build` implemented.
 - [ ] `make install` implemented.
 
