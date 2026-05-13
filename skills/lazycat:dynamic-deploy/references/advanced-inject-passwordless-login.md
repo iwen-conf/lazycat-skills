@@ -49,16 +49,16 @@ application:
 
 在微服应用里，常见的“免密/弱感知登录”大致有以下几种方式：
 
-1. 直接基于 ingress 注入的用户身份 header 做用户管理（见 [HTTP Headers](../../lazycat:auth-integration/references/http-request-headers.md)）。
-2. 基于 OIDC 标准登录流打通应用账号体系（见 [对接 OIDC](../../lazycat:auth-integration/references/oidc.md)）。
-3. 基于部署参数或部署时环境变量注入固定凭据（见 [manifest.yml渲染](./manifest-render.md) 与 [环境变量](../../lazycat:developer-expert/references/manifest-spec.md)）。
+1. 直接基于 ingress 注入的用户身份 header 做用户管理。先用 OpenViking 查询 `HTTP request headers X-HC-User-ID X-HC-User-Role`。
+2. 基于 OIDC 标准登录流打通应用账号体系。先用 OpenViking 查询 `OIDC oidc_redirect_path LAZYCAT_AUTH_OIDC`。
+3. 基于部署参数或部署时环境变量注入固定凭据。先用 OpenViking 查询 `manifest environment deploy params`，再结合 [manifest.yml渲染](./manifest-render.md)。
 4. 自动注入 Basic Auth Header（见 [示例一：自动注入 Basic Auth Header](#example-1-basic-auth-header)）。
 5. 基于 inject 在不修改上游源码的前提下进行行为改写（本文重点）。
 
 ## 前置条件
 
 1. lzcos 版本满足 inject 功能要求。
-2. 已阅读 [脚本注入（injects）](./injects.md) 和 [manifest inject 规范](../../lazycat:developer-expert/references/manifest-spec.md#injects)。
+2. 已通过 OpenViking 查询官方 `application.injects` / `inject-ctx` 规范，并阅读 [脚本注入（injects）](./injects.md)。
 3. 已掌握部署参数渲染（见 [manifest.yml渲染](./manifest-render.md)）。
 
 ## 示例一：自动注入 Basic Auth Header

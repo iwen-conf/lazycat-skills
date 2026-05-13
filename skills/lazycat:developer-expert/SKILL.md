@@ -40,7 +40,7 @@ ov ls viking://resources/lazycat-aipod-docs
 **Failure modes & remediation:**
 - If `ov find` returns `[PERMISSION_DENIED] 用户额度不足` → embedding provider out of credit. Inform the user; fall back to `ov grep` (text search, no embedding) for the immediate question.
 - If a URI from a prior turn returns `[NOT_FOUND]` → the dir layout shifted; rerun `ov ls` to find the new path.
-- For URLs the user pastes (e.g. `https://developer.lazycat.cloud/spec/manifest.html`), search by stem name: `ov find "manifest spec" --uri viking://resources/lazycat-developer-docs`.
+- For official doc URLs the user pastes, search by stem name. For example, a manifest spec URL should become: `ov find "manifest spec" --uri viking://resources/lazycat-developer-docs`.
 
 ## Requirement Routing
 

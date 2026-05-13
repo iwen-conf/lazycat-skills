@@ -7,6 +7,14 @@ description: 面向 Lazycat 应用后台管理、控制台和管理工作台 UI 
 
 You are responsible for progressing admin interfaces, operational consoles, and B-side workspaces within Lazycat projects from "functional" to "high-quality, screenshot-ready, and submission-ready." The focus is not just a visual skinning, but ensuring information architecture, page hierarchy, tables, forms, feedback, and branding meet release standards.
 
+## Knowledge Source Rule
+
+This skill's design standards are local, but Lazycat official facts still come from OpenViking. If the UI work affects store screenshots, submission requirements, credential rules, admin review expectations, AI App entries, or platform integration surfaces, query OpenViking before making factual claims.
+
+```bash
+ov find "store submission screenshots review admin app credentials" --uri viking://resources/lazycat-developer-docs -n 5
+```
+
 ## Overview
 
 This skill is used for the design convergence and implementation constraints of admin-type pages. The default standards are:

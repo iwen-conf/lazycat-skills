@@ -42,14 +42,20 @@ description: 一句话描述（用于触发匹配，务必精准）
 3. **示例代码必须可用**：所有 YAML/bash 示例必须是真实可执行的，不要放伪代码
 4. **中文优先**：本技能包面向中文开发者，所有文档使用中文编写
 
+### 知识源与 OpenViking 规则
+- 懒猫官方文档事实以 OpenViking 为权威来源。凡涉及 `lpk`、`manifest`、`package`、`build`、路由、OIDC、API、inject、部署参数、AI Pod、商店规则等官方事实，任何技能都必须先按 `lazycat:developer-expert/SKILL.md` 的 "Knowledge Base Protocol" 执行 `ov find` / `ov read` / `ov grep`，不要凭记忆回答。
+- 垂直技能如果被直接触发，也必须继承 OpenViking 规则；不能假设一定先经过 `lazycat:developer-expert`。
+- `references/` 只放本技能私有 cheat-sheet、工程经验、流程模板、质量门禁和官方文档没有的沉淀；不要把懒猫官方文档整篇或大段二次转抄进仓库。
+- 如果本地经验文档需要提到官方规范，写成"先通过 OpenViking 查询 `<主题>`，再结合本文经验规则执行"，不要链接到已删除的离线官方文档副本。
+
 ### 修改技能时的同步规则
-- 以下文档的**单一源**位于 `lazycat:lpk-builder/references/`：`manifest-spec.md`、`build-spec.md`、`package-spec.md`、`store-publish.md`、`troubleshooting.md`。`lazycat:developer-expert/references/` 下的同名文件仅为引用指针，**修改时只改 lpk-builder 下的源文件**。
+- `lazycat:lpk-builder`、`lazycat:advanced-routing`、`lazycat:auth-integration`、`lazycat:aipod-developer` 已被移除；不要新增或恢复对这些技能目录的引用。相关官方事实统一通过 OpenViking 查询。
 - `references/` 下的其他共享文件（如 `aipod-playbook.md`、`cash-incentive.md`、`command-conventions.md`）如果在多个技能中被引用，修改时必须同步所有引用方的路径。
 
 ## 4. 敏感信息约束（红线）
 
 ### 绝对禁止出现的内容
-- 真实的微服设备名称（如 `snyht13.heiyu.space`）
+- 真实的微服设备名称（如真实的 `*.heiyu.space` 私有域名）
 - 任何形式的真实密码、API Key、Token
 - 懒猫内部未公开的基础设施地址
 

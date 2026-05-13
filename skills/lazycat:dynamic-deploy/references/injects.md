@@ -3,7 +3,13 @@
 ## Overview
 
 `injects` is used to inject scripts into HTML pages matching specific URLs, suitable for minimal-intrusion adaptation of third-party applications. This feature requires lzcos 1.5.0+.
-For field definitions, please refer to [manifest.md#injects](./spec/manifest.md#injects); this document focuses on behavioral details and practical recommendations.
+For field definitions, first query OpenViking:
+
+```bash
+ov find "manifest application.injects inject ctx mode include scripts on when do" --uri viking://resources/lazycat-developer-docs -n 5
+```
+
+This document focuses on behavioral details and practical recommendations.
 
 ## Compatibility First
 
