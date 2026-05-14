@@ -14,7 +14,7 @@ For image-based migrations, final pullable image refs belong in the source manif
 
 ## Requirement Routing and Skill Distribution (Progressive Disclosure)
 
-When a user presents a requirement, strictly follow the classification below and **use your file reading tools (or the `cat` command) to read the corresponding detailed reference documents**. Do not attempt to answer complex configuration questions from memory.
+When a user presents a requirement, strictly follow the classification below and **use local file reading and scoped local search tools to read the corresponding detailed reference documents**. Do not attempt to answer complex configuration questions from memory.
 
 ### 1. Basic Packaging and Docker Porting (The Basics)
 **Scenario:** The user wants to run a standard Docker image or `docker-compose.yml` on Lazycat, requiring basic `lzc-build.yml` and `lzc-manifest.yml`.
@@ -84,8 +84,10 @@ You must read the above sub-documents on a "Lazy-load" basis. For example, if a 
 ## 本地知识库检索机制 (Local Knowledge Base Search)
 You have access to a local, offline knowledge base containing 87 fully parsed Lazycat Developer Documentation files located in the `references/docs/` directory. You **MUST NOT** answer technical questions about Lazycat configurations, APIs, or specifications from memory to avoid hallucination.
 
-1. **URL-based Search**: If the user provides a specific URL (e.g., `https://developer.lazycat.cloud/...`), read `references/docs/INDEX.md` to map it to the exact local file path, then read that file using `read_file`.
-2. **Topic-based Search**: If the user asks a general question (e.g., "How to configure OIDC?", "What are the rules for GPU acceleration?", "How to use application.injects?"), you MUST use the `grep_search` tool inside the `references/docs/` directory with relevant keywords to locate the authoritative source files. Read the full context from the found files to provide an accurate, hallucination-free response.
+1. **URL-based Search**: If the user provides a specific URL (e.g., `https://developer.lazycat.cloud/...`), read `references/docs/INDEX.md` to map it to the exact local file path, then read that local Markdown file.
+2. **Topic-based Search**: If the user asks a general question (e.g., "How to configure OIDC?", "What are the rules for GPU acceleration?", "How to use application.injects?"), search only inside `references/docs/` and the relevant vertical skill `references/` with local tools such as `rg`, `fd`, or the Agent's local file search. Read the full context from the matched files before answering.
+3. **Fallback Scope**: If the split docs do not contain the answer, search `../lazycat-developer-docs.md` as the aggregate offline snapshot, then the current vertical skill's references.
+4. **External Verification**: Only query official online documentation when local docs are missing, clearly stale, or the user asks for current verification. Do not use remote semantic indexes, external long-term memory, paid vector databases, or cloud indexing as the default knowledge path.
 
 ## 官方规范参考文档 (Official Specifications)
 在进行应用打包、构建、配置清单、设置部署参数及免密登录脚本注入时，必须严格参考并遵循以下官方规范文档，不要凭空臆造字段（请先通过 `references/docs/INDEX.md` 找到对应的本地 Markdown 文件阅读其细节）：

@@ -2,6 +2,24 @@
 
 面向 LazyCat MicroServer 平台的 AI 技能包仓库。安装后，AI 可以围绕懒猫应用的创建、移植、打包、路由、认证、后台管理和上架交付提供稳定的工程化能力。
 
+## 本地知识库
+
+本仓库内置离线懒猫开发文档与工程经验文档。AI 回答 `lpk`、`manifest`、`package.yml`、`lzc-build.yml`、路由、OIDC、inject、部署参数、AI Pod、商店提审等事实型问题时，必须优先读取本仓库内的本地 Markdown，不默认依赖远程语义索引、外部长期记忆、云端向量库或付费索引服务。
+
+主要本地来源：
+
+- `skills/lazycat:developer-expert/references/docs/INDEX.md`：官方开发文档 URL 到本地文件的索引。
+- `skills/lazycat:developer-expert/references/docs/`：拆分后的官方开发文档 Markdown。
+- `skills/lazycat-developer-docs.md`：聚合版官方开发文档快照。
+- 各技能目录下的 `references/`：面向具体工作流的工程经验、清单和约束。
+
+推荐检索顺序：
+
+1. 先按 URL 或主题读取 `references/docs/INDEX.md` 与对应本地文档。
+2. 找不到明确文件时，用 `rg` 在 `skills/lazycat:developer-expert/references/docs/` 和相关技能 `references/` 内做有范围的关键词搜索。
+3. 再按场景加载垂直技能文档，避免一次性读取无关大文件。
+4. 只有本地文档缺失、规则明显可能过期，或用户明确要求联网核验时，才查询官方线上文档，并说明本地快照与线上信息的关系。
+
 ## 技能分组
 
 ### 生命周期

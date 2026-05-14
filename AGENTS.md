@@ -42,6 +42,13 @@ description: 一句话描述（用于触发匹配，务必精准）
 3. **示例代码必须可用**：所有 YAML/bash 示例必须是真实可执行的，不要放伪代码
 4. **中文优先**：本技能包面向中文开发者，所有文档使用中文编写
 
+### 知识源与本地检索规则
+- 懒猫官方事实优先来自仓库内的本地 Markdown：`skills/lazycat:developer-expert/references/docs/INDEX.md`、`skills/lazycat:developer-expert/references/docs/`、`skills/lazycat-developer-docs.md`，以及各技能 `references/`。
+- 任何涉及 `lpk`、`manifest`、`package.yml`、`lzc-build.yml`、路由、OIDC、API、inject、部署参数、AI Pod、商店规则等官方事实的问题，都必须先检索并阅读本地文档，不要凭记忆回答。
+- 默认检索方式使用本地文件读取、`rg`、`fd` 或编辑器/Agent 提供的本地搜索能力；搜索范围应限制在本仓库或相关 `references/`，不要扫描整个 Home 目录。
+- 不要把远程语义索引、外部长期记忆、云端向量库、付费索引服务或自动持久化记忆写成默认工作流。只有用户明确要求，且已说明成本与隐私影响时，才可引入外部服务。
+- 如果本地文档缺失或明显可能过期，优先查询官方公开线上文档并在回复中说明依据；不要用第三方资料替代官方规范。
+
 ### 修改技能时的同步规则
 - 以下文档的**单一源**位于 `lazycat:lpk-builder/references/`：`manifest-spec.md`、`build-spec.md`、`package-spec.md`、`store-publish.md`、`troubleshooting.md`。`lazycat:developer-expert/references/` 下的同名文件仅为引用指针，**修改时只改 lpk-builder 下的源文件**。
 - `references/` 下的其他共享文件（如 `aipod-playbook.md`、`cash-incentive.md`、`command-conventions.md`）如果在多个技能中被引用，修改时必须同步所有引用方的路径。
