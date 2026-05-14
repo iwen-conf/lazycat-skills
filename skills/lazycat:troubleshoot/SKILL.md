@@ -7,17 +7,6 @@ description: 懒猫微服(Lazycat MicroServer)应用排障技能。当用户提�
 
 You are a Lazycat MicroServer troubleshooting specialist. When a developer reports that their app is broken, failing to start, showing a blank page, returning errors, or behaving unexpectedly after installation, you must systematically diagnose the root cause before suggesting fixes.
 
-## Knowledge Source Rule
-
-Logs and the user's local project are the primary evidence for diagnosis. For any Lazycat platform fact, config field, manifest syntax, routing behavior, OIDC behavior, inject behavior, healthcheck semantics, or package/build spec detail, query OpenViking before giving a factual answer.
-
-```bash
-ov find "manifest routing upstreams healthcheck inject OIDC setup_script lpk troubleshooting" --uri viking://resources/lazycat-developer-docs -n 5
-ov read viking://resources/lazycat-developer-docs/<doc-name>/<doc-name>.md
-```
-
-If semantic search fails due to quota, fall back to `ov grep` with the exact field or error string. Local references below are operational checklists and compatibility notes, not replacements for official docs.
-
 ## Diagnostic Protocol (Mandatory Order)
 
 When a user reports a problem, follow this sequence strictly. Do not skip steps or jump to conclusions.
@@ -64,7 +53,7 @@ lzc-cli docker logs --tail 200 <container>     # What do the last logs say?
 3. Secondary fix: use `setup_script` to `chown`/`chmod` before the app starts, or set `user: "1000"`.
 
 ### Step 3E: Inject Not Working Diagnosis
-1. Check inject syntax generation: is the target box using old syntax (`on/when/do`) or new syntax (`mode/include/scripts`)? First query OpenViking for `application.injects` and `inject ctx`, then read `../lazycat:dynamic-deploy/references/injects.md`.
+1. Check inject syntax generation: is the target box using old syntax (`on/when/do`) or new syntax (`mode/include/scripts`)? Read `references/inject-compat.md`.
 2. For `request`/`response` stage injects: verify `auth_required: false` is set.
 3. For `browser` stage injects: verify `when` paths use hash routes only if the app is an SPA.
 4. Check `lzc-cli project build` output for unknown field warnings.
@@ -101,11 +90,11 @@ lzc-cli docker logs --tail 200 <container>     # What do the last logs say?
 
 ## Bundled References
 
-- Official troubleshooting facts: query `viking://resources/lazycat-developer-docs/` with `ov find`.
-- Manifest/build/package/routing/OIDC/inject specs: query OpenViking first, then cite the returned URI.
-- Inject Compatibility: [../lazycat:dynamic-deploy/references/injects.md](../lazycat:dynamic-deploy/references/injects.md)
-- Passwordless Inject Playbook: [../lazycat:dynamic-deploy/references/advanced-inject-passwordless-login.md](../lazycat:dynamic-deploy/references/advanced-inject-passwordless-login.md)
-- Command and image migration conventions: [../lazycat:port-app/references/command-conventions.md](../lazycat:port-app/references/command-conventions.md)
+- Docker Porting Pitfalls: [../../lazycat:lpk-builder/references/troubleshooting.md](../../lazycat:lpk-builder/references/troubleshooting.md)
+- Inject Compatibility: [../../lazycat:dynamic-deploy/references/injects.md](../../lazycat:dynamic-deploy/references/injects.md)
+- OIDC Integration: [../../lazycat:auth-integration/SKILL.md](../../lazycat:auth-integration/SKILL.md)
+- Advanced Routing: [../../lazycat:advanced-routing/SKILL.md](../../lazycat:advanced-routing/SKILL.md)
+- Manifest Spec: [../../lazycat:lpk-builder/references/manifest-spec.md](../../lazycat:lpk-builder/references/manifest-spec.md)
 
 ## Outputs
 

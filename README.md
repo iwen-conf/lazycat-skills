@@ -4,12 +4,12 @@
 
 ## 文档检索：依赖 OpenViking 知识库
 
-本仓库不再夹带懒猫官方文档的离线副本。所有事实型问题（lpk / manifest / spec / API / 路由 / 认证 / AI Pod 等）都通过用户机器上的 [OpenViking](https://github.com/volcengine/OpenViking) 知识库实时检索；`lazycat:developer-expert` 是总入口，垂直技能被直接触发时也必须继承同一协议：
+本仓库不再夹带懒猫官方文档的离线副本。所有事实型问题（lpk / manifest / spec / API / 路由 / 认证 / AI Pod 等）都由 `lazycat:developer-expert` 通过用户机器上的 [OpenViking](https://github.com/volcengine/OpenViking) 知识库实时检索：
 
 - `viking://resources/lazycat-developer-docs/`：58 篇开发者手册（developer.lazycat.cloud）
 - `viking://resources/lazycat-aipod-docs/`：93 篇算力舱手册（developer.lazycat.cloud/aipod）
 
-查询命令和降级策略见 `lazycat:developer-expert/SKILL.md` 中的 "Knowledge Base Protocol"。如果机器上没装 OpenViking，技能仍可用，但 AI 必须先说明无法检索权威知识库，再谨慎退回到本地经验文档或一般知识。
+入库方式见 `lazycat:developer-expert/SKILL.md` 中的 "Knowledge Base Protocol"。如果机器上没装 OpenViking，技能仍可用，但 AI 会退回到一般知识，准确度会下降。
 
 ## 技能分组
 
@@ -65,5 +65,3 @@ npx skills add iwen-conf/lazycat-skills
 - 根目录不放测试工程、临时目录或与技能包无关的构建文件。
 - **不要把懒猫官方文档拷贝进 `references/`**——通过 OpenViking 实时检索。
 - 技能 `references/` 只放：(a) 仅本技能使用的私有 cheat-sheet；(b) 官方文档没有的经验沉淀。
-- 涉及官方事实的垂直技能必须写明 OpenViking 前置查询；本地 `references/` 只能作为执行策略和经验补充。
-- 不要引用已删除的旧技能目录：`lazycat:lpk-builder`、`lazycat:advanced-routing`、`lazycat:auth-integration`、`lazycat:aipod-developer`。

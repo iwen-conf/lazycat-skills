@@ -7,14 +7,6 @@ description: 面向 Lazycat 应用图标准备与外部 AI 图像生成交接的
 
 You are responsible for preparing App Icon generation handovers during the asset phase of a Lazycat app. You do not claim the image is generated; instead, you organize the icon semantics, design constraints, and final English prompt for the user to use with other image models to generate a 1024x1024 PNG.
 
-## Knowledge Source Rule
-
-This skill owns icon prompt handoff, not official review policy. If the user asks about Lazycat store asset requirements, icon review constraints, screenshot submission, or Developer Center behavior, query OpenViking before answering.
-
-```bash
-ov find "store submission icon assets screenshots review" --uri viking://resources/lazycat-developer-docs -n 5
-```
-
 ## Overview
 
 This skill is used when a project enters the "Store Assets / Submission Assets / Icon Completion" phase. The goal is not to discuss design in broad terms, but to output a copyable prompt that aligns with the project's actual functionality, store positioning, and review context.

@@ -7,17 +7,6 @@ description: 面向 Lazycat 应用攻略与文章创作的 skill。只要用户�
 
 You are responsible for progressing a "desire to write a Lazycat guide" to a finished article "worthy of publishing and applying for incentives." Articles must be based on real applications, real scenarios, and real operations, avoiding abstract or conceptual text.
 
-## Knowledge Source Rule
-
-For Lazycat integration or official-policy articles, query OpenViking before drafting factual sections. This includes route/upstream/ingress, OIDC, file association, deploy params, inject, AI Pod, `AI App`, AI Browser Extension, store submission, and incentive rules.
-
-```bash
-ov find "Lazycat integration OIDC file association route inject store rules" --uri viking://resources/lazycat-developer-docs -n 5
-ov find "AI Pod AI App browser extension guide" --uri viking://resources/lazycat-aipod-docs -n 5
-```
-
-The article may cite the official topic surfaced by OpenViking, but should add real app context, screenshots, and operational insight rather than rewriting official docs.
-
 ## Overview
 
 This skill is used for writing application guides, usage tutorials, and integration instructions. Default requirements:

@@ -3,13 +3,10 @@
 Compiled from official pages and related docs to help move projects toward a "high-probability path for current incentives." Final reward issuance and amounts are subject to official review and current rules.
 
 Official Sources:
-
-Before making an eligibility judgment, query OpenViking for the current official rules:
-
-```bash
-ov find "store rule cash incentive app review reward" --uri viking://resources/lazycat-developer-docs -n 5
-ov find "OIDC integration file association MIME store submission guide" --uri viking://resources/lazycat-developer-docs -n 5
-```
+- Community Incentive Rules: <https://developer.lazycat.cloud/store-rule.html>
+- OIDC Integration: <https://developer.lazycat.cloud/advanced-oidc.html>
+- File Association: <https://developer.lazycat.cloud/advanced-mime.html>
+- Store Submission Guide: <https://developer.lazycat.cloud/store-submission-guide.html>
 
 ## 1. Reward Structure
 

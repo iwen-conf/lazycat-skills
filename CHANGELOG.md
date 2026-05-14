@@ -1,11 +1,5 @@
 # Changelog
 
-## 2026-05-13
-
-- docs: 将 OpenViking 明确为全库官方事实知识源，要求垂直技能被直接触发时也必须先检索权威文档。
-- fix: 清理 `troubleshoot`、`dynamic-deploy` 和相关 references 中对已删除旧技能目录的引用，改为 OpenViking 查询主题与现存经验文档。
-- docs: 收紧本地 `references/` 边界，明确其只作为经验、流程和质量门禁补充，不替代官方规范。
-
 ## 2026-04-24
 
 - docs: 收紧懒猫项目的 `Makefile` 约定，明确 `make build` 只负责基于已准备好的镜像引用与交付物打包 `lpk`，不承担源码级构建。

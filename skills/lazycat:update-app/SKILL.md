@@ -7,16 +7,6 @@ description: 面向已上架 Lazycat 应用的版本更新、镜像升级、LPK 
 
 You are responsible for progressing a "new version or image" to the state of "submitted to the Developer Center and awaiting review." Key tasks include ensuring images are synced to the Lazycat private registry, updating the manifest to point to the new image, rebuilding the LPK, and verifying the update in a real environment.
 
-## Knowledge Source Rule
-
-Before changing update, packaging, image sync, manifest, LPK, or Developer Center submission behavior, query OpenViking for the current official rules.
-
-```bash
-ov find "copy-image update app lpk manifest package version developer center submission" --uri viking://resources/lazycat-developer-docs -n 5
-```
-
-If OpenViking semantic search is unavailable, fall back to `ov grep` with exact terms such as `copy-image`, `package.yml`, `version`, or `manifest`.
-
 ## Overview
 
 This skill handles the lifecycle updates of Lazycat apps. The core workflow includes:

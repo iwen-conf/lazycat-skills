@@ -1,18 +1,10 @@
 # manifest.yml Rendering
 
-Official field names and current rendering behavior must be checked through OpenViking before implementation:
-
-```bash
-ov find "deploy params manifest render text template SysParams UserParams stable_secret" --uri viking://resources/lazycat-developer-docs -n 5
-```
-
-This document is a local implementation note and example collection.
-
 lzcos v1.3.8+ supports dynamic rendering of the `manifest.yml` file, giving developers better control over deployment parameters.
 
 The `manifest.yml` rendering process is as follows:
 
-1. The developer creates an `lzc-deploy-params.yml` file in the project root and packages it into the lpk using `lzc-cli project build` (requires lzc-cli v1.3.7+).
+1. The developer creates an [lzc-deploy-params.yml](./spec/deploy-params) file in the project root and packages it into the lpk using `lzc-cli project build` (requires lzc-cli v1.3.7+).
 2. Before execution, the system redirects to a UI for parameter supplementation, requiring the user to fill in all parameters defined in `lzc-deploy-params.yml`.
 3. The system retrieves the user-provided parameters and uses them as template parameters (`U`) to render the final `lzc-manifest.yml` from the lpk.
 4. The final manifest is stored at `/lzcapp/run/manifest.yml` (relative to the original file `/lzcapp/pkg/manifest.yml`) and is used as the definitive configuration.

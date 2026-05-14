@@ -6,13 +6,12 @@ Not applicable to standard web apps integrating AI. If your project is a standar
 
 ## 1. Official References
 
-Before using this kit, query OpenViking for the current official docs:
-
-```bash
-ov find "AI App development package ai-pod-service caddy-aipod extension.zip" --uri viking://resources/lazycat-aipod-docs -n 5
-ov find "AI Browser Plugin testing login state 401 extension" --uri viking://resources/lazycat-aipod-docs -n 5
-ov find "app submission review guide AI App" --uri viking://resources/lazycat-developer-docs -n 5
-```
+- AI App Development Docs:
+  `https://developer.lazycat.cloud/open/zh/guide/aipod/ai-application.html`
+- AI Browser Plugin Testing Docs:
+  `https://developer.lazycat.cloud/open/zh/guide/aipod/ai-browser-plugin-testing.html`
+- App Submission/Review Guide:
+  `https://developer.lazycat.cloud/open/zh/guide/publish/app-review.html`
 
 Per official docs, AI Apps typically involve:
 - `lzc-build.yml`

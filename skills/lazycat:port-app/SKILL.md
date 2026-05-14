@@ -7,17 +7,6 @@ description: 面向 Lazycat 应用移植选型与落地的 skill。只要用户�
 
 You are responsible for progressing a "search for a portable project" to a "portable and worthwhile" state. The focus is not just on porting itself, but on market de-duplication and incentive assessment, avoiding projects that are already duplicates, lack incentive potential, or are unsuitable for listing.
 
-## Knowledge Source Rule
-
-Before deciding any Lazycat official behavior, query OpenViking: packaging specs, manifest image rules, `copy-image`, route/upstream/ingress fields, OIDC, file association, store incentive rules, and AI Pod / AI Browser Extension requirements.
-
-```bash
-ov find "docker porting lpk manifest copy-image route upstream ingress OIDC file association store rules" --uri viking://resources/lazycat-developer-docs -n 5
-ov find "AI Pod AI App browser extension porting package" --uri viking://resources/lazycat-aipod-docs -n 5
-```
-
-Local `references/` files cover porting workflow and command conventions; official field names and current rules come from OpenViking.
-
 ## Overview
 
 This skill is for porting open-source or self-hosted software to Lazycat. Default requirements:

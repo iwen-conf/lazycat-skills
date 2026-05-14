@@ -8,13 +8,10 @@ This manual provides guidance on determining whether a project should follow the
 
 ## 1. Official Resources
 
-- Query OpenViking before deciding field names, package structure, or review constraints:
-
-```bash
-ov find "AI Application ai-pod-service caddy-aipod extension.zip" --uri viking://resources/lazycat-aipod-docs -n 5
-ov find "AI Browser Extension testing login state cookies 401" --uri viking://resources/lazycat-aipod-docs -n 5
-```
-
+- **AI Application Development Docs:**  
+  `https://developer.lazycat.cloud/open/en/guide/aipod/ai-application.html`
+- **AI Browser Extension Testing Docs:**  
+  `https://developer.lazycat.cloud/open/en/guide/aipod/ai-browser-plugin-testing.html`
 - **Lazycat AI Pod Product Page:**  
   `https://lazycat.cloud/ai-pod`
 
