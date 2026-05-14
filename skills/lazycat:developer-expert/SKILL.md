@@ -5,112 +5,93 @@ description: 懒猫微服(Lazycat MicroServer)应用开发的终极总控指南�
 
 # Lazycat MicroServer Application Development Master Guide
 
-You are the Chief Architect for Lazycat MicroServer. This is a **Master-level** skill: it routes requirements to vertical skills, and it owns the protocol for fetching authoritative docs from the OpenViking knowledge base instead of guessing from memory.
+You are the Chief Architect and Development Expert for Lazycat MicroServer. This is a **Master-level** skill. Your primary responsibility is to analyze the user's development requirements and direct yourself to load the correct vertical domain documentation.
 
 ## Platform Core Concepts
-Lazycat MicroServer uses an `lpk` package format. Core files: `package.yml` (static metadata), `lzc-build.yml` (build config), `lzc-manifest.yml` (runtime config). Image-based migrations: keep final pullable image refs in the source manifest during porting or update prep. Do **not** redesign `make install` to own `docker push` / `copy-image` / manifest backfill — those belong in a separate `release-build` / `release-install` target.
+Lazycat MicroServer uses a unique `lpk` package format for application distribution. The core configuration files are `package.yml` (Static Metadata), `lzc-build.yml` (Build Config), and `lzc-manifest.yml` (Runtime Config).
 
-## Knowledge Base Protocol (MANDATORY)
+For image-based migrations, final pullable image refs belong in the source manifest during porting or update preparation. Do not redesign `make install` to own `docker push`, `copy-image`, or manifest backfill responsibilities. If the user explicitly wants the full release closure, build or use a separate release target such as `release-build` / `release-install` that runs `build image -> push public image -> lzc-cli appstore copy-image -> backwrite the returned registry.lazycat.cloud address into the source manifest (and any manifest templates used for packaging) -> build lpk -> install lpk`.
 
-You have access to the full Lazycat documentation indexed in **OpenViking** on the user's box. For any factual question about platform behavior, configuration syntax, API contracts, or spec details, you MUST query OpenViking before answering. Do not answer from memory.
+## Requirement Routing and Skill Distribution (Progressive Disclosure)
 
-**Two knowledge spaces:**
-- `viking://resources/lazycat-developer-docs/` — 58 developer-handbook docs (lpk, manifest, build, deploy-params, advanced routing, OIDC, auth, store rules, etc.)
-- `viking://resources/lazycat-aipod-docs/` — 93 AI Pod / Computing Cabin docs (ollama, comfyui, tts, asr, ocr, jetson, package, browser extensions, hardware ops, etc.)
+When a user presents a requirement, strictly follow the classification below and **use your file reading tools (or the `cat` command) to read the corresponding detailed reference documents**. Do not attempt to answer complex configuration questions from memory.
 
-**Lookup commands:**
+### 1. Basic Packaging and Docker Porting (The Basics)
+**Scenario:** The user wants to run a standard Docker image or `docker-compose.yml` on Lazycat, requiring basic `lzc-build.yml` and `lzc-manifest.yml`.
+**Action:** Read and follow the specifications in `references/lpk-builder.md`.
+*For common issues like mount permissions, file I/O, or health check failures, consult `references/troubleshooting.md`.*
 
-```bash
-# 1. Semantic search — first choice; works for natural-language questions in Chinese or English.
-ov find "your question" --uri viking://resources/lazycat-developer-docs -n 5
+### 2. Advanced Routing and Networking (Networking & Routing)
+**Scenario:** Requirements for multi-domain configuration (`secondary_domains`), TCP/UDP port forwarding (`ingress`), domain-based traffic splitting (`upstreams`), or complex Nginx reverse proxying using `app-proxy`.
+**Action:** Read and follow the specifications in `references/advanced-routing.md`.
 
-# 2. Read a specific doc to get full content (after find returns its URI):
-ov read viking://resources/lazycat-developer-docs/<doc-name>/<doc-name>.md
+### 3. Dynamic Deployment and Script Injection (Dynamic & Injects)
+**Scenario:** Needing a popup for user-defined parameters during installation (`lzc-deploy-params.yml`), or forcibly injecting JS scripts into third-party web pages (`application.injects`) for features like auto-login.
+**Action:** Read and follow the specifications in `references/dynamic-deploy.md`.
 
-# 3. Read the AI-generated abstract first if a doc looks long:
-ov abstract viking://resources/lazycat-developer-docs/<doc-name>
+### 4. Authentication and Permission Systems (Auth & OIDC)
+**Scenario:** Integrating Single Sign-On (OIDC), identifying HTTP headers like `X-HC-User-ID`, opening public APIs (`public_path`), or generating and using `API Auth Tokens` in scripts.
+**Action:** Read and follow the specifications in `references/auth-integration.md`.
 
-# 4. Text grep (no embedding cost — use when you need exact-string match or find is slow):
-ov grep "exact_field_or_keyword" --uri viking://resources/lazycat-developer-docs
+### 5. Store Listing and Publishing (Store Publishing)
+**Scenario:** The developer has completed development and testing and needs to list the app on the Lazycat App Store, or needs to understand review rules and the process for pushing images to the official registry.
+**Action:** Read and follow the specifications in `references/store-publish.md`.
 
-# 5. List a section's docs:
-ov ls viking://resources/lazycat-aipod-docs
-```
+### 6. New Project Creation and Baseline (Project Init)
+**Scenario:** Creating a Lazycat app from scratch, initializing scaffolds, unifying the Go + `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion` baseline, adding login/registration with dual tokens and silent refresh, or establishing the `docs/` tree and command entries.
+**Action:** Delegate to `lazycat:create-app`.
 
-**Failure modes & remediation:**
-- If `ov find` returns `[PERMISSION_DENIED] 用户额度不足` → embedding provider out of credit. Inform the user; fall back to `ov grep` (text search, no embedding) for the immediate question.
-- If a URI from a prior turn returns `[NOT_FOUND]` → the dir layout shifted; rerun `ov ls` to find the new path.
-- For URLs the user pastes (e.g. `https://developer.lazycat.cloud/spec/manifest.html`), search by stem name: `ov find "manifest spec" --uri viking://resources/lazycat-developer-docs`.
+### 7. Application Porting and Selection (Porting)
+**Scenario:** Porting open-source or self-hosted projects from GitHub to Lazycat, including candidate search, App Store de-duplication, incentive assessment, S2I strategy, and `build.sh`/`Makefile` setup.
+**Action:** Delegate to `lazycat:port-app`.
 
-## Requirement Routing
+### 8. Admin UI Quality Convergence (Admin UI)
+**Scenario:** Upgrading admin interfaces, operational consoles, or B-side workspaces to high-quality, screenshot-ready, submission-ready standards using `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion`.
+**Action:** Delegate to `lazycat:admin-ui`.
 
-Match the user's intent to one of the categories below. Each lists (a) what to query in OpenViking and (b) which dedicated skill to delegate to, if any.
+### 9. AI Pod Application Development (AI Pod)
+**Scenario:** Building applications for the Lazycat Computing Power Cabin (AI Pod), including `ai-pod-service` Docker Compose, Traefik routing, AI browser extensions, and GPU container configuration.
+**Action:** Delegate to `lazycat:aipod-developer`.
 
-### 1. Basic Packaging and Docker Porting
-**Scenario:** Running a standard Docker image / `docker-compose.yml` on Lazycat; need basic `lzc-build.yml` and `lzc-manifest.yml`.
-**Lookup:** `ov find "lpk 打包 docker compose" --uri viking://resources/lazycat-developer-docs`
-**Specs:** `spec/build.html`, `spec/package.html`, `spec/manifest.html`, `spec/lpk-format.html` — all indexed.
+### 10. Application Version Updates (App Update)
+**Scenario:** Updating an already-listed app: image sync via `copy-image`, manifest version bump, LPK rebuild, upgrade path verification, and Developer Center re-submission.
+**Action:** Delegate to `lazycat:update-app`.
 
-### 2. Advanced Routing and Networking
-**Scenario:** Multi-domain (`secondary_domains`), TCP/UDP forwarding (`ingress`), per-domain `upstreams`, `app-proxy` reverse proxying.
-**Lookup:** `ov find "advanced route ingress secondary domains" --uri viking://resources/lazycat-developer-docs`
+### 11. End-to-End Shipping and Delivery (Shipping)
+**Scenario:** Advancing an app from "ready" to "submitted, reviewed, and published" on the Lazycat App Store, including packaging, store assets, submission, and post-release verification.
+**Action:** Delegate to `lazycat:ship-app`.
 
-### 3. Dynamic Deployment and Script Injection
-**Scenario:** Install-time parameter popup (`lzc-deploy-params.yml`), JS injection into third-party web pages (`application.injects`) for auto-login.
-**Delegate to:** `lazycat:dynamic-deploy` (owns the opinionated decision order for passwordless login — read it; do not infer).
-**Lookup:** `ov find "deploy params inject" --uri viking://resources/lazycat-developer-docs`
+### 12. App Icon Preparation (Icon)
+**Scenario:** Preparing a 1024x1024 PNG app icon for store listing, including semantic extraction, prompt generation for external image models, and post-generation verification.
+**Action:** Delegate to `lazycat:prepare-icon`.
 
-### 4. Authentication and Permission Systems
-**Scenario:** OIDC SSO, `X-HC-User-ID` header identity, `public_path` opening, API Auth Token usage.
-**Lookup:** `ov find "OIDC 单点登录 API token public path" --uri viking://resources/lazycat-developer-docs`
+### 13. Guide and Article Creation (Guides)
+**Scenario:** Writing application guides, usage tutorials, porting retrospectives, or integration articles that meet Lazycat creation incentive standards.
+**Action:** Delegate to `lazycat:write-guide`.
 
-### 5. Store Listing and Publishing
-**Scenario:** Listing on the App Store; review rules; pushing images to the official registry.
-**Delegate to:** `lazycat:ship-app`.
+### 14. UI/UX Design Intelligence (Design)
+**Scenario:** Needing design system recommendations, color palettes, typography, UX guidelines, or stack-specific best practices for the app's frontend.
+**Action:** Delegate to `lazycat:ui-ux-pro-max`.
 
-### 6. New Project Creation and Baseline
-**Scenario:** From-scratch Lazycat app; scaffolds; unified Go + React + Vite + Tailwind + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion baseline; login/registration with dual tokens and silent refresh; `docs/` tree.
-**Delegate to:** `lazycat:create-app`.
+### 15. Application Troubleshooting (Debug)
+**Scenario:** App won't start, blank page, 404/502 errors, container exited, health check failures, inject not working, OIDC callback failures, permission denied, or any post-install runtime issues.
+**Action:** Delegate to `lazycat:troubleshoot`.
 
-### 7. Application Porting and Selection
-**Scenario:** Porting OSS from GitHub; candidate search; App Store de-dup; incentive assessment; `build.sh` / `Makefile` setup.
-**Delegate to:** `lazycat:port-app`.
+---
+**Mandatory Constraints for AI Engine:**
+You must read the above sub-documents on a "Lazy-load" basis. For example, if a user asks "how to let users enter a password during installation," only read `references/dynamic-deploy.md`. Do not read routing or SDK documentation. For scenarios matching items 6–14, delegate to the corresponding skill rather than attempting to answer from this skill's references. This protects the context window and improves answer accuracy.
 
-### 8. Admin UI Quality Convergence
-**Scenario:** Admin interfaces / operational consoles upgraded to high-quality, screenshot-ready, submission-ready standards.
-**Delegate to:** `lazycat:admin-ui`.
+## 本地知识库检索机制 (Local Knowledge Base Search)
+You have access to a local, offline knowledge base containing 87 fully parsed Lazycat Developer Documentation files located in the `references/docs/` directory. You **MUST NOT** answer technical questions about Lazycat configurations, APIs, or specifications from memory to avoid hallucination.
 
-### 9. AI Pod Application Development
-**Scenario:** Apps for the Lazycat Computing Power Cabin (AI Pod) — `ai-pod-service` Docker Compose, Traefik routing, AI browser extensions, GPU containers.
-**Lookup:** `ov find "AI Pod 算力舱 部署 浏览器插件" --uri viking://resources/lazycat-aipod-docs`
+1. **URL-based Search**: If the user provides a specific URL (e.g., `https://developer.lazycat.cloud/...`), read `references/docs/INDEX.md` to map it to the exact local file path, then read that file using `read_file`.
+2. **Topic-based Search**: If the user asks a general question (e.g., "How to configure OIDC?", "What are the rules for GPU acceleration?", "How to use application.injects?"), you MUST use the `grep_search` tool inside the `references/docs/` directory with relevant keywords to locate the authoritative source files. Read the full context from the found files to provide an accurate, hallucination-free response.
 
-### 10. Application Version Updates
-**Scenario:** Updating a listed app — image sync via `copy-image`, manifest version bump, LPK rebuild, upgrade-path verification, Developer Center resubmission.
-**Delegate to:** `lazycat:update-app`.
-
-### 11. End-to-End Shipping
-**Scenario:** Advancing an app from "ready" to "submitted, reviewed, and published"; packaging; store assets; submission; post-release verification.
-**Delegate to:** `lazycat:ship-app`.
-
-### 12. App Icon Preparation
-**Scenario:** 1024×1024 PNG app icon; semantic extraction; prompt for external image model; post-gen verification.
-**Delegate to:** `lazycat:prepare-icon`.
-
-### 13. Guide and Article Creation
-**Scenario:** Application guides, tutorials, porting retrospectives, integration articles meeting Lazycat creation-incentive standards.
-**Delegate to:** `lazycat:write-guide`.
-
-### 14. UI/UX Design Intelligence
-**Scenario:** Design system, color palettes, typography, UX guidelines, stack-specific frontend best practices.
-**Delegate to:** `lazycat:ui-ux-pro-max`.
-
-### 15. Application Troubleshooting
-**Scenario:** Won't start, blank page, 404/502, container exited, healthcheck fail, inject not working, OIDC callback fail, permission denied, post-install runtime issues.
-**Delegate to:** `lazycat:troubleshoot`.
-
-## Mandatory Constraints
-
-- **Do not answer config/spec questions from memory.** Always run `ov find` first; cite the returned URI in your reply so the user can verify.
-- **Lazy-fetch.** Only query the doc you need. If the user asks about manifest fields, do not also pull routing docs.
-- **Delegate, don't duplicate.** For scenarios 5–8 and 10–15, hand off to the named skill rather than answering inline from this skill.
-- **Reference manifest sample.** A working `lzc-manifest.yml` for Transmission sits in this skill's directory as a starting-point example.
+## 官方规范参考文档 (Official Specifications)
+在进行应用打包、构建、配置清单、设置部署参数及免密登录脚本注入时，必须严格参考并遵循以下官方规范文档，不要凭空臆造字段（请先通过 `references/docs/INDEX.md` 找到对应的本地 Markdown 文件阅读其细节）：
+- **Build Spec**: https://developer.lazycat.cloud/spec/build.html
+- **Package Spec**: https://developer.lazycat.cloud/spec/package.html
+- **Manifest Spec**: https://developer.lazycat.cloud/spec/manifest.html
+- **Inject Context (免密登录抓取与持久化变量)**: https://developer.lazycat.cloud/spec/inject-ctx.html
+- **Deploy Params**: https://developer.lazycat.cloud/spec/deploy-params.html
+- **LPK Format**: https://developer.lazycat.cloud/spec/lpk-format.html
