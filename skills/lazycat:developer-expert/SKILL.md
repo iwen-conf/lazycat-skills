@@ -18,20 +18,20 @@ When a user presents a requirement, strictly follow the classification below and
 
 ### 1. Basic Packaging and Docker Porting (The Basics)
 **Scenario:** The user wants to run a standard Docker image or `docker-compose.yml` on Lazycat, requiring basic `lzc-build.yml` and `lzc-manifest.yml`.
-**Action:** Read and follow the specifications in `references/lpk-builder.md`.
+**Action:** Delegate to `lazycat:lpk-builder` and read `references/lpk-builder.md` only as a pointer to the canonical skill.
 *For common issues like mount permissions, file I/O, or health check failures, consult `references/troubleshooting.md`.*
 
 ### 2. Advanced Routing and Networking (Networking & Routing)
 **Scenario:** Requirements for multi-domain configuration (`secondary_domains`), TCP/UDP port forwarding (`ingress`), domain-based traffic splitting (`upstreams`), or complex Nginx reverse proxying using `app-proxy`.
-**Action:** Read and follow the specifications in `references/advanced-routing.md`.
+**Action:** Delegate to `lazycat:advanced-routing` and read `references/advanced-routing.md` only as a pointer to the canonical skill.
 
 ### 3. Dynamic Deployment and Script Injection (Dynamic & Injects)
 **Scenario:** Needing a popup for user-defined parameters during installation (`lzc-deploy-params.yml`), or forcibly injecting JS scripts into third-party web pages (`application.injects`) for features like auto-login.
-**Action:** Read and follow the specifications in `references/dynamic-deploy.md`.
+**Action:** Delegate to `lazycat:dynamic-deploy` and read `references/dynamic-deploy.md` only as a pointer to the canonical skill.
 
 ### 4. Authentication and Permission Systems (Auth & OIDC)
 **Scenario:** Integrating Single Sign-On (OIDC), identifying HTTP headers like `X-HC-User-ID`, opening public APIs (`public_path`), or generating and using `API Auth Tokens` in scripts.
-**Action:** Read and follow the specifications in `references/auth-integration.md`.
+**Action:** Delegate to `lazycat:auth-integration` and read `references/auth-integration.md` only as a pointer to the canonical skill.
 
 ### 5. Store Listing and Publishing (Store Publishing)
 **Scenario:** The developer has completed development and testing and needs to list the app on the Lazycat App Store, or needs to understand review rules and the process for pushing images to the official registry.
@@ -79,14 +79,14 @@ When a user presents a requirement, strictly follow the classification below and
 
 ---
 **Mandatory Constraints for AI Engine:**
-You must read the above sub-documents on a "Lazy-load" basis. For example, if a user asks "how to let users enter a password during installation," only read `references/dynamic-deploy.md`. Do not read routing or SDK documentation. For scenarios matching items 6–14, delegate to the corresponding skill rather than attempting to answer from this skill's references. This protects the context window and improves answer accuracy.
+Use lazy loading and delegate to the corresponding vertical skill instead of duplicating its rules here. For example, if a user asks how to let users enter a password during installation, use `lazycat:dynamic-deploy`; do not read routing docs. For scenarios matching items 1–15, prefer the vertical skill as the canonical source. This protects the context window and avoids stale duplicate guidance.
 
 ## 本地知识库检索机制 (Local Knowledge Base Search)
 You have access to a local, offline knowledge base containing 87 fully parsed Lazycat Developer Documentation files located in the `references/docs/` directory. You **MUST NOT** answer technical questions about Lazycat configurations, APIs, or specifications from memory to avoid hallucination.
 
 1. **URL-based Search**: If the user provides a specific URL (e.g., `https://developer.lazycat.cloud/...`), read `references/docs/INDEX.md` to map it to the exact local file path, then read that local Markdown file.
 2. **Topic-based Search**: If the user asks a general question (e.g., "How to configure OIDC?", "What are the rules for GPU acceleration?", "How to use application.injects?"), search only inside `references/docs/` and the relevant vertical skill `references/` with local tools such as `rg`, `fd`, or the Agent's local file search. Read the full context from the matched files before answering.
-3. **Fallback Scope**: If the split docs do not contain the answer, search `../lazycat-developer-docs.md` as the aggregate offline snapshot, then the current vertical skill's references.
+3. **Fallback Scope**: If the split docs do not contain the answer, search the current vertical skill's `SKILL.md` and `references/` files. The old aggregate offline snapshot is intentionally not kept in this repository.
 4. **External Verification**: Only query official online documentation when local docs are missing, clearly stale, or the user asks for current verification. Do not use remote semantic indexes, external long-term memory, paid vector databases, or cloud indexing as the default knowledge path.
 
 ## 官方规范参考文档 (Official Specifications)

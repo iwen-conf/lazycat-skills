@@ -10,7 +10,6 @@
 
 - `skills/lazycat:developer-expert/references/docs/INDEX.md`：官方开发文档 URL 到本地文件的索引。
 - `skills/lazycat:developer-expert/references/docs/`：拆分后的官方开发文档 Markdown。
-- `skills/lazycat-developer-docs.md`：聚合版官方开发文档快照。
 - 各技能目录下的 `references/`：面向具体工作流的工程经验、清单和约束。
 
 推荐检索顺序：

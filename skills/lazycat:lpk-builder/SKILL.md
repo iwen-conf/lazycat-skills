@@ -14,6 +14,8 @@ Packaging and porting a Lazycat MicroServer application (LPK v2) involves writin
 ### 1. Static Metadata (`package.yml`)
 Define the application's identity, version (must strictly be `x.x.x` format), and localization.
 - For field definitions and BCP 47 localization rules, read `references/package-spec.md`.
+- For migrated web/server apps, default to declaring unsupported mobile/TV platforms unless the app has been verified there: `android`, `ios`, `tvos`.
+- `locales` must follow Lazycat package rules and BCP 47 language tags. Prefer at least `zh-CN` and `en-US` for `name`, `description`, and `usage` when preparing store-facing packages.
 
 **Standard Template:**
 ```yaml
@@ -23,10 +25,19 @@ name: My App
 description: High-performance Lazycat application.
 author: Developer Name
 license: MIT
+unsupported_platforms:
+  - android
+  - ios
+  - tvos
 locales:
-  zh:
+  zh-CN:
     name: "我的应用"
     description: "高性能懒猫应用。"
+    usage: "打开应用后会自动使用预置账号完成登录。"
+  en-US:
+    name: "My App"
+    description: "High-performance Lazycat application."
+    usage: "Open the app and it will sign in automatically with the preset account."
 ```
 
 ### 2. Writing the Build Configuration (`lzc-build.yml`)
@@ -165,19 +176,25 @@ When generating configuration files, you must comply with the following Lazycat 
 6. **Avoid Build Script Recursion**
    - **Never** execute `lzc project build` or `lzc-cli project build` within the `buildscript` (e.g., `build.sh`) defined in `lzc-build.yml`. Since `buildscript` is called by the `build` command, calling it internally will cause an infinite loop.
 
-7. **Prioritize Docker over Source Code**
-   - If a project provides a Docker image or `docker-compose.yml`, base the porting ENTIRELY on these Docker artifacts. **Do NOT** read or analyze the application's source code, as this wastes context. Just configure the `image:` in `lzc-manifest.yml` to use the provided Docker image.
+7. **No Business Source Changes During Porting**
+   - Default migration goal: make the existing project run on Lazycat MicroServer without changing business code. This is usually not difficult when the project already has a Docker image, `Dockerfile`, or `docker-compose.yml`; solve it in the packaging/runtime layer instead of rewriting the app.
+   - Allowed changes: Lazycat packaging files (`package.yml`, `lzc-build.yml`, `lzc-manifest.yml`, `lzc-deploy-params.yml`), `Makefile`, `build.sh`, Docker wrapper files, startup/seed scripts, runtime config templates, icons, store assets, and docs.
+   - Forbidden by default: editing upstream frontend pages, backend business logic, application auth implementation, database schema/migrations, domain models, API handlers, or tests solely to make Lazycat packaging work.
+   - If an adaptation seems to require source changes, stop and first try non-invasive alternatives: official Docker image, wrapper image, `setup_script`, `entrypoint`/`command`, environment variables, mounted config, one-shot seed service, OIDC, `public_path`, or `application.injects`. Only modify business source after the user explicitly approves that scope.
+
+8. **Prioritize Docker over Source Code**
+   - If a project provides a Docker image or `docker-compose.yml`, base the porting ENTIRELY on these Docker artifacts. **Do NOT modify** the application's source code. Read source/config only when needed to identify ports, health endpoints, env vars, startup commands, or documented initialization behavior.
    - **Auto-Translation for `docker-compose.yml`**:
      - `ports: ["8080:80"]` -> Convert to `routes` in `lzc-manifest.yml` (e.g., `- /=http://service_name:80`).
      - `volumes: ["./data:/app/data"]` -> Convert to `binds` mapping to `/lzcapp/var/` (e.g., `- /lzcapp/var/data:/app/data`).
-     - `depends_on` -> **Keep it**, and convert the list form to the map form with `condition: service_healthy` per rule 9. Do not drop it; without gating, dependents boot against half-ready infra and crash. Service-to-service HTTP still uses `http://service_name:port` — the `depends_on` block is only about startup ordering.
+     - `depends_on` -> **Keep it**, and convert the list form to the map form with `condition: service_healthy` per rule 10. Do not drop it; without gating, dependents boot against half-ready infra and crash. Service-to-service HTTP still uses `http://service_name:port` — the `depends_on` block is only about startup ordering.
 
-8. **Settle Final Image Refs Before Install**
+9. **Settle Final Image Refs Before Install**
    - If the app depends on copied or bridged images, the returned test/official registry addresses must be written into the source `lzc-manifest.yml` and any manifest templates used by packaging before `make build` / `make install`.
    - `make install` is for packaging + installing the current LPK. It must not silently own image upload, `copy-image`, or manifest backfill responsibilities.
    - If the user asks for a complete release closure, add or use a separate release target instead of overloading `make install`.
 
-9. **Gate Dependents on Healthchecks, Not Just Start Order**
+10. **Gate Dependents on Healthchecks, Not Just Start Order**
    - **Enforce a layered startup order**: classify every service into infra (MySQL/PostgreSQL/Redis/ZooKeeper/etcd), middleware (Nacos/Consul/Kafka/RocketMQ/MinIO), one-shot seeds (schema import, config push, bucket init), and business (gateway/auth/api/workers). Each layer must be gated `service_healthy` on the layers below it; never let a business container race against a still-booting infra container. Seed containers sit between infra and middleware/business — business waits on the seed's terminal healthcheck, not on its mere start.
    - A bare `depends_on: [svc_a, svc_b]` (list form) only waits for the dependency to be **started**, not **healthy**. For slow-starting stacks (MySQL, Nacos, RocketMQ, Redis with ACL init, Kafka, ZooKeeper, any JVM service) this lets dependents boot against a half-ready infra and crash with "connection refused" / "auth not ready" / "topic missing" / "schema not initialized".
    - Use the **map form** with an explicit `condition: service_healthy` (compose-style):
@@ -204,7 +221,19 @@ When generating configuration files, you must comply with the following Lazycat 
    - Main business services (gateway, auth, api, business logic) must list **every** infra dependency they talk to at boot, each gated on `service_healthy`. "Only one container has the issue" is usually because a sibling forgot to gate on the same infra.
    - If a dependency is genuinely optional and the app should survive its absence, mark it with `condition: service_started` plus in-app retry/backoff — do **not** use `service_healthy` on an optional dep (the whole stack will hang when that dep naturally fails).
 
-10. **No Cross-Runtime Artifacts in the LPK**
+11. **Passwordless Login and Startup Account Contract**
+   - Store-facing ports that require an in-app account must support passwordless login. Prefer OIDC when the upstream supports it; otherwise use non-invasive runtime initialization plus `application.injects`.
+   - When the upstream supports creating a user from CLI/CMD/env/admin API at startup, create a fixed initial account during service startup without editing business code. Use `setup_script`, wrapper `entrypoint`/`command`, or a one-shot seed service that waits for the app health endpoint, creates the account idempotently, writes a terminal marker, and exposes a healthcheck.
+   - The default credential contract must be explicit in docs and `locales.<lang>.usage`:
+     - 账号: `<fixed-login-account>`
+     - 密码: `<fixed-login-password>`
+     - 昵称: `<fixed-display-name>`
+   - Initial credentials may be fixed because the browser inject provides the no-password experience, but do not leave them undocumented. If secrets must be generated, use Lazycat deploy params or `stable_secret` and explain where the user can see/change them.
+   - For "可修改式免密登录", follow the official three-phase inject pattern: request captures login/init/password-change candidates into `ctx.flow`; response persists them to `ctx.persist` only on 2xx; browser uses `builtin://simple-inject-password` to fill login forms and fills current-password fields on change-password pages with `autoSubmit: false`.
+   - Do not guess login/init/change-password API paths, payload keys, or CSS selectors. Inspect documented APIs, browser network traffic, or config; if unavailable, ask for these details before writing the inject.
+   - Passwordless login work must be verified together with healthchecks and startup order: the app service is healthy before the seed runs, the seed is healthy/done before browser login is tested, and business services do not race databases or seed containers.
+
+12. **No Cross-Runtime Artifacts in the LPK**
    - Do **not** compile language-specific artifacts on the host (`.class`, `.pyc`, Go/Rust native binaries, `.so`/`.dylib`, CGO outputs) and drop them into the `lpk` to be executed inside a service container whose runtime differs from the host. This is how you produce `UnsupportedClassVersionError` / `GLIBC_X.Y not found` / wrong-arch crashes the moment a container loads them.
    - The lpk is a neutral carrier for `package.yml`, `lzc-build.yml`, `lzc-manifest.yml`, icons, shell scripts, static assets, and config. Anything that needs a specific language runtime belongs **inside the service image**.
    - Preferred order for helpers and healthchecks:

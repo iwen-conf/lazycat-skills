@@ -43,9 +43,9 @@ description: 一句话描述（用于触发匹配，务必精准）
 4. **中文优先**：本技能包面向中文开发者，所有文档使用中文编写
 
 ### 知识源与本地检索规则
-- 懒猫官方事实优先来自仓库内的本地 Markdown：`skills/lazycat:developer-expert/references/docs/INDEX.md`、`skills/lazycat:developer-expert/references/docs/`、`skills/lazycat-developer-docs.md`，以及各技能 `references/`。
+- 懒猫官方事实优先来自仓库内的本地 Markdown：`skills/lazycat:developer-expert/references/docs/INDEX.md`、`skills/lazycat:developer-expert/references/docs/`，以及各技能 `references/`。
 - 任何涉及 `lpk`、`manifest`、`package.yml`、`lzc-build.yml`、路由、OIDC、API、inject、部署参数、AI Pod、商店规则等官方事实的问题，都必须先检索并阅读本地文档，不要凭记忆回答。
-- 默认检索方式使用本地文件读取、`rg`、`fd` 或编辑器/Agent 提供的本地搜索能力；搜索范围应限制在本仓库或相关 `references/`，不要扫描整个 Home 目录。
+- 默认检索方式使用本地文件读取、`rg`、`fd` 或编辑器/Agent 提供的本地搜索能力；搜索范围应限制在本仓库、`references/docs/` 或相关垂直技能 `references/`，不要扫描整个 Home 目录。
 - 不要把远程语义索引、外部长期记忆、云端向量库、付费索引服务或自动持久化记忆写成默认工作流。只有用户明确要求，且已说明成本与隐私影响时，才可引入外部服务。
 - 如果本地文档缺失或明显可能过期，优先查询官方公开线上文档并在回复中说明依据；不要用第三方资料替代官方规范。
 
@@ -96,6 +96,7 @@ description: 一句话描述（用于触发匹配，务必精准）
 4. **不要随意新增技能** — 新增技能前应与用户确认需求和定位
 5. **不要在技能中提及社区激励/红包奖励信息**
 6. **不要将 SDK 相关内容加回来** — SDK 技能已被有意移除
+7. **不要让迁移型技能默认修改上游项目业务代码** — 懒猫移植应默认只改包装层：`package.yml`、`lzc-build.yml`、`lzc-manifest.yml`、`lzc-deploy-params.yml`、`Makefile`、`build.sh`、Docker 包装层、启动脚本、运行时初始化脚本和文档。除非用户明确要求开发新功能，否则禁止改前端页面、后端业务逻辑、数据库 schema、鉴权流程等业务源文件。
 
 ## 7. 需要主动做的事情
 

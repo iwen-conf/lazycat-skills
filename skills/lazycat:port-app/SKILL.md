@@ -18,6 +18,9 @@ This skill is for porting open-source or self-hosted software to Lazycat. Defaul
 - Implementation must provide `build.sh`, `Makefile`, `make build`, and `make install`.
 - Once migration is confirmed, the agent must actually create or complete the repository `Makefile`; do not stop at giving advice, TODOs, or pseudo-targets.
 - For image-based ports, settle final pullable image refs in `lzc-manifest.yml` during migration or `make update`; do not make `make install` responsible for `docker push`, `copy-image`, or manifest rewrite work.
+- The porting boundary is non-invasive by default: do not modify upstream business code. Only change Lazycat packaging/runtime wrapper files unless the user explicitly approves product development scope.
+- For common web/server ports, declare unsupported platforms `android`, `ios`, and `tvos` in `package.yml` unless those clients have been verified.
+- If the app requires an in-app account, integrate passwordless login and document the credential contract: account, password, and nickname. Prefer startup-created fixed initial credentials plus three-phase inject for later password changes.
 - Must retain upstream address, license, and porting notes.
 
 For tool-based apps or those requiring unified login, evaluate `file_handler` and Microservice OIDC. If the project is AI-native, determine if it should be ported as a Computing Power Cabin `AI App` or AI Browser Extension.
@@ -29,10 +32,10 @@ To verify apps installed on Lazycat MicroServer, use `lazycat_account` / `lazyca
 - **Trigger**: User mentions porting, "port," finding projects on GitHub, checking for duplicates, avoiding duplicate porting, porting incentives, upstream repository, Makefile, build.sh, file_handler, OIDC, store login, lazycat_account, lazycat_password, Computing Power Cabin, `AI App`, AI Browser Extension.
 - **Inputs**: Candidate project keywords, target category, incentive goals, GitHub upstream info, App Store access status, local MicroServer credentials status, login/file association needs, AI-native status.
 - **Outputs**: Candidate project list, de-duplication conclusion, incentive judgment, completed porting entry files (`build.sh`, `Makefile`), AI Pod route judgment, and release entry for `lazycat:ship-app`.
-- **Quality Gate**: Must complete GitHub search and App Store de-duplication. If local `lazycat_account` / `lazycat_password` are present, prioritize real login before checking. If a duplicate exists without differentiation, do not proceed with the incentive path. Deliverables must include an actually completed `build.sh` and `Makefile`, not just a suggested template. AI projects must define a route (Standard, AI App, or Browser Ext).
+- **Quality Gate**: Must complete GitHub search and App Store de-duplication. If local `lazycat_account` / `lazycat_password` are present, prioritize real login before checking. If a duplicate exists without differentiation, do not proceed with the incentive path. Deliverables must include an actually completed `build.sh` and `Makefile`, not just a suggested template. AI projects must define a route (Standard, AI App, or Browser Ext). Ports with login must include a passwordless-login design and documented initial credentials.
 ## Decision Tree
 
-- **Rule 1 — Never Modify Original Source Code**: The entire porting process must rely on Docker images and manifest configurations. Do not edit or modify the original upstream code under any circumstances.
+- **Rule 1 — Never Modify Original Business Code**: The entire porting process must rely on Docker images, wrapper images, startup scripts, seed scripts, and Lazycat manifest/package/build configuration. Do not edit or modify original upstream business code unless the user explicitly changes the task from "porting" to "feature development".
 - **Rule 2 — Use Existing Image**: If the project publishes official Docker images (Docker Hub, GHCR, Quay, etc.), use the image directly. Run `lzc-cli appstore copy-image <image>`. This is the fastest and most reliable path.
 - **Rule 3 — Build Image if Needed**: If no remote image exists but a `Dockerfile` is provided, build the image locally for `linux/amd64`, and then run `lzc-cli appstore copy-image <image>`.
 - **Rule 4 — Write Back to YML**: Take the returned `registry.lazycat.cloud/...` address from the copy command and write it back into `lzc-manifest.yml`.
@@ -96,15 +99,21 @@ Upon execution, provide a brief summary of:
 7. Prioritize OIDC or `file_handler` for suitable projects, as they affect incentives and UX.
 8. For AI-native projects, determine if they fit better as standard apps, `AI Apps`, or AI Browser Extensions.
 9. If a ported project needs a static homepage, the priority must be: `Connection Entry`, `Status Check`, `Actions`, `Feedback`. Do not put "Why use it" or "Roadmap" in running pages; use `README` or store assets.
-10. **Zero Modification to Original Code**: Absolutely DO NOT modify the original source code under any circumstances.
+10. **Zero Modification to Original Business Code**: Absolutely DO NOT modify original source files for frontend pages, backend handlers, domain logic, auth logic, database schema/migrations, or tests during a port. Allowed scope is packaging/runtime wrapper files only: `package.yml`, `lzc-build.yml`, `lzc-manifest.yml`, `lzc-deploy-params.yml`, `Makefile`, `build.sh`, Docker wrapper files, startup/seed scripts, config templates, icons, store assets, and docs.
 11. **Image-Based Porting Flow**: If a project provides a Docker image, use the image directly. If no image exists but a Dockerfile is provided, build the image first. Once an image is available (remote or locally built), use `lzc-cli appstore copy-image <image>` to copy the image to the Lazycat registry.
 12. **Write Back to YML and Build LPK**: After copying the image, the returned `registry.lazycat.cloud/...` address MUST be written back into `lzc-manifest.yml`. Only after this is done, run `make build` and `make install` to build the `.lpk` package.
 13. **Strict Health Check and Startup Order**: You MUST configure `healthcheck` (with `test`, `start_period`, `interval`, `timeout`, `retries`) for all dependencies (like MySQL, Redis, etc.) and map `depends_on` with `condition: service_healthy`. Business containers must wait for infrastructure containers to be fully healthy to avoid startup crashes.
     - **Auto-Translation for `docker-compose.yml`**:
-      - `ports: ["8080:80"]` -> Convert to `routes` in `lzc-manifest.yml` (e.g., `- /=http://${service_name}.${lzcapp_appid}.lzcapp:80`).
+      - `ports: ["8080:80"]` -> Convert to `routes` in `lzc-manifest.yml` (e.g., `- /=http://service_name:80`). Do not leave `${lzcapp_appid}` or shell-style placeholders in a plain manifest.
       - `volumes: ["./data:/app/data"]` -> Convert to `binds` mapping to `/lzcapp/var/` (e.g., `- /lzcapp/var/data:/app/data`).
       - `depends_on` -> **KEEP IT**. Convert list form to map form with `condition: service_healthy` to guarantee correct startup sequences (e.g., app waits for DB to be healthy). DO NOT drop it, or apps will crash on boot.
       - `healthcheck` -> **MANDATORY FOR DEPENDENCIES**. If a service is depended upon, you MUST define a `healthcheck` with a robust `test` command (like `curl` or `mysqladmin ping`), and generous `start_period`, `interval`, `timeout`, and `retries`. Without health checks, `service_healthy` conditions will fail and dependents will hang forever.
+14. **Default Platform Declaration**: In `package.yml`, add `unsupported_platforms: [android, ios, tvos]` for normal migrated web/server apps unless you have verified mobile/TV support. Keep `locales` in `package.yml`, not `lzc-manifest.yml`, and use BCP 47 keys such as `zh-CN` and `en-US`.
+15. **Passwordless Login Contract**: If the app has an internal login page, provide a non-invasive passwordless-login path before considering the port complete.
+    - Create a fixed initial user at startup using documented CLI/CMD/env/admin API, `setup_script`, wrapper `entrypoint`/`command`, or a one-shot seed service. Do not edit business auth code.
+    - Document the initial credentials in README/store usage/locales: `账号`, `密码`, `昵称`.
+    - Use official three-phase inject for modifiable credentials: request captures login/init/change-password credentials into `ctx.flow`; response writes `ctx.persist` only on 2xx; browser fills login and current-password fields with `builtin://simple-inject-password`.
+    - Do not invent API paths, payload keys, or selectors. Inspect runtime traffic or ask the user before writing inject YAML.
 
 ## Workflow
 
@@ -139,12 +148,16 @@ At minimum, add:
 ### 5. Plan Adaptation and Image Sync
 - `lzc-build.yml`, `lzc-manifest.yml`.
 - **Image Porting (Mandatory)**: 
-  1. **Zero Source Code Modification**: Only use existing Docker images or build directly from a provided Dockerfile.
+  1. **Zero Business Source Modification**: Only use existing Docker images or build directly from a provided Dockerfile.
   2. If the image needs to be built, build it locally first.
   3. Use `lzc-cli appstore copy-image <docker_image>` to get an official `registry.lazycat.cloud/...` image name.
   4. Write the returned image address back into `lzc-manifest.yml`.
   5. Put this sync + manifest-backfill step in migration flow or `make update`, not in `make install`.
-  6. By the time `make build` / `make install` runs to build the LPK, `lzc-manifest.yml` must already contain the final pullable image refs.- `build.sh`, `Makefile` (must include `build`, `install`, `update`, `release-prep`).
+  6. By the time `make build` / `make install` runs to build the LPK, `lzc-manifest.yml` must already contain the final pullable image refs.
+- `build.sh`, `Makefile` (must include `build`, `install`, `update`, `release-prep`).
+- Add `unsupported_platforms` to `package.yml` for unverified platforms: `android`, `ios`, `tvos`.
+- Add `locales.zh-CN` and `locales.en-US` usage text that explains how login works and lists the initial account/password/nickname when fixed credentials are used.
+- For login apps, add passwordless login without changing business source: startup-created fixed user + health-gated seed + three-phase inject for login/change-password learning.
 - Add `application.oidc_redirect_path` and `application.file_handler` if applicable.
 - For AI-native: evaluate `ai-pod-service/`, `caddy-aipod`, and `extension.zip`.
 - If a static homepage is needed, check if it's essential for runtime; if only for submission/promotion, use docs or store assets instead.
@@ -161,6 +174,8 @@ Once "worth porting" is confirmed, hand over to `lazycat:ship-app` for packaging
 - Upstream address, license, and repo status recorded.
 - `build.sh` and `Makefile` completed in the repo.
 - OIDC or `file_handler` evaluated.
+- For login apps, passwordless login designed, credentials documented (`账号`/`密码`/`昵称`), and API paths/selectors verified instead of guessed.
+- `package.yml` includes `unsupported_platforms` and BCP 47 `locales` when preparing a real LPK.
 - For incentives: clarified that real installation and verification on Lazycat MicroServer is mandatory.
 - AI Pod route evaluated for AI projects.
 

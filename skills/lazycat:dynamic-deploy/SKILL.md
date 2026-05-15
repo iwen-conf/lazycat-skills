@@ -64,6 +64,18 @@ services:
 2. **简单自动填充 (Simple Autofill)**：如果密码在部署后**绝对固定不变**（例如通过部署参数传入固定管理员密码），可退化为直接在 `browser` 阶段使用 `builtin://simple-inject-password` 填充。
 3. **基础 Auth 注入 (Basic Auth)**：上游没有 HTML 登录页，仅仅使用标准的 HTTP Basic Auth 时，直接在 `request` 阶段注入 `Authorization` HTTP 头即可。
 
+### 固定初始账号 + 可修改式免密登录（迁移应用默认组合）
+当第三方应用需要内部账号，并且上游支持通过启动命令、CLI、环境变量或管理 API 创建用户时，必须优先使用这个非侵入组合，而不是修改业务代码：
+
+1. **启动期创建固定初始用户**：用 `setup_script`、wrapper `entrypoint`/`command`、或 one-shot seed service 在服务启动后幂等创建账号。seed 必须等待主应用 healthcheck 通过，成功后写入完成标记，并提供自己的 terminal healthcheck。
+2. **固定凭据必须可见**：在 README、商店使用说明或 `package.yml.locales.<lang>.usage` 中写明：
+   - 账号：`<固定账号>`
+   - 密码：`<固定密码>`
+   - 昵称：`<固定昵称>`
+3. **后续允许用户改密**：使用三阶段联动监听登录、初始化和改密请求；只有 response 2xx 后才把新账号/密码写入 `ctx.persist`；登录页从 `ctx.persist` 自动填充。这样初始账号固定，但用户改密后免密登录会跟随新密码。
+4. **健康检查和启动顺序绑定**：数据库/缓存先健康，主应用再健康，seed 最后创建用户并健康；浏览器注入只解决登录体验，不能掩盖后端未初始化或 seed 未完成的问题。
+5. **禁止猜测**：创建用户命令、API 路径、payload 字段和输入框选择器必须来自上游文档、容器内 CLI help、运行时网络请求或用户提供的信息。
+
 > **🛑 强制红线 (STOP)**: 既然“三阶段联动”是主流方案，**绝对不要**凭空捏造 API 路径和选择器！你**必须**主动读取 `references/advanced-inject-passwordless-login.md`（或 `advanced-inject.md`）中的教程模板，并在写代码前主动向用户询问或确认相关的 初始化/登录/改密 API 接口路径及表单选择器。
 
 **简单自动填充示例 (静态密码):**
@@ -79,7 +91,7 @@ application:
         - src: builtin://simple-inject-password
           params:
             user: "admin"
-            password: "{{ stable_secret "app_admin_pass" }}"
+            password: '{{ stable_secret "app_admin_pass" }}'
             autoSubmit: true
 ```
 
