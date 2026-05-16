@@ -36,6 +36,37 @@ When porting existing Docker images or `docker-compose.yml` files to Lazycat Mic
 - **Correct Approach:** Write semantically meaningful health check probes. For Web services, use `curl` to check actual API endpoints. For databases (e.g., MySQL), use actual SQL queries like `select 1` to determine if the service is truly ready.
 - Use `services.[].healthcheck` (instead of the deprecated `health_check`) and properly configure `retries`, `interval`, and `start_period`.
 
+### 3.1 Ingress Health Is Often a Secondary Symptom
+**Problem:** Lazycat ingress logs may repeat `service "<name>" is not ready`, while the real failure is inside the routed business service or its dependency chain. A common pattern is: ingress waits for the business service -> business service starts early -> database is still `rejecting connections` -> business exits or becomes unhealthy -> ingress keeps reporting the route target as not ready.
+
+**Best Practices:**
+- Do not start by relaxing the ingress or application healthcheck. First inspect the route target service logs and dependency health.
+- If business logs contain `connect: connection refused`, `database is starting up`, `rejecting connections`, `auth not ready`, `schema not found`, `topic missing`, or `bucket missing`, fix dependency readiness and seed order before changing the business healthcheck.
+- Infra services need readiness probes that reflect actual readiness, not process liveness:
+  - PostgreSQL: `pg_isready` can still report `rejecting connections` during first boot; give it a realistic `start_period` and verify logs.
+  - MySQL: use `mysqladmin ping` or `SELECT 1` with the real credentials.
+  - Redis: require `PONG` with auth when ACL/password is enabled.
+- Business services that open DB/cache connections during startup must explicitly gate on every required infra service with `condition: service_healthy`.
+- If the business still needs its own startup retry, keep it bounded and log the dependency being waited on. Do not rely only on Docker ordering.
+
+### 3.2 One-shot Migration and Seed Containers
+**Problem:** A migration or seed container may be modeled as a one-shot service with a terminal healthcheck marker such as `/tmp/done`. If it runs before PostgreSQL/MySQL/Redis is truly ready, it exits once with `connection refused`, never writes the marker, and every dependent service waits forever or starts with missing schema/config.
+
+**Best Practices:**
+- Keep the terminal marker contract: write `/tmp/done` (or the chosen marker) only after the migration/seed succeeds, then keep the container alive if downstream health gating depends on it.
+- Add bounded retry/wait for transient dependency failures (`connection refused`, DB starting, temporary auth-not-ready). Permanent migration errors must still fail fast.
+- Make seeds idempotent. Re-running after a partial install should produce `no change`, `already exists`, or equivalent success rather than corrupting state.
+- Gate business services on the seed service with `condition: service_healthy`, not merely on the database.
+
+### 3.3 Deployment Parameters and Generated Config
+**Problem:** Apps using `lzc-deploy-params.yml` may look like they have a generic startup or 503 problem when the setup wizard was not completed, required params were not rendered, or generated config files are stale/missing.
+
+**Best Practices:**
+- Treat `need setup deploy params` as an installation/setup state, not a container startup failure. Complete the deployment-parameter wizard before starting or debugging the app.
+- If a service needs a generated config file (for example `/app/.config/app.conf`), render it from environment/deploy params in `setup_script` on every startup so parameter changes apply after restart.
+- During troubleshooting, inspect the rendered environment variables and generated file inside the container. Look for empty strings, placeholder values, unsupported provider names, or stale files from an older install.
+- If deploy params were added after an earlier install, rebuild the LPK, reinstall, complete the setup wizard, then restart. Do not try to fix this by changing route healthchecks.
+
 ## 4. Privileged Mode & Capabilities
 **Problem:** Some applications (e.g., sidecars, VPNs, or apps requiring FUSE mounts) depend on Docker's privileged mode (`privileged: true`) or specific capabilities (`cap_add`).
 

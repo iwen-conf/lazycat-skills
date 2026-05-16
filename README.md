@@ -11,6 +11,7 @@
 - `skills/lazycat:developer-expert/references/docs/INDEX.md`：官方开发文档 URL 到本地文件的索引。
 - `skills/lazycat:developer-expert/references/docs/`：拆分后的官方开发文档 Markdown。
 - 各技能目录下的 `references/`：面向具体工作流的工程经验、清单和约束。
+- `skills/lazycat:lpk-builder/references/runtime-model.md`：迁移前判断懒猫运行机理、入口、存储、依赖、初始化和登录风险的核心参考。
 
 推荐检索顺序：
 

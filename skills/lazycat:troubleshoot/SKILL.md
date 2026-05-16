@@ -36,13 +36,27 @@ lzc-cli docker logs --tail 200 <container>     # What do the last logs say?
 
 ### Step 3B: Health Check Failure Diagnosis
 1. Distinguish "slow startup" from "startup command failed" — check if the process is still alive.
-2. If alive but slow: check for blocking first-boot tasks (GeoIP download, DB migration, demo data seeding). Move non-critical tasks to background or make them idempotent.
-3. If the process died: treat as Step 3A.
-4. Only adjust `start_period` / `retries` after confirming the app actually starts successfully given enough time.
+2. Identify which healthcheck is failing: Lazycat ingress/app container, the routed business service, an infra service (PostgreSQL/MySQL/Redis), or a one-shot seed/migration service. Do not treat all `unhealthy` states as the same problem.
+3. If the Lazycat ingress logs repeatedly say a route target service is not ready, immediately inspect the target service logs and health status. The ingress symptom is often downstream of a business service that crashed or could not reach its database.
+4. If a business service logs `connection refused`, `database is starting up`, `rejecting connections`, auth-not-ready, schema-not-found, or topic/bucket missing, treat it as dependency readiness or seed ordering failure before changing the business healthcheck.
+5. If an infra service is still initializing, tune the infra healthcheck first: probe real readiness, increase `start_period` for first boot, and ensure dependents use `depends_on: condition: service_healthy`.
+6. If a one-shot migration/seed service races a database, keep the terminal marker contract (`/tmp/done` or equivalent) but add bounded retry/wait for transient dependency errors. Permanent migration errors must still fail fast.
+7. If alive but slow: check for blocking first-boot tasks (GeoIP download, DB migration, demo data seeding). Move non-critical tasks to background or make them idempotent.
+8. If the process died: treat as Step 3A.
+9. Only adjust `start_period` / `retries` after confirming the app actually starts successfully given enough time.
+
+### Step 3B-2: Deploy Parameters and Rendered Config Diagnosis
+Use this path when logs mention missing config files, placeholder values, repeated 503 from a "pending" service, or `need setup deploy params`.
+
+1. Check whether the app includes `lzc-deploy-params.yml` and whether the install wizard has been completed. `need setup deploy params` is not a container crash; it means required user params have not been rendered yet.
+2. Inspect rendered environment variables and files from inside the container. Confirm required config content is present, not an empty string, default placeholder, or stale value from a previous install.
+3. If a config file is generated from deploy params, prefer writing it in `setup_script` on every startup from the rendered environment. This makes later parameter changes take effect after restart.
+4. Validate provider names and model/category fields separately. Do not pass UI labels or model categories into upstream config fields that expect canonical provider IDs.
+5. If the package was installed before deploy params were added, rebuild the LPK, reinstall, complete the setup wizard, then restart. Do not debug this as a generic route or healthcheck failure first.
 
 ### Step 3C: Routing / Blank Page Diagnosis
 1. Verify `application.routes` target matches the actual service name and port.
-2. Check the service domain format: `${service_name}.${lzcapp_appid}.lzcapp`.
+2. For same-app routing, prefer concrete service upstreams such as `http://service_name:port`. Do not leave shell-style placeholders like `${lzcapp_appid}` in a plain `lzc-manifest.yml`.
 3. If using `application.upstreams`, check `disable_trim_location` and `use_backend_host` settings.
 4. For SPA apps returning 404 on refresh: the upstream web server needs a fallback to `index.html`.
 5. For secondary domains: verify `application.secondary_domains` and `app-proxy` Nginx config.
@@ -75,6 +89,12 @@ lzc-cli docker logs --tail 200 <container>     # What do the last logs say?
 | 404 on specific paths | URL prefix stripping | `disable_trim_location` in upstreams |
 | 502 Bad Gateway | Container crashed or wrong port | `docker ps -a` + `docker logs` |
 | `unhealthy` after 5 min | Slow first boot or dead process | Check if process is alive first |
+| Ingress says service not ready | Routed service crashed or dependency not ready | Target service logs + dependency health |
+| Business logs `connect: connection refused` | DB/cache not ready or missing `depends_on` gate | Infra healthcheck + `condition: service_healthy` |
+| DB health shows `rejecting connections` | First-boot DB initialization still running | DB logs + longer real readiness probe |
+| Migration/seed exits before DB ready | One-shot service raced infra | Add bounded retry; keep `/tmp/done` success marker |
+| `need setup deploy params` | Install wizard not completed | Complete deploy params setup, then start |
+| Missing generated config + 503 | Deploy params not rendered or stale package | Rebuild/reinstall and inspect rendered env/file |
 | Inject script not executing | Wrong stage or `auth_required` missing | Inject syntax + `auth_required: false` |
 | OIDC callback 404 | `oidc_redirect_path` mismatch | Compare manifest path vs app config |
 | Config file read-only crash | Mounting from `/lzcapp/pkg/content/` | Use `setup_script` to copy to `/lzcapp/var/` |
@@ -87,6 +107,8 @@ lzc-cli docker logs --tail 200 <container>     # What do the last logs say?
 3. **Verify what's actually in the package.** If `build.sh` doesn't include a file, `setup_script` can't use it.
 4. **Don't adjust health checks to mask failures.** Increasing `start_period` is only valid if the app actually starts given enough time.
 5. **Route debugging requires knowing the exact service name and port.** Don't guess — read the manifest.
+6. **Ingress health failures are often secondary.** Always inspect the routed service and its dependencies before changing the ingress or route healthcheck.
+7. **Deployment parameters are part of startup state.** If required params are missing or stale, fix the setup/render path before treating the app as broken.
 
 ## Bundled References
 

@@ -11,6 +11,8 @@ You are a professional Lazycat MicroServer Application Ecosystem Developer. Your
 
 Packaging and porting a Lazycat MicroServer application (LPK v2) involves writing three core configuration files: `package.yml`, `lzc-build.yml`, and `lzc-manifest.yml`.
 
+Before translating Docker or Compose files, read `references/runtime-model.md` and explicitly classify the app's delivery form, HTTP/TCP entry path, persistence plan, dependency layers, initialization path, and login path. Then run the "can this app run on Lazycat" gate: image/arch, process model, network listener, storage, dependencies, init/login, and external requirements. Do not start from YAML templates until these runtime facts are known.
+
 ### 1. Static Metadata (`package.yml`)
 Define the application's identity, version (must strictly be `x.x.x` format), and localization.
 - For field definitions and BCP 47 localization rules, read `references/package-spec.md`.
@@ -153,6 +155,13 @@ When the user needs to formally list the app on the Lazycat App Store, read `ref
 
 When generating configuration files, you must comply with the following Lazycat MicroServer red-line rules:
 
+0. **Understand the Runtime Model Before Writing YAML**
+   - Treat LPK as a packaged runtime contract, not a raw Docker Compose upload. `package.yml` is static metadata, `lzc-build.yml` is build-only, and `lzc-manifest.yml` is the runtime source for services, routes, binds, healthchecks, and startup scripts.
+   - For every port, classify: delivery form (`image` / `compose` / `Dockerfile` / source-only), entry (`routes` / `upstreams` / `ingress`), persistence (`/lzcapp/var` / `/lzcapp/cache` / document access), dependency layers, initialization, and login.
+   - Before claiming an app can run, verify the runability gate from `references/runtime-model.md`: image/architecture, long-running process, real listener protocol/port, writable storage, dependency readiness, initialization/login, and external requirements.
+   - If the app's real port, persistent data path, required env vars, first-boot init command, or readiness probe is unknown, inspect upstream Docker docs/config first. Do not invent manifest fields or guess healthcheck URLs.
+   - Use `references/runtime-model.md` as the canonical preflight guide for this judgment.
+
 1. **Inter-Service Communication Domains**
    - Never use `localhost` for cross-container communication.
    - For `application.routes` and most intra-app HTTP forwarding, prefer concrete service upstreams such as `http://your_service_name:80`.
@@ -220,6 +229,9 @@ When generating configuration files, you must comply with the following Lazycat 
    - Tune `start_period`, `interval`, `timeout`, `retries` to the service's real cold-start budget. JVM services routinely need `start_period: 30s–60s`; MySQL first-boot initialization can need minutes (`start_period: 5m+`). Do not copy a generic `start_period: 5s` from a web-app template onto a Spring Boot service.
    - Main business services (gateway, auth, api, business logic) must list **every** infra dependency they talk to at boot, each gated on `service_healthy`. "Only one container has the issue" is usually because a sibling forgot to gate on the same infra.
    - If a dependency is genuinely optional and the app should survive its absence, mark it with `condition: service_started` plus in-app retry/backoff — do **not** use `service_healthy` on an optional dep (the whole stack will hang when that dep naturally fails).
+   - Treat Lazycat ingress messages like `service "<name>" is not ready` as a symptom. Before changing route or ingress health settings, inspect the target service logs and all infra dependencies. If the target logs `connection refused` to PostgreSQL/MySQL/Redis, fix dependency readiness/order first.
+   - One-shot migration or seed services must be idempotent, retry transient dependency-not-ready errors, write their terminal marker only after success, and remain health-gated for downstream services.
+   - For apps using `lzc-deploy-params.yml`, verify the setup wizard has been completed and rendered config/env values exist before debugging 503, missing config files, or pending-health services.
 
 11. **Passwordless Login and Startup Account Contract**
    - Store-facing ports that require an in-app account must support passwordless login. Prefer OIDC when the upstream supports it; otherwise use non-invasive runtime initialization plus `application.injects`.

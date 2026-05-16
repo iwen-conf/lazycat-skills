@@ -19,6 +19,7 @@ This skill is for porting open-source or self-hosted software to Lazycat. Defaul
 - Once migration is confirmed, the agent must actually create or complete the repository `Makefile`; do not stop at giving advice, TODOs, or pseudo-targets.
 - For image-based ports, settle final pullable image refs in `lzc-manifest.yml` during migration or `make update`; do not make `make install` responsible for `docker push`, `copy-image`, or manifest rewrite work.
 - The porting boundary is non-invasive by default: do not modify upstream business code. Only change Lazycat packaging/runtime wrapper files unless the user explicitly approves product development scope.
+- Before declaring a project suitable for porting, classify its Lazycat runtime model: delivery form, entry route, persistence, dependency layers, initialization, and login. Read `../lazycat:lpk-builder/references/runtime-model.md` for the canonical preflight model.
 - For common web/server ports, declare unsupported platforms `android`, `ios`, and `tvos` in `package.yml` unless those clients have been verified.
 - If the app requires an in-app account, integrate passwordless login and document the credential contract: account, password, and nickname. Prefer startup-created fixed initial credentials plus three-phase inject for later password changes.
 - Must retain upstream address, license, and porting notes.
@@ -32,7 +33,7 @@ To verify apps installed on Lazycat MicroServer, use `lazycat_account` / `lazyca
 - **Trigger**: User mentions porting, "port," finding projects on GitHub, checking for duplicates, avoiding duplicate porting, porting incentives, upstream repository, Makefile, build.sh, file_handler, OIDC, store login, lazycat_account, lazycat_password, Computing Power Cabin, `AI App`, AI Browser Extension.
 - **Inputs**: Candidate project keywords, target category, incentive goals, GitHub upstream info, App Store access status, local MicroServer credentials status, login/file association needs, AI-native status.
 - **Outputs**: Candidate project list, de-duplication conclusion, incentive judgment, completed porting entry files (`build.sh`, `Makefile`), AI Pod route judgment, and release entry for `lazycat:ship-app`.
-- **Quality Gate**: Must complete GitHub search and App Store de-duplication. If local `lazycat_account` / `lazycat_password` are present, prioritize real login before checking. If a duplicate exists without differentiation, do not proceed with the incentive path. Deliverables must include an actually completed `build.sh` and `Makefile`, not just a suggested template. AI projects must define a route (Standard, AI App, or Browser Ext). Ports with login must include a passwordless-login design and documented initial credentials.
+- **Quality Gate**: Must complete GitHub search, App Store de-duplication, and runtime runability gate. If local `lazycat_account` / `lazycat_password` are present, prioritize real login before checking. If a duplicate exists without differentiation, do not proceed with the incentive path. Deliverables must include an actually completed `build.sh` and `Makefile`, not just a suggested template. AI projects must define a route (Standard, AI App, or Browser Ext). Ports with login must include a passwordless-login design and documented initial credentials.
 ## Decision Tree
 
 - **Rule 1 — Never Modify Original Business Code**: The entire porting process must rely on Docker images, wrapper images, startup scripts, seed scripts, and Lazycat manifest/package/build configuration. Do not edit or modify original upstream business code unless the user explicitly changes the task from "porting" to "feature development".
@@ -41,7 +42,7 @@ To verify apps installed on Lazycat MicroServer, use `lazycat_account` / `lazyca
 - **Rule 4 — Write Back to YML**: Take the returned `registry.lazycat.cloud/...` address from the copy command and write it back into `lzc-manifest.yml`.
 - **Rule 5 — Build LPK**: Once the `lzc-manifest.yml` is updated with the correct image addresses, run `make build` and `make install` to build the `.lpk` package.
 
-- **Step 2 — Check Project Type**: Perform GitHub search, App Store check, incentive judgment, integration assessment, and AI Pod route judgment. Finally, decide to proceed or switch projects.
+- **Step 2 — Check Project Type**: Perform GitHub search, App Store check, incentive judgment, runtime-model preflight, integration assessment, and AI Pod route judgment. Finally, decide to proceed or switch projects.
 
 
 ## When to Use
@@ -108,6 +109,8 @@ Upon execution, provide a brief summary of:
       - `volumes: ["./data:/app/data"]` -> Convert to `binds` mapping to `/lzcapp/var/` (e.g., `- /lzcapp/var/data:/app/data`).
       - `depends_on` -> **KEEP IT**. Convert list form to map form with `condition: service_healthy` to guarantee correct startup sequences (e.g., app waits for DB to be healthy). DO NOT drop it, or apps will crash on boot.
       - `healthcheck` -> **MANDATORY FOR DEPENDENCIES**. If a service is depended upon, you MUST define a `healthcheck` with a robust `test` command (like `curl` or `mysqladmin ping`), and generous `start_period`, `interval`, `timeout`, and `retries`. Without health checks, `service_healthy` conditions will fail and dependents will hang forever.
+    - Before writing the manifest, draw the service layers: infra -> middleware -> seed/migration -> business. If this graph is unclear, inspect upstream Compose, docs, env examples, and startup logs first.
+    - Treat route health as end-to-end readiness. Lazycat can wait for route upstream ports, but it cannot make a business service survive a database race, missing schema, bad generated config, or absent initial account.
 14. **Default Platform Declaration**: In `package.yml`, add `unsupported_platforms: [android, ios, tvos]` for normal migrated web/server apps unless you have verified mobile/TV support. Keep `locales` in `package.yml`, not `lzc-manifest.yml`, and use BCP 47 keys such as `zh-CN` and `en-US`.
 15. **Passwordless Login Contract**: If the app has an internal login page, provide a non-invasive passwordless-login path before considering the port complete.
     - Create a fixed initial user at startup using documented CLI/CMD/env/admin API, `setup_script`, wrapper `entrypoint`/`command`, or a one-shot seed service. Do not edit business auth code.
@@ -138,6 +141,16 @@ Upon execution, provide a brief summary of:
 - Additional incentive opportunities (OIDC, `file_handler`).
 - Can regular users obtain credentials?
 - For AI projects: evaluate `AI App` route.
+- Runtime feasibility preflight:
+  - Delivery: official image, Compose, Dockerfile, or source-only.
+  - Entry: HTTP route/upstream, TCP/UDP ingress, secondary domain, or browser extension.
+  - Persistence: writable data paths under `/lzcapp/var`, cache paths, document access, and permissions.
+  - Dependencies: infra, middleware, seed/migration, business service order and healthchecks.
+  - Initialization: `setup_script`, deploy params, generated config, default account creation.
+  - Login: none, OIDC, fixed initial credentials, or inject.
+  - Runability gate: image/arch, process model, network listener, storage, dependencies, init/login, and external requirements.
+  - Risk: low / medium / high, with blockers recorded before implementation.
+  - Decision: `Can Run`, `Can Run After Packaging Fixes`, `Cannot Determine Yet`, or `Not Suitable For Standard Lazycat Port`. Do not use vague conclusions like "should be possible".
 
 ### 4. Solidify Porting Repository Entries
 At minimum, add:
@@ -147,6 +160,7 @@ At minimum, add:
 
 ### 5. Plan Adaptation and Image Sync
 - `lzc-build.yml`, `lzc-manifest.yml`.
+- Write a short runtime-model note in the porting docs before implementation: delivery form, entry, persistence, dependency layers, init, login, and unresolved risks.
 - **Image Porting (Mandatory)**: 
   1. **Zero Business Source Modification**: Only use existing Docker images or build directly from a provided Dockerfile.
   2. If the image needs to be built, build it locally first.
@@ -177,6 +191,7 @@ Once "worth porting" is confirmed, hand over to `lazycat:ship-app` for packaging
 - For login apps, passwordless login designed, credentials documented (`账号`/`密码`/`昵称`), and API paths/selectors verified instead of guessed.
 - `package.yml` includes `unsupported_platforms` and BCP 47 `locales` when preparing a real LPK.
 - For incentives: clarified that real installation and verification on Lazycat MicroServer is mandatory.
+- Runtime runability gate completed and documented before implementation, with one of the four required decisions.
 - AI Pod route evaluated for AI projects.
 
 ## Red Flags
@@ -188,6 +203,8 @@ Once "worth porting" is confirmed, hand over to `lazycat:ship-app` for packaging
 - Proceeding with incentives when duplicates exist.
 - Relying on marketing talk for incentives when the app is weak.
 - Missing upstream address or license.
+- No runtime runability gate, especially for Compose stacks with databases or first-boot initialization.
+- Claiming "can run" without evidence for image/arch, long-running process, listener port, writable data paths, dependencies, initialization, and login.
 - No `build.sh` or `Makefile`.
 - Missing file association for tool apps.
 
@@ -195,6 +212,7 @@ Once "worth porting" is confirmed, hand over to `lazycat:ship-app` for packaging
 
 - Market Research: [references/market-research.md](./references/market-research.md)
 - Porting Checklist: [references/porting-checklist.md](./references/porting-checklist.md)
+- Runtime Model and Porting Judgment: [../lazycat:lpk-builder/references/runtime-model.md](../lazycat:lpk-builder/references/runtime-model.md)
 - Command Conventions: [references/command-conventions.md](./references/command-conventions.md)
 - Native Batch Copy CLI (Go): [references/lzc-copy-image-go/README.md](./references/lzc-copy-image-go/README.md)
 - S2I (Source-to-Image) Strategy: [references/s2i-strategy.md](./references/s2i-strategy.md)
@@ -214,6 +232,7 @@ App Store Check
 - ...
 
 Conclusion
+- Can Run / Can Run After Packaging Fixes / Cannot Determine Yet / Not Suitable For Standard Lazycat Port
 - Proceed / Switch / Non-incentive path
 
 Requirements
