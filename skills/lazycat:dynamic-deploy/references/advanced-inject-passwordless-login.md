@@ -41,8 +41,8 @@ application:
       do:
         - src: builtin://simple-inject-password
           params:
-            user: admin
-            password: secret
+            user: lazycat
+            password: Lazycat@2026
 ```
 
 ## 常见方式
@@ -79,7 +79,7 @@ application:
       when:
         - /api/*
       do: |
-        ctx.headers.set("Authorization", "Basic " + ctx.base64.encode("admin:admin123"));
+        ctx.headers.set("Authorization", "Basic " + ctx.base64.encode("lazycat:Lazycat@2026"));
 ```
 
 ## 示例二：部署参数 + simple-inject-password
@@ -100,7 +100,7 @@ params:
     type: string
     name: "Login User"
     description: "Default login username"
-    default_value: "admin"
+    default_value: "lazycat"
 
   # 密码默认随机生成，避免弱口令
   - id: login_password
@@ -131,7 +131,7 @@ application:
 
 ## 验证
 
-1. 安装应用时填写部署参数（不填写时，用户名使用 `admin`，密码使用 `default_value: "$random(...)"` 生成值）。
+1. 安装应用时填写部署参数（不填写时，用户名使用 `lazycat`，密码使用 `default_value: "$random(...)"` 生成值）。
 2. 打开登录页（命中 `when`）。
 3. 账号和密码输入框被自动填充。
 

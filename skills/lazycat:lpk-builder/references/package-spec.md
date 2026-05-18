@@ -48,9 +48,9 @@ locales:
   zh-CN:
     name: "演示应用"
     description: "一个用于 Lazycat OS 的高性能演示程序。"
-    usage: "打开应用后会自动使用预置账号登录。默认账号：admin@example.local，默认密码：请查看使用说明。"
+    usage: "打开应用后会自动使用预置账号登录。默认账号：lazycat@lazycat.com，默认密码：请查看使用说明。"
   en-US:
     name: "Demo App"
     description: "A high-performance demo application for Lazycat OS."
-    usage: "Open the app and it signs in automatically with the preset account. Default account: admin@example.local. Default password: see usage notes."
+    usage: "Open the app and it signs in automatically with the preset account. Default account: lazycat@lazycat.com. Default password: see usage notes."
 ```

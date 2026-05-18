@@ -90,7 +90,7 @@ application:
       do:
         - src: builtin://simple-inject-password
           params:
-            user: "admin"
+            user: "lazycat"
             password: '{{ stable_secret "app_admin_pass" }}'
             autoSubmit: true
 ```

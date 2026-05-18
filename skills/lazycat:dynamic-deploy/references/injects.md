@@ -31,8 +31,8 @@ application:
       do:
         - src: builtin://simple-inject-password
           params:
-            user: "admin"
-            password: "admin123"
+            user: "lazycat"
+            password: "Lazycat@2026"
 ```
 
 Only use the newer `mode/include/scripts` form after confirming the target box really supports it.
@@ -51,8 +51,8 @@ application:
       do:
         - src: builtin://simple-inject-password
           params:
-            user: "admin"
-            password: "admin123"
+            user: "lazycat"
+            password: "Lazycat@2026"
 ```
 
 ## Rule Model

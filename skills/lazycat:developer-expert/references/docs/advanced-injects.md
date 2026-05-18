@@ -84,7 +84,7 @@ application:
       when:
         - /api/*
       do: |
-        ctx.headers.set("Authorization", "Basic " + ctx.base64.encode("admin:admin123"));
+        ctx.headers.set("Authorization", "Basic " + ctx.base64.encode("lazycat:Lazycat@2026"));
 
     - id: remove-cors
       on: response
