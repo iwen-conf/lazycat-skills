@@ -8,6 +8,7 @@
 - [ ] If highly duplicative, terminated incentive path or clarified differentiation.
 
 ## 2. Project Execution
+- [ ] Before editing, declared the allowed write scope for this port and limited changes to packaging/runtime wrapper files.
 - [ ] Created `docs/requirements`.
 - [ ] Created `docs/api-design`.
 - [ ] Created `docs/architecture`.
@@ -16,7 +17,9 @@
 - [ ] Created or completed `Makefile` in the repo after migration, not just as a proposed template.
 - [ ] `make build` implemented.
 - [ ] `make install` implemented.
-- [ ] No upstream business source files were modified for the port. Only Lazycat packaging/runtime wrapper files were changed, unless the user explicitly approved business-code changes.
+- [ ] No upstream business source files were modified for the port. Only Lazycat packaging/runtime wrapper files were changed, unless the user explicitly approved business-code changes in the current task and named the feature/file scope.
+- [ ] If startup, login, healthcheck, schema, routing, or review requirements seemed to require a business-code change, the agent stopped and reported the blocker instead of silently editing upstream source.
+- [ ] Final diff was checked against the boundary: allowed files are `package.yml`, `lzc-build.yml`, `lzc-manifest.yml`, `lzc-deploy-params.yml`, `Makefile`, `build.sh`, Docker wrapper files, `runtime/`, setup/seed scripts, config templates, docs, icons, and store assets.
 
 ## 3. Lazycat Adaptation
 - [ ] Runtime model preflight completed before writing manifest: delivery form, entry path, persistence, dependency layers, initialization, and login path.

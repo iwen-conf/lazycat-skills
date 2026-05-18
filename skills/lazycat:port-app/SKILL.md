@@ -18,7 +18,7 @@ This skill is for porting open-source or self-hosted software to Lazycat. Defaul
 - Implementation must provide `build.sh`, `Makefile`, `make build`, and `make install`.
 - Once migration is confirmed, the agent must actually create or complete the repository `Makefile`; do not stop at giving advice, TODOs, or pseudo-targets.
 - For image-based ports, settle final pullable image refs in `lzc-manifest.yml` during migration or `make update`; do not make `make install` responsible for `docker push`, `copy-image`, or manifest rewrite work.
-- The porting boundary is non-invasive by default: do not modify upstream business code. Only change Lazycat packaging/runtime wrapper files unless the user explicitly approves product development scope.
+- The porting boundary is non-invasive by default and must be enforced as a write-scope gate, not just a preference. Only change Lazycat packaging/runtime wrapper files unless the user explicitly approves product development scope in the current task.
 - Before declaring a project suitable for porting, classify its Lazycat runtime model: delivery form, entry route, persistence, dependency layers, initialization, and login. Read `../lazycat:lpk-builder/references/runtime-model.md` for the canonical preflight model.
 - For common web/server ports, declare unsupported platforms `android`, `ios`, and `tvos` in `package.yml` unless those clients have been verified.
 - If the app requires an in-app account, integrate passwordless login and document the credential contract: account, password, and nickname. Prefer startup-created fixed initial credentials plus three-phase inject for later password changes.
@@ -36,7 +36,7 @@ To verify apps installed on Lazycat MicroServer, use `lazycat_account` / `lazyca
 - **Quality Gate**: Must complete GitHub search, App Store de-duplication, and runtime runability gate. If local `lazycat_account` / `lazycat_password` are present, prioritize real login before checking. If a duplicate exists without differentiation, do not proceed with the incentive path. Deliverables must include an actually completed `build.sh` and `Makefile`, not just a suggested template. AI projects must define a route (Standard, AI App, or Browser Ext). Ports with login must include a passwordless-login design and documented initial credentials.
 ## Decision Tree
 
-- **Rule 1 — Never Modify Original Business Code**: The entire porting process must rely on Docker images, wrapper images, startup scripts, seed scripts, and Lazycat manifest/package/build configuration. Do not edit or modify original upstream business code unless the user explicitly changes the task from "porting" to "feature development".
+- **Rule 1 — Never Modify Original Business Code**: The entire porting process must rely on Docker images, wrapper images, startup scripts, seed scripts, and Lazycat manifest/package/build configuration. Do not edit or modify original upstream business code unless the user explicitly changes the task from "porting" to "feature development" and names the business files or feature scope that may be changed.
 - **Rule 2 — Use Existing Image**: If the project publishes official Docker images (Docker Hub, GHCR, Quay, etc.), use the image directly. Run `lzc-cli appstore copy-image <image>`. This is the fastest and most reliable path.
 - **Rule 3 — Build Image if Needed**: If no remote image exists but a `Dockerfile` is provided, build the image locally for `linux/amd64`, and then run `lzc-cli appstore copy-image <image>`.
 - **Rule 4 — Write Back to YML**: Take the returned `registry.lazycat.cloud/...` address from the copy command and write it back into `lzc-manifest.yml`.
@@ -101,6 +101,10 @@ Upon execution, provide a brief summary of:
 8. For AI-native projects, determine if they fit better as standard apps, `AI Apps`, or AI Browser Extensions.
 9. If a ported project needs a static homepage, the priority must be: `Connection Entry`, `Status Check`, `Actions`, `Feedback`. Do not put "Why use it" or "Roadmap" in running pages; use `README` or store assets.
 10. **Zero Modification to Original Business Code**: Absolutely DO NOT modify original source files for frontend pages, backend handlers, domain logic, auth logic, database schema/migrations, or tests during a port. Allowed scope is packaging/runtime wrapper files only: `package.yml`, `lzc-build.yml`, `lzc-manifest.yml`, `lzc-deploy-params.yml`, `Makefile`, `build.sh`, Docker wrapper files, startup/seed scripts, config templates, icons, store assets, and docs.
+    - Before editing, state the intended write scope and keep it to the allowed wrapper files.
+    - If a fix appears to require changing upstream business code, stop and report `Blocked by business-code change requirement`; offer a wrapper/image/config alternative if one exists.
+    - Do not treat tests, UI copy, auth handlers, API handlers, migrations, seed data inside upstream app directories, or framework config as "small harmless changes"; they are business-source changes unless they are part of a wrapper directory created for the port.
+    - User phrases such as "不要修改业务代码", "只做移植", "不要动上游", "包装一下", or an ordinary porting request mean business-source writes are forbidden.
 11. **Image-Based Porting Flow**: If a project provides a Docker image, use the image directly. If no image exists but a Dockerfile is provided, build the image first. Once an image is available (remote or locally built), use `lzc-cli appstore copy-image <image>` to copy the image to the Lazycat registry.
 12. **Write Back to YML and Build LPK**: After copying the image, the returned `registry.lazycat.cloud/...` address MUST be written back into `lzc-manifest.yml`. Only after this is done, run `make build` and `make install` to build the `.lpk` package.
 13. **Strict Health Check and Startup Order**: You MUST configure `healthcheck` (with `test`, `start_period`, `interval`, `timeout`, `retries`) for all dependencies (like MySQL, Redis, etc.) and map `depends_on` with `condition: service_healthy`. Business containers must wait for infrastructure containers to be fully healthy to avoid startup crashes.
@@ -158,6 +162,23 @@ At minimum, add:
 - `build.sh`, `Makefile` (with `build` and `install` targets).
 - After migration lands, actually write or fix the `Makefile` in the repo so it can be executed immediately; do not leave the port in a "Makefile pending" state.
 
+Before writing files, create a porting write-scope note in your working response or porting docs:
+
+```text
+Allowed write scope
+- Lazycat packaging/runtime: package.yml, lzc-build.yml, lzc-manifest.yml, lzc-deploy-params.yml
+- Build/install wrapper: Makefile, build.sh, Docker wrapper files
+- Runtime wrapper: runtime/, setup scripts, seed scripts, config templates
+- Port documentation/assets: docs/, README/store usage, icons
+
+Forbidden write scope
+- Upstream frontend pages/components/routes/state
+- Upstream backend handlers/services/domain logic/auth logic
+- Upstream database schema/migrations/models
+- Upstream tests or fixtures used to justify changed behavior
+- Any existing upstream application source file unless the user explicitly approves product-development scope
+```
+
 ### 5. Plan Adaptation and Image Sync
 - `lzc-build.yml`, `lzc-manifest.yml`.
 - Write a short runtime-model note in the porting docs before implementation: delivery form, entry, persistence, dependency layers, init, login, and unresolved risks.
@@ -168,6 +189,11 @@ At minimum, add:
   4. Write the returned image address back into `lzc-manifest.yml`.
   5. Put this sync + manifest-backfill step in migration flow or `make update`, not in `make install`.
   6. By the time `make build` / `make install` runs to build the LPK, `lzc-manifest.yml` must already contain the final pullable image refs.
+- **Business-Code Stop Rule**:
+  1. If the app cannot start because upstream code assumes paths, hosts, ports, secrets, or writable directories, first solve with env vars, command args, `setup_script`, binds, generated config, reverse-proxy/upstream settings, or wrapper entrypoint.
+  2. If the app cannot provide login because upstream has only internal auth, first solve with documented CLI/CMD/env/admin API, one-shot seed service, OIDC, or inject.
+  3. If the only viable solution is changing upstream auth, API, UI, schema, migrations, or application source, mark the port `Cannot Determine Yet` or `Not Suitable For Standard Lazycat Port` and ask for explicit product-development approval.
+  4. Never silently make the business-code change just to pass build, healthcheck, login, or review gates.
 - `build.sh`, `Makefile` (must include `build`, `install`, `update`, `release-prep`).
 - Add `unsupported_platforms` to `package.yml` for unverified platforms: `android`, `ios`, `tvos`.
 - Add `locales.zh-CN` and `locales.en-US` usage text that explains how login works and lists the initial account/password/nickname when fixed credentials are used.

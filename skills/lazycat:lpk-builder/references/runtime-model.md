@@ -35,7 +35,7 @@ TCP/UDP 访问路径：
 - 有官方镜像：优先直接使用官方镜像，迁移范围保持在 manifest/package/build/运行脚本。
 - 有 `docker-compose.yml`：按 Compose 的服务、端口、卷、环境变量、依赖关系转换到 manifest。
 - 只有 `Dockerfile`：构建 `linux/amd64` 镜像，再同步到 Lazycat 可拉取的 registry。
-- 只有源码且无 Docker 化方案：先评估能否非侵入地补 Docker 包装层；不要默认改业务代码。
+- 只有源码且无 Docker 化方案：先评估能否非侵入地补 Docker 包装层；不要默认改业务代码。如果必须改业务代码才能启动，应输出阻塞结论或请求明确的产品开发授权。
 - 需要 GPU、KVM、dockerd、systemd、FUSE、特权能力：先判断是否属于 AI Pod、`runtime`、`compose_override` 或高级能力场景，再迁移。
 
 ### 2.2 网络入口
@@ -78,6 +78,7 @@ TCP/UDP 访问路径：
 - 部署参数必须通过安装向导完成渲染；`need setup deploy params` 是安装配置状态，不是容器崩溃。
 - 由部署参数生成的配置文件，应在 `setup_script` 每次启动时从渲染后的环境变量重写或校验。
 - 固定初始账号、OIDC、inject 免密登录、改密学习必须与启动顺序和健康检查一起设计。
+- 如果初始化、登录、路由、健康检查或配置适配看起来需要改上游源文件，必须先穷尽环境变量、命令参数、`setup_script`、bind、生成配置、wrapper entrypoint、OIDC、inject 等非侵入方式。没有非侵入路径时，不要自行改业务代码。
 
 ## 3. 能否在懒猫上运行的判定门禁
 
@@ -95,6 +96,7 @@ TCP/UDP 访问路径：
 - 镜像可拉取或可构建，且无不可替代宿主依赖：可继续。
 - 依赖特权、GPU、KVM、dockerd、systemd、FUSE：转入高级能力或 AI Pod 判断。
 - 只有本机脚本、无 Docker 化路径、且必须改业务代码才能启动：高风险，不能直接宣称可迁移。
+- 为了通过构建或启动而修改上游前端、后端、认证、schema、migration、测试或业务配置，不属于普通迁移范围；应标记为 `Blocked by business-code change requirement` 或转入用户明确批准的产品开发任务。
 
 ### 3.2 进程模型
 
@@ -196,7 +198,8 @@ TCP/UDP 访问路径：
 - 认为 `depends_on` 表示“等数据库可用”；列表式依赖通常只表示启动顺序，不等于 readiness。
 - 把需要构建进镜像的运行时代码放进 LPK 内容目录，然后让预构建镜像去调用它。
 - 在 `make install` 中偷偷执行镜像构建、推送、`copy-image` 和 manifest 回写，导致安装入口不可预测。
-- 为了迁移方便直接改上游认证、数据库 schema 或业务代码，而没有先尝试 wrapper、env、setup、seed、OIDC、inject。
+- 为了迁移方便直接改上游认证、数据库 schema、前端页面、后端 API、测试或业务代码，而没有先尝试 wrapper、env、setup、seed、OIDC、inject。
+- 用户已经说“不要修改业务代码”或任务只是普通移植时，仍然为了达成健康检查、登录、初始化或审核目标去改上游源码。
 - 没有明确长期前台进程，就把一次性 CLI 或后台脚本包装成普通应用。
 - 没有弄清真实监听端口，就直接写 `routes: /=http://service:80`。
 - 没有验证普通用户是否能获得账号或配置，就认为“容器能启动”代表“应用能交付”。

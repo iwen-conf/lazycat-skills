@@ -89,6 +89,7 @@ When porting existing Docker images or `docker-compose.yml` files to Lazycat Mic
 - **先区分“慢启动”还是“启动命令失败”：** 如果日志里出现 `container ... exited (1)`、`Unrecognized command`、`LoadError`、`NameError`，先按命令失败处理，不要先去调大 `start_period`。
 - **明确包里真正带了什么：** 检查 `build.sh`/`lzc-build.yml`。如果打包过程只复制 `runtime/` 和 manifest，而没有构建新的应用镜像，就不要让 `runtime/*.sh` 依赖镜像中不存在的新增源码。
 - **复用远程镜像时，优先把自定义逻辑写在包内可交付层：** 例如 `runtime/*.sh`、`setup_script`、已存在的镜像命令参数。只有当你真的同步构建并发布了新镜像时，才去依赖新增的应用源码或 rake task。
+- **不要用业务代码修包装问题：** 如果报错来自路径、环境变量、启动顺序、默认账号、Host、健康检查或配置文件位置，先用 manifest、bind、`setup_script`、wrapper entrypoint、seed 服务、OIDC 或 inject 解决。普通移植任务中禁止为了让容器启动而直接改上游前端、后端、认证、schema、migration 或测试代码。
 - **排查顺序要固定：**
   1. 看 `startup-log-tail`，判断是卡在 `Waiting` 还是已经 `exited (1)`。
   2. 看失败容器的最后日志，抓具体异常字符串。
