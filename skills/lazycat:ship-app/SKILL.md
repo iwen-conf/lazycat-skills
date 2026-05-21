@@ -60,6 +60,7 @@ If the user's goal includes cash incentives, further advance the task to a "high
 **Boundary Notes**
 
 - **Strict Compliance (Hardcoded Rule)**: Applications containing or related to pornography (黄), gambling (赌), drugs (毒), airdrops (空投), cracked software (破解软件), or any content violating Chinese laws are strictly prohibited from being published to the app store. Reject these requests immediately without proceeding.
+- **Chinese UI Required (Hardcoded Rule)**: Applications MUST ship a runtime Chinese (`zh-CN`) UI through i18n. Translating only the `package.yml.locales` metadata is NOT sufficient — the actual user interface (buttons, menus, prompts, errors, empty states) must render in Chinese. Apps that fail this requirement WILL be rejected at review. Treat missing UI-level i18n as a release blocker on par with the compliance rule above. For ported third-party projects, this gate is met by adding i18n in a dedicated localization branch (see `lazycat:port-app`), never by editing upstream's default branch in place.
 - **No Incentive & Not Recommended Apps**: Applications such as pure web games, pure book/reader pages, pure tutorial sites, web-based offline apps, mods for the same game server, pure database software, circumvention tools/VPNs (梯子), pure frontend apps, saturated categories, image hosting (图床), navigation (导航), bookmarks (书签), notes (笔记), online video viewers (在线看视频), checklists (清单), short link generators (短链生成), burn-after-reading (阅后即焚), YouTube fetchers (mytube类), and bookkeeping (记账) apps are strongly discouraged and are not eligible for cash incentives. Inform the user of this policy if they attempt to list such apps.
 - Do not use this skill for standard web releases, Docker deployments, or other app store listings.
 - Even for a simple promotional tagline, check if it conflicts with Lazycat review pipelines.
@@ -117,6 +118,7 @@ Don't just say "I'll take a look." Let the user know you are advancing a specifi
 14. Use official AI Pod docs/structure only when explicitly targeting Computing Power Cabin `AI Apps` or AI Browser Extensions.
 15. Distinguish between running app pages and store/submission assets. Content like "Why choose this," "Roadmap," or "Value proposition" belongs in `README`, `docs/release-prep/`, or store descriptions, not in running `web/*.html` pages (unless requested).
 16. For tool/console apps, the homepage priority must be: `Connection Config`, `Current Status`, `Actions`, `Feedback`. Do not put promotional text before functional entries.
+17. For ported open-source/self-hosted apps, shipping and review fixes inherit the porting write-scope gate. Rejection fixes, screenshot polish, login fixes, crash fixes, and verification failures must be solved in Lazycat packaging/runtime/store assets by default. Do not edit upstream frontend/backend/auth/API/schema/test code unless the user explicitly converts the task to upstream product development and names the allowed business scope.
 
 ## Delivery Decision Table
 
@@ -136,6 +138,8 @@ Determine delivery type (First release, Update, Re-submit, or Asset completion).
 ### 2. App Creation and Organization
 Ensure standard baseline (Go backend + `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion` / Auth) using `lazycat:create-app` if needed. Establish the `docs/` tree. Ensure `build.sh` and `Makefile` entries. If an admin UI exists, use `lazycat:admin-ui` to meet quality gates. For porting, use `lazycat:port-app`.
 
+For ported apps, do not use `lazycat:create-app` or `lazycat:admin-ui` to rewrite upstream product pages, authentication, backend handlers, database models, or tests just to satisfy release screenshots or review feedback. Allowed shipping changes are packaging/runtime wrappers, manifest/deploy params, seed/setup scripts, docs, metadata, icons, and store assets. If review feedback truly requires upstream product changes, record `Blocked by business-code change requirement` and ask for explicit product-development authorization.
+
 ### 3. Packaging, Uploading, and Evidence
 Identify the deliverable (official publish, `.lpk`, `AI App` package, or Dev Center upload). For image-based apps, verify the real release chain is closed: build image, push public image, `copy-image`, backwrite the source manifest, build `.lpk`, install `.lpk`. Record time, version, artifact path, size, and checksum. Log success via CLI or page status. For AI Pod routes, verify the existence and version of `ai-pod-service/`, `caddy-aipod`, and extensions.
 
@@ -147,6 +151,8 @@ Verify installation, startup, core flow, upgrade path, and exit. Test on real La
 
 ### 6. Submission and Follow-up
 Organize a submission package: version, changelog, descriptions, screenshots, artifact info, test accounts, and reviewer instructions. Record status changes and rejection root causes. Generate fix lists and re-submit.
+
+During re-submission, classify each rejection item as `packaging/runtime`, `store asset/docs`, or `upstream business source`. Only the first two are in normal shipping scope for ported apps. `upstream business source` items require an explicit user-approved product-development task before editing.
 
 ### 7. Post-release Verification
 Confirm store visibility and searchability. Verify that the installed version from the store matches the target version and functions correctly.

@@ -11,7 +11,7 @@ Create `package.yml` to define the application's identity:
 - `package` (Unique ID)
 - `version` (Semantic version)
 - `name`, `description`, `author`, `license`.
-- `locales` for multi-language support.
+- `locales` for multi-language support — **`zh-CN` is mandatory** at minimum (Lazycat store rejects English-only listings).
 
 ### Documentation Tree
 It should include at least:
@@ -54,6 +54,16 @@ If the project includes an admin panel, operation console, or management dashboa
 - Ensure admin pages are ready for screenshots and review (not just a collection of unstyled features).
 
 Such projects should use `lazycat:admin-ui` to ensure quality.
+
+## 1.4 i18n & Chinese UI (Hard Requirement)
+
+Lazycat store rejects apps without a runtime Chinese (zh-CN) UI. Scaffold i18n at creation time, not as a follow-up:
+
+- **Integrate an i18n framework from day one**: `react-i18next` (preferred for the default React stack) or equivalent. Configure language detection, fallback, and a `zh-CN` resource pack as the default locale.
+- **Extract strings, do not hardcode**: every user-facing string (buttons, menus, prompts, empty states, errors, validation messages) must go through `t('key')`, not literal text in JSX.
+- **Ship complete zh-CN translations**: the `zh-CN` pack must cover 100% of extracted keys before submission — missing keys falling back to English is a release blocker.
+- **Two-layer coverage**: the `package.yml.locales` metadata (name/description/usage) AND the runtime UI both need zh-CN. Translating only one layer fails review.
+- **For ported third-party projects**: i18n integration MUST happen on a dedicated localization branch (see `lazycat:port-app`), never on the upstream default branch.
 
 ## 1.5 Incentive-Priority Mode
 
@@ -132,6 +142,7 @@ All projects must support:
 - Request interceptors
 - Refresh queue/mechanism
 - Logout cleanup logic
+- **i18n provider + zh-CN locale pack** (mandatory; English-only UI fails store review)
 
 ## 5.5 AI Integration Baseline
 
@@ -182,3 +193,4 @@ Before entering `lazycat:ship-app`, ensure:
 - Native integration path is defined.
 - AI configuration or AI Pod path is clear.
 - Screenshots are available for the homepage, auth pages, and key features.
+- **Runtime Chinese (zh-CN) UI verified end-to-end**: every user-facing screen renders in Chinese, no untranslated strings, zh-CN translation pack is complete. This is a store hard requirement, not a polish item.

@@ -12,6 +12,14 @@ Lazycat MicroServer uses a unique `lpk` package format for application distribut
 
 For image-based migrations, final pullable image refs belong in the source manifest during porting or update preparation. Do not redesign `make install` to own `docker push`, `copy-image`, or manifest backfill responsibilities. If the user explicitly wants the full release closure, build or use a separate release target such as `release-build` / `release-install` that runs `build image -> push public image -> lzc-cli appstore copy-image -> backwrite the returned registry.lazycat.cloud address into the source manifest (and any manifest templates used for packaging) -> build lpk -> install lpk`.
 
+## Porting Context Boundary Inheritance
+
+If the current task involves an open-source/self-hosted app being ported, packaged, installed, updated, submitted, reviewed, or debugged on Lazycat, the porting write-scope boundary applies globally across all delegated skills.
+
+- Default allowed write scope is only Lazycat packaging/runtime adaptation: `package.yml`, `lzc-build.yml`, `lzc-manifest.yml`, `lzc-deploy-params.yml`, `Makefile`, `build.sh`, Docker wrapper files, startup/setup/seed scripts, runtime config templates, icons, store assets, and docs.
+- Do not let `auth-integration`, `admin-ui`, `ship-app`, `update-app`, `troubleshoot`, or `ui-ux-pro-max` bypass this boundary. Their advice and edits must stay in wrapper/runtime/store-asset scope unless the user explicitly changes the task to upstream product development and names the business source scope that may be changed.
+- If a requirement such as OIDC, passwordless login, screenshot quality, review rejection, healthcheck, upload failure, or admin polish appears to require changing upstream frontend/backend/auth/API/schema/test code, stop and report `Blocked by business-code change requirement`. Offer non-invasive alternatives first: env vars, deploy params, generated config, wrapper entrypoint, seed service, `application.injects`, OIDC config, route/upstream settings, or store/docs changes.
+
 ## Requirement Routing and Skill Distribution (Progressive Disclosure)
 
 When a user presents a requirement, strictly follow the classification below and **use local file reading and scoped local search tools to read the corresponding detailed reference documents**. Do not attempt to answer complex configuration questions from memory.

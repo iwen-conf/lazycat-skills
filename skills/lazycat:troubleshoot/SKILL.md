@@ -7,6 +7,20 @@ description: 懒猫微服(Lazycat MicroServer)应用排障技能。当用户提�
 
 You are a Lazycat MicroServer troubleshooting specialist. When a developer reports that their app is broken, failing to start, showing a blank page, returning errors, or behaving unexpectedly after installation, you must systematically diagnose the root cause before suggesting fixes.
 
+## Write-Scope Gate Before Fixing
+
+Before editing any file, classify the task context:
+
+- **Porting / packaging context**: the user is migrating, packaging, installing, submitting, updating, or troubleshooting an app on Lazycat, or phrases the task as "只做移植", "不要修改业务代码", "包装一下", "不要动上游", "make install 后报错", "安装后打不开", "上传失败但这是移植项目", or an ordinary Lazycat porting/debugging request.
+- **Product-development context**: the user explicitly changes the task into feature/bug development for the upstream application and names the business feature or business source scope that may be changed.
+
+In porting / packaging context, troubleshooting is **read-only against upstream business source by default**:
+
+- Allowed fix scope: `package.yml`, `lzc-build.yml`, `lzc-manifest.yml`, `lzc-deploy-params.yml`, `Makefile`, `build.sh`, Docker wrapper files, `runtime/`, startup scripts, `setup_script`, seed scripts, config templates, icons, store assets, and docs.
+- Forbidden fix scope: upstream frontend pages/components/routes/state, backend handlers/services/domain logic/auth logic, agents, API handlers, database schema/migrations/models, tests, fixtures, and framework/business config inside the upstream app.
+- If logs identify a real upstream bug in forbidden scope, do **not** patch it during a port. Report `Blocked by business-code change requirement`, quote the exact file/symbol/log evidence, and offer a wrapper/config/env/deploy-params alternative if one exists.
+- Do not present a forbidden business-source patch as "修复并部署" just because it makes the current smoke test pass. In porting context, a successful workaround must live in the packaging/runtime layer.
+
 ## Diagnostic Protocol (Mandatory Order)
 
 When a user reports a problem, follow this sequence strictly. Do not skip steps or jump to conclusions.
@@ -33,6 +47,7 @@ lzc-cli docker logs --tail 200 <container>     # What do the last logs say?
 2. Cross-check with `build.sh` / `lzc-build.yml`: is the failing file/command actually packaged into the lpk or present in the image?
 3. If using a remote pre-built image with local runtime scripts, verify the scripts only call commands that exist in the image.
 4. Check `setup_script` for syntax errors or missing dependencies.
+5. If the failing file is upstream business source, keep diagnosis read-only and apply the Write-Scope Gate before proposing any edit.
 
 ### Step 3B: Health Check Failure Diagnosis
 1. Distinguish "slow startup" from "startup command failed" — check if the process is still alive.
@@ -53,6 +68,7 @@ Use this path when logs mention missing config files, placeholder values, repeat
 3. If a config file is generated from deploy params, prefer writing it in `setup_script` on every startup from the rendered environment. This makes later parameter changes take effect after restart.
 4. Validate provider names and model/category fields separately. Do not pass UI labels or model categories into upstream config fields that expect canonical provider IDs.
 5. If the package was installed before deploy params were added, rebuild the LPK, reinstall, complete the setup wizard, then restart. Do not debug this as a generic route or healthcheck failure first.
+6. If an endpoint fails because an optional external credential is missing, such as `OPENAI_API_KEY`, do not patch backend LLM/client initialization in porting context. Expose the credential through `lzc-deploy-params.yml`, environment variables, generated config, or document that the feature is unavailable until configured. If the upstream crashes merely from the missing optional key and no wrapper/config path can prevent it, report `Blocked by business-code change requirement`.
 
 ### Step 3C: Routing / Blank Page Diagnosis
 1. Verify `application.routes` target matches the actual service name and port.
@@ -95,6 +111,7 @@ Use this path when logs mention missing config files, placeholder values, repeat
 | Migration/seed exits before DB ready | One-shot service raced infra | Add bounded retry; keep `/tmp/done` success marker |
 | `need setup deploy params` | Install wizard not completed | Complete deploy params setup, then start |
 | Missing generated config + 503 | Deploy params not rendered or stale package | Rebuild/reinstall and inspect rendered env/file |
+| Endpoint 500 from missing `OPENAI_API_KEY` / provider key | Missing deploy parameter or upstream assumes required LLM config | Add deploy params/env/config; do not patch backend agents in porting context |
 | Inject script not executing | Wrong stage or `auth_required` missing | Inject syntax + `auth_required: false` |
 | OIDC callback 404 | `oidc_redirect_path` mismatch | Compare manifest path vs app config |
 | Config file read-only crash | Mounting from `/lzcapp/pkg/content/` | Use `setup_script` to copy to `/lzcapp/var/` |
@@ -109,6 +126,7 @@ Use this path when logs mention missing config files, placeholder values, repeat
 5. **Route debugging requires knowing the exact service name and port.** Don't guess — read the manifest.
 6. **Ingress health failures are often secondary.** Always inspect the routed service and its dependencies before changing the ingress or route healthcheck.
 7. **Deployment parameters are part of startup state.** If required params are missing or stale, fix the setup/render path before treating the app as broken.
+8. **Porting fixes must stay in the wrapper/runtime layer.** Logs may prove an upstream bug, but proof is not permission to edit business code.
 
 ## Bundled References
 
@@ -129,7 +147,7 @@ Diagnosis
 - Root Cause: <specific finding from logs/config>
 
 Fix
-- ...
+- <wrapper/runtime/config fix, or `Blocked by business-code change requirement` with the forbidden file/symbol>
 
 Verification
 - ...

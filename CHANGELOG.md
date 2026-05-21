@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-05-19
+
+- docs: 强化 `lazycat:troubleshoot` 排障写入边界，要求移植/包装语境下即使日志定位到后端 agent/API 等上游 bug，也必须先走部署参数、环境变量、wrapper/runtime 方案；无法非侵入修复时输出 `Blocked by business-code change requirement`，不得直接修改业务代码。
+- docs: 将移植写入边界提升为 `developer-expert` 全局继承规则，并同步收紧 `ship-app`、`update-app`、`auth-integration`，防止提审修复、版本更新、OIDC 接入或后台截图质量流程绕过“不得修改上游业务代码”红线。
+
 ## 2026-05-18
 
 - docs: 将 Lazycat 移植的“不要修改业务代码”升级为写入白名单、停止条件和交付自检，要求遇到必须改上游源码才能启动/登录/过健康检查时先阻塞并请求明确授权。

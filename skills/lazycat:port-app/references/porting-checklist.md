@@ -9,6 +9,7 @@
 
 ## 2. Project Execution
 - [ ] Before editing, declared the allowed write scope for this port and limited changes to packaging/runtime wrapper files.
+- [ ] **Cloned upstream onto a dedicated localization branch (e.g., `lazycat/i18n-zh` or `lazycat/port`), not upstream's default branch**. All porting and i18n changes live on this branch so the upstream default branch stays clean and future `git merge upstream/main` remains possible. Recorded the branch name and base commit.
 - [ ] Created `docs/requirements`.
 - [ ] Created `docs/api-design`.
 - [ ] Created `docs/architecture`.
@@ -20,6 +21,7 @@
 - [ ] No upstream business source files were modified for the port. Only Lazycat packaging/runtime wrapper files were changed, unless the user explicitly approved business-code changes in the current task and named the feature/file scope.
 - [ ] If startup, login, healthcheck, schema, routing, or review requirements seemed to require a business-code change, the agent stopped and reported the blocker instead of silently editing upstream source.
 - [ ] Final diff was checked against the boundary: allowed files are `package.yml`, `lzc-build.yml`, `lzc-manifest.yml`, `lzc-deploy-params.yml`, `Makefile`, `build.sh`, Docker wrapper files, `runtime/`, setup/seed scripts, config templates, docs, icons, and store assets.
+- [ ] **UI-level Chinese (zh-CN) i18n added on the localization branch (Release Blocker)**: If upstream has no Chinese UI, the port MUST integrate an i18n framework, extract user-facing strings, and ship a complete zh-CN translation pack on the localization branch. Apps without runtime Chinese UI WILL be rejected by Lazycat review — porting without this step means the port cannot be listed. i18n edits to upstream source code are an explicit exception to the upstream-write-scope rule, but only for string extraction and locale file additions; do not refactor business logic during this step.
 
 ## 3. Lazycat Adaptation
 - [ ] Runtime model preflight completed before writing manifest: delivery form, entry path, persistence, dependency layers, initialization, and login path.
@@ -35,7 +37,7 @@
 - [ ] Prepared `lzc-build.yml`.
 - [ ] Prepared `lzc-manifest.yml`.
 - [ ] Prepared `package.yml` with `unsupported_platforms` declaring `android`, `ios`, and `tvos` unless those platforms were verified.
-- [ ] Prepared `package.yml.locales` with BCP 47 keys such as `zh-CN` and `en-US`, including usage text when login credentials need explanation.
+- [ ] Prepared `package.yml.locales` with BCP 47 keys such as `zh-CN` and `en-US`, including usage text when login credentials need explanation. **Note: this only covers store metadata; the runtime UI i18n is a separate requirement covered in section 2.**
 - [ ] If the app uses bridged images, the final pullable image refs have already been written back to `lzc-manifest.yml` before `make install`.
 - [ ] Evaluated OIDC requirement.
 - [ ] Evaluated `file_handler` requirement.

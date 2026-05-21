@@ -34,6 +34,8 @@ services:
 ## 2. HTTP Header Identity Recognition (Custom Backend)
 If a user is developing their own backend code, `lzc-ingress` automatically injects the following HTTP Headers into all authenticated requests before they reach the application container. Developers can trust these headers directly.
 
+This section applies to original applications or explicitly authorized upstream product-development tasks. For ported third-party apps, prefer `lzc-manifest.yml` OIDC configuration, environment variables, mounted/generated config, `application.injects`, or wrapper/seed integration. Do not modify upstream auth handlers, backend middleware, API handlers, frontend login pages, database schema, or tests just to integrate Lazycat identity unless the user explicitly approves that business-source scope.
+
 - `X-HC-User-ID`: The logged-in username (UID).
 - `X-HC-User-Role`: The user role (`NORMAL` or `ADMIN`).
 - `X-HC-Device-ID`: The unique device ID of the client within the current microservice.

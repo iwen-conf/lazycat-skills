@@ -30,6 +30,7 @@ This skill handles the lifecycle updates of Lazycat apps. The core workflow incl
 2. **Real Environment Verification**: After an update, you must install it via `make install` on Lazycat MicroServer for functional verification and upgrade path checks (e.g., database migrations).
 3. **Metadata Integrity**: When submitting to the Developer Center, the app name, tagline, detailed description, and keywords must be complete and consistent with the local manifest.
 4. **Makefile Driven**: Prefer the repo's dedicated release target when it exists. If the repo is image-only and the user asks for the full closure, the standard sequence is `build image -> push public image -> copy-image -> backwrite source manifest -> build lpk -> install lpk`.
+5. **Ported App Boundary**: For ported open-source/self-hosted apps, a "code update" means adopting an upstream release, rebuilding an image from already-approved upstream code, or applying a user-approved product-development patch with named business scope. Do not silently modify upstream frontend/backend/auth/API/schema/test code to make an update, upgrade path, healthcheck, login, or review pass.
 
 ## Workflow
 
@@ -39,6 +40,7 @@ This skill handles the lifecycle updates of Lazycat apps. The core workflow incl
 - Execute `lzc-cli appstore copy-image <public_image_name>`.
 - Retrieve the returned Lazycat private image address.
 - Backwrite the `image` field in the source `lzc-manifest.yml`. If the repo packages from manifest templates, backwrite those sources too.
+- If the update is for a ported app, classify changed files before editing: packaging/runtime files are allowed; upstream business source files require explicit product-development authorization. If the only way to verify the update is to patch business code, report `Blocked by business-code change requirement`.
 
 ### 2. Automated Build
 - Prefer an explicit release target such as `make release-build` / `make release-install` when the repo already supports the full chain.
@@ -49,6 +51,7 @@ This skill handles the lifecycle updates of Lazycat apps. The core workflow incl
 - Run `make install`: Install the new package to a local or physical environment.
 - **Mandatory: Users must open the app for a real experience to confirm functionality.**
 - **Persistence Check**: Verify that user data, configurations, and databases remain intact after upgrading from an older version. Forcing volume wipes for image updates is prohibited.
+- Verification failures in ported apps must first be handled through manifest, deploy params, env/config rendering, wrapper entrypoints, setup/seed scripts, routes/upstreams, image version selection, or docs. Do not patch upstream business logic as part of the update loop without explicit authorization.
 
 ### 4. Prepare Submission Assets
 - Run `make release-prep`: Run tests and generate screenshots (especially for new features).

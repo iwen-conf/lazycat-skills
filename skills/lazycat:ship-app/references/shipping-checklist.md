@@ -5,6 +5,7 @@ Check items by stage. Do not skip steps.
 ## 1. Project Initiation & Prerequisites
 
 - [ ] **Strict Compliance Check**: Ensure the application does not contain or relate to pornography (黄), gambling (赌), drugs (毒), airdrops (空投), cracked software (破解软件), or any content violating Chinese laws. Applications violating this rule are strictly prohibited from listing and must be rejected immediately.
+- [ ] **Chinese UI i18n Check (Release Blocker)**: Confirm the app's runtime UI fully supports Chinese (`zh-CN`) — i18n framework integrated, all user-facing strings extracted, zh-CN translations complete (buttons, menus, prompts, empty states, error messages). Translating only `package.yml.locales` metadata is NOT enough. Apps without Chinese UI WILL be rejected. For ported projects, verify i18n was added on a dedicated localization branch, not the upstream default branch.
 - [ ] Clarify if it's a first-time launch, an update, or a re-submission after rejection.
 - [ ] Define the target version number, release date, and minimum viable release scope.
 - [ ] Verify developer certification, Developer Center permissions, and target app permissions.
@@ -23,7 +24,7 @@ Check items by stage. Do not skip steps.
 - [ ] App summary matches actual functionality.
 - [ ] Icon is complete, clear, and contains no placeholders.
 - [ ] Category settings are correct.
-- [ ] Multilingual copy covers the default language with a clear fallback strategy.
+- [ ] Multilingual copy covers the default language with a clear fallback strategy. **`zh-CN` is mandatory** for both `package.yml.locales` metadata (name, description, usage) and runtime UI strings; English-only listings will be rejected.
 - [ ] Version description or changelog is prepared.
 - [ ] If an admin interface exists, visual direction is consistent across login/registration, dashboard, lists, forms, and settings pages.
 - [ ] If the app requires a username/password, regular users can self-register, use unified login, or obtain publicly available credentials.

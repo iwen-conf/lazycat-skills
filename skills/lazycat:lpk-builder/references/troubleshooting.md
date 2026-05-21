@@ -2,6 +2,20 @@
 
 When porting existing Docker images or `docker-compose.yml` files to Lazycat Micro-service (`lzc-manifest.yml`), developers often encounter issues at several key points. Refer to and apply these best practices when assisting users.
 
+## 0. 排障写入边界：先判定是不是移植问题
+
+普通 Lazycat 移植、打包、安装、上架、更新和安装后排障默认只允许修改包装层与运行时适配层。排障日志可以指向上游 bug，但不能自动授权修改上游业务源码。
+
+**允许修改：** `package.yml`、`lzc-build.yml`、`lzc-manifest.yml`、`lzc-deploy-params.yml`、`Makefile`、`build.sh`、Docker wrapper、`runtime/`、启动脚本、`setup_script`、seed 脚本、配置模板、图标、商店素材和文档。
+
+**禁止默认修改：** 上游前端页面/组件/路由/状态、后端 handler/service/domain/auth/agent/API 逻辑、数据库 schema/migration/model、测试、fixture，以及上游应用内部业务配置。
+
+如果日志显示必须改上游业务源码才能修好，例如后端 `backend/app/...` 初始化崩溃、API handler 对缺失外部凭证没有降级、前端页面逻辑必须重写，处理方式是：
+
+1. 先尝试非侵入方案：环境变量、`lzc-deploy-params.yml`、生成配置、bind、`setup_script`、wrapper entrypoint、seed 服务、OIDC、inject、upstream/Host 配置。
+2. 如果非侵入方案不可行，输出 `Blocked by business-code change requirement`，说明具体日志、文件和符号。
+3. 只有用户把任务明确改成产品功能开发，并点名允许修改的业务范围后，才可以编辑这些业务源码。
+
 ## 1. User & Permissions
 **Problem:** Many third-party Docker images run as non-root users (e.g., `node`, `abc`) by default. However, in Lazycat Micro-service, persistent directories (`/lzcapp/var/`) and user document directories (`/lzcapp/run/mnt/home/`) require `root` privileges for read/write access by default, leading to `Permission denied` errors.
 
@@ -90,6 +104,7 @@ When porting existing Docker images or `docker-compose.yml` files to Lazycat Mic
 - **明确包里真正带了什么：** 检查 `build.sh`/`lzc-build.yml`。如果打包过程只复制 `runtime/` 和 manifest，而没有构建新的应用镜像，就不要让 `runtime/*.sh` 依赖镜像中不存在的新增源码。
 - **复用远程镜像时，优先把自定义逻辑写在包内可交付层：** 例如 `runtime/*.sh`、`setup_script`、已存在的镜像命令参数。只有当你真的同步构建并发布了新镜像时，才去依赖新增的应用源码或 rake task。
 - **不要用业务代码修包装问题：** 如果报错来自路径、环境变量、启动顺序、默认账号、Host、健康检查或配置文件位置，先用 manifest、bind、`setup_script`、wrapper entrypoint、seed 服务、OIDC 或 inject 解决。普通移植任务中禁止为了让容器启动而直接改上游前端、后端、认证、schema、migration 或测试代码。
+- **外部凭证缺失不是业务源码修改许可：** 如果接口 500 的根因是缺少 `OPENAI_API_KEY`、模型供应商 key、第三方服务地址或 webhook secret，优先用 `lzc-deploy-params.yml`、环境变量、生成配置或使用说明解决。不要为了上传、登录、健康检查或冒烟测试通过，直接给上游后端 agent/API handler 加懒初始化、兜底返回或跳过逻辑。
 - **排查顺序要固定：**
   1. 看 `startup-log-tail`，判断是卡在 `Waiting` 还是已经 `exited (1)`。
   2. 看失败容器的最后日志，抓具体异常字符串。
