@@ -1,6 +1,6 @@
 ---
 name: "lazycat:aipod-developer"
-description: 懒猫AI算力舱(AI Pod)应用开发与打包规范。当用户需要构建一个部署到算力舱的AI应用、编写ai-pod-service的docker-compose.yml、配置Traefik路由规则、打包AI浏览器插件、或发布AI应用到商店时触发。
+description: Build and package AI apps for the Lazycat AI Pod (Computing Power Cabin). Use for ai-pod-service docker-compose, Traefik routing, GPU container config, and AI browser-extension packaging. Only for the official AI Pod route; standard web apps that merely call an AI API stay in lazycat:create-app. AI算力舱应用、ai-pod-service、Traefik路由、GPU、AI浏览器插件打包。
 ---
 
 # Lazycat AI Pod Application Construction Guide

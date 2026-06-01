@@ -1,6 +1,6 @@
 ---
 name: "lazycat:lpk-builder"
-description: 用于将现有应用或代码打包为懒猫微服(Lazycat MicroServer) lpk 应用格式的专业指南。当用户需要将 docker 镜像、docker-compose转换或从零打包懒猫微服应用时触发。
+description: Package an app into Lazycat MicroServer lpk format (v2). Use to convert a Docker image or docker-compose, or build an lpk from scratch — writing package.yml, lzc-build.yml, and lzc-manifest.yml. Owns the canonical packaging specs (manifest/build/package/store/troubleshooting). 打包lpk、docker镜像转换、docker-compose转换、manifest/build/package规范。
 ---
 
 # Lazycat MicroServer LPK Packaging and Porting Guide
@@ -12,6 +12,8 @@ You are a professional Lazycat MicroServer Application Ecosystem Developer. Your
 Packaging and porting a Lazycat MicroServer application (LPK v2) involves writing three core configuration files: `package.yml`, `lzc-build.yml`, and `lzc-manifest.yml`.
 
 Before translating Docker or Compose files, read `references/runtime-model.md` and explicitly classify the app's delivery form, HTTP/TCP entry path, persistence plan, dependency layers, initialization path, and login path. Then run the "can this app run on Lazycat" gate: image/arch, process model, network listener, storage, dependencies, init/login, and external requirements. Do not start from YAML templates until these runtime facts are known.
+
+Also classify file selection. If the packaged or migrated app exposes open/save/upload/download file flows, add Lazycat file picker selection through `application.injects` using the official file chooser inject script. For migrated apps, this is a packaging/runtime adaptation and must not be solved by editing upstream frontend business code.
 
 ### 1. Static Metadata (`package.yml`)
 Define the application's identity, version (must strictly be `x.x.x` format), and localization.
@@ -245,7 +247,32 @@ When generating configuration files, you must comply with the following Lazycat 
    - Do not guess login/init/change-password API paths, payload keys, or CSS selectors. Inspect documented APIs, browser network traffic, or config; if unavailable, ask for these details before writing the inject.
    - Passwordless login work must be verified together with healthchecks and startup order: the app service is healthy before the seed runs, the seed is healthy/done before browser login is tested, and business services do not race databases or seed containers.
 
-12. **No Cross-Runtime Artifacts in the LPK**
+12. **Mandatory File Picker Selection for File-Capable Apps**
+   - For migrated/packaged apps with file open/save/upload/download flows, integrate the official file chooser inject before declaring the LPK complete. This covers browser-native `showOpenFilePicker()`, `showSaveFilePicker()`, and `<input type="file">` entry points.
+   - Use `application.injects` in `lzc-manifest.yml` and package `lazycat-injects/lzc-file-chooser-inject.js` into the LPK content. Keep parameters under `do[].params`, not in the script filename.
+   - Default inject shape:
+     ```yaml
+     application:
+       injects:
+         - id: open-save-chooser
+           on: browser
+           when:
+             - /*
+           do:
+             - src: file:///lzcapp/pkg/content/lazycat-injects/lzc-file-chooser-inject.js
+               params:
+                 diskRoot: /_lzc/files/home
+                 fallbackMime: application/octet-stream
+                 locale: auto
+                 hooks:
+                   fileSystemAccess: true
+                   fileInput: true
+     ```
+   - Verify that the app shows the "local filesystem / Lazycat MicroServer" choice when a file entry is triggered, Lazycat selection opens the Lazycat file picker, and local selection preserves the original upstream flow.
+   - If the app has no file entry, write that in the porting/release notes. Do not add dead injects.
+   - Official reference: https://developer.lazycat.cloud/lazycat-file-picker-auto-intercept.html.
+
+13. **No Cross-Runtime Artifacts in the LPK**
    - Do **not** compile language-specific artifacts on the host (`.class`, `.pyc`, Go/Rust native binaries, `.so`/`.dylib`, CGO outputs) and drop them into the `lpk` to be executed inside a service container whose runtime differs from the host. This is how you produce `UnsupportedClassVersionError` / `GLIBC_X.Y not found` / wrong-arch crashes the moment a container loads them.
    - The lpk is a neutral carrier for `package.yml`, `lzc-build.yml`, `lzc-manifest.yml`, icons, shell scripts, static assets, and config. Anything that needs a specific language runtime belongs **inside the service image**.
    - Preferred order for helpers and healthchecks:

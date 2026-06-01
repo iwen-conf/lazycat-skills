@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-06-01
+
+- docs: 重写全部 15 个技能的 `description`，改为简洁英文摘要加少量中文触发词，去除冗长关键词堆砌；标准 React 前端技术栈串只在 `ui-ux-pro-max` 保留一次，其余技能改为引用，并补充技能间的衔接提示（create-app/port-app → admin-ui/lpk-builder/ship-app），同步更新 README 技能列表。
+- docs: 新增文件选择器强制规则，要求迁移应用通过 `application.injects` 接入官方文件选择器自动拦截，原创应用在业务 UI/代码中内置懒猫文件选择能力，并同步到相关技能质量门禁。
+
 ## 2026-05-19
 
 - docs: 强化 `lazycat:troubleshoot` 排障写入边界，要求移植/包装语境下即使日志定位到后端 agent/API 等上游 bug，也必须先走部署参数、环境变量、wrapper/runtime 方案；无法非侵入修复时输出 `Blocked by business-code change requirement`，不得直接修改业务代码。

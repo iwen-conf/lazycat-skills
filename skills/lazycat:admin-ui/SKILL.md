@@ -1,6 +1,6 @@
 ---
 name: lazycat:admin-ui
-description: 面向 Lazycat 应用后台管理、控制台和管理工作台 UI 收敛的 skill。只要用户提到后台管理、Admin、管理台、控制台、仪表盘、运营后台、React 后台、shadcn/ui 管理界面、Tailwind 主题、后台模板、管理端改版、后台页面美化、管理列表、数据工作台、提审前页面升级、高质量后台等请求，就必须使用此 skill。负责把后台管理界面收敛成高质量、可截图、可提审的 `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion` 管理体验，允许以成熟模板为起点但必须完成品牌化和业务化改造。
+description: Converge a Lazycat app's admin/console/dashboard UI to a high-quality, screenshot-ready, submission-ready state on the standard React frontend stack (see lazycat:ui-ux-pro-max). Use for admin panels, operational consoles, data workbenches, and pre-submission page polish; mature templates are allowed as a starting point but must be brand- and business-customized. 后台管理、Admin、控制台、仪表盘、运营后台、提审前页面升级。
 ---
 
 # Lazycat Admin UI Quality Baseline

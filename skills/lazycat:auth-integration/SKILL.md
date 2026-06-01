@@ -1,6 +1,6 @@
 ---
 name: "lazycat:auth-integration"
-description: 用于处理懒猫微服(Lazycat MicroServer)应用接入官方认证体系（OIDC单点登录）、HTTP Header用户身份识别、API Auth Token 以及配置独立鉴权(public_path)的专业指南。
+description: "Integrate a Lazycat MicroServer app with the official auth system: OIDC single sign-on, HTTP-header identity (X-HC-User-ID), API Auth Tokens, and standalone-auth bypass (public_path). 接入OIDC单点登录、HTTP Header用户身份、API Auth Token、独立鉴权public_path。"
 ---
 
 # Lazycat MicroServer Authentication Integration Guide

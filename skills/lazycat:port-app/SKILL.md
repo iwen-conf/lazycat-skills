@@ -1,6 +1,6 @@
 ---
 name: lazycat:port-app
-description: 面向 Lazycat 应用移植选型与落地的 skill。只要用户提到移植应用、移植开源项目、从 GitHub 选项目、查重、避免重复移植、看 App Store 里是否已有、移植激励、上游仓库、build.sh、Makefile、lpk 打包、file_handler、OIDC、商店登录、lazycat_account、lazycat_password、懒猫算力仓、AI应用、AI 浏览器插件 等请求，就必须使用此 skill。负责从 GitHub 搜索候选项目、在 Lazycat App Store 查重、判断是否还有激励空间，并把移植项目收敛到可打包、可安装、可提审的状态，同时判断 AI 项目是否更适合移植为懒猫 `AI应用` 或 AI 浏览器插件。
+description: "Port an open-source/self-hosted project to Lazycat. Use for candidate selection (GitHub search), App Store de-duplication, incentive-space check, and driving the port to a packageable/installable/reviewable state via wrapper + runtime layers only (non-invasive: never edit upstream business code). Also decides whether an AI project fits better as an AI App or browser extension. Chains to lazycat:lpk-builder for packaging and lazycat:ship-app for delivery. 移植开源项目、选型、查重、激励判断、build.sh/Makefile、非侵入打包上架。"
 ---
 
 # Lazycat App Porting
@@ -22,6 +22,7 @@ This skill is for porting open-source or self-hosted software to Lazycat. Defaul
 - Before declaring a project suitable for porting, classify its Lazycat runtime model: delivery form, entry route, persistence, dependency layers, initialization, and login. Read `../lazycat:lpk-builder/references/runtime-model.md` for the canonical preflight model.
 - For common web/server ports, declare unsupported platforms `android`, `ios`, and `tvos` in `package.yml` unless those clients have been verified.
 - If the app requires an in-app account, integrate passwordless login and document the credential contract: account, password, and nickname. Prefer startup-created fixed initial credentials plus three-phase inject for later password changes.
+- If the app has file open/save/upload/download flows, integrate Lazycat file picker selection by `application.injects` with the official file chooser inject; do not modify upstream business frontend for this integration.
 - Must retain upstream address, license, and porting notes.
 
 For tool-based apps or those requiring unified login, evaluate `file_handler` and Microservice OIDC. If the project is AI-native, determine if it should be ported as a Computing Power Cabin `AI App` or AI Browser Extension.
@@ -97,7 +98,7 @@ Upon execution, provide a brief summary of:
 4. Every port must include upstream address, license, and porting notes.
 5. Every port must provide `build.sh`, `Makefile`, `make build`, and `make install`.
 6. After migration is selected, you must finish the repo's `Makefile` yourself. Do not hand off with "please add a Makefile later" or leave placeholder targets unimplemented.
-7. Prioritize OIDC or `file_handler` for suitable projects, as they affect incentives and UX.
+7. Prioritize OIDC, `file_handler`, and mandatory file picker selection for suitable projects, as they affect incentives and UX.
 8. For AI-native projects, determine if they fit better as standard apps, `AI Apps`, or AI Browser Extensions.
 9. If a ported project needs a static homepage, the priority must be: `Connection Entry`, `Status Check`, `Actions`, `Feedback`. Do not put "Why use it" or "Roadmap" in running pages; use `README` or store assets.
 10. **Zero Modification to Original Business Code**: Absolutely DO NOT modify original source files for frontend pages, backend handlers, domain logic, auth logic, database schema/migrations, or tests during a port. Allowed scope is packaging/runtime wrapper files only: `package.yml`, `lzc-build.yml`, `lzc-manifest.yml`, `lzc-deploy-params.yml`, `Makefile`, `build.sh`, Docker wrapper files, startup/seed scripts, config templates, icons, store assets, and docs.
@@ -121,6 +122,13 @@ Upon execution, provide a brief summary of:
     - Document the initial credentials in README/store usage/locales: `账号`, `密码`, `昵称`.
     - Use official three-phase inject for modifiable credentials: request captures login/init/change-password credentials into `ctx.flow`; response writes `ctx.persist` only on 2xx; browser fills login and current-password fields with `builtin://simple-inject-password`.
     - Do not invent API paths, payload keys, or selectors. Inspect runtime traffic or ask the user before writing inject YAML.
+16. **Mandatory File Picker Selection for Ports**: If a migrated app has any file open/save/upload/download entry, provide Lazycat file picker selection before considering the port complete.
+    - Use `application.injects` with `lzc-file-chooser-inject.js` to intercept browser file entry points, including `showOpenFilePicker()`, `showSaveFilePicker()`, and `<input type="file">`.
+    - Keep this non-invasive. Do not edit upstream pages/components/routes/state just to add Lazycat file selection.
+    - Put inject parameters under `do[].params`, including `diskRoot`, `fallbackMime`, `locale`, optional `text`, and `hooks.fileSystemAccess` / `hooks.fileInput`.
+    - Verify both branches where applicable: local filesystem still follows the original flow, and Lazycat MicroServer opens the Lazycat file picker.
+    - If the app has no file entry, document `File picker: Not applicable, no file open/save/upload/download flow`.
+    - Official reference: https://developer.lazycat.cloud/lazycat-file-picker-auto-intercept.html.
 
 ## Workflow
 
@@ -152,6 +160,7 @@ Upon execution, provide a brief summary of:
   - Dependencies: infra, middleware, seed/migration, business service order and healthchecks.
   - Initialization: `setup_script`, deploy params, generated config, default account creation.
   - Login: none, OIDC, fixed initial credentials, or inject.
+  - File selection: no file flow, existing file flow with file chooser inject, or `file_handler` plus file chooser inject.
   - Runability gate: image/arch, process model, network listener, storage, dependencies, init/login, and external requirements.
   - Risk: low / medium / high, with blockers recorded before implementation.
   - Decision: `Can Run`, `Can Run After Packaging Fixes`, `Cannot Determine Yet`, or `Not Suitable For Standard Lazycat Port`. Do not use vague conclusions like "should be possible".
@@ -198,6 +207,7 @@ Forbidden write scope
 - Add `unsupported_platforms` to `package.yml` for unverified platforms: `android`, `ios`, `tvos`.
 - Add `locales.zh-CN` and `locales.en-US` usage text that explains how login works and lists the initial account/password/nickname when fixed credentials are used.
 - For login apps, add passwordless login without changing business source: startup-created fixed user + health-gated seed + three-phase inject for login/change-password learning.
+- For file-capable migrated apps, add `application.injects` for the official file chooser script and package `lazycat-injects/lzc-file-chooser-inject.js` into the LPK content. Treat missing file picker selection as an incomplete port unless the app has no file flow.
 - Add `application.oidc_redirect_path` and `application.file_handler` if applicable.
 - For AI-native: evaluate `ai-pod-service/`, `caddy-aipod`, and `extension.zip`.
 - If a static homepage is needed, check if it's essential for runtime; if only for submission/promotion, use docs or store assets instead.
@@ -215,6 +225,7 @@ Once "worth porting" is confirmed, hand over to `lazycat:ship-app` for packaging
 - `build.sh` and `Makefile` completed in the repo.
 - OIDC or `file_handler` evaluated.
 - For login apps, passwordless login designed, credentials documented (`账号`/`密码`/`昵称`), and API paths/selectors verified instead of guessed.
+- For file-capable apps, file picker selection is either implemented with inject and verified, or explicitly marked not applicable because the app has no file flow.
 - `package.yml` includes `unsupported_platforms` and BCP 47 `locales` when preparing a real LPK.
 - For incentives: clarified that real installation and verification on Lazycat MicroServer is mandatory.
 - Runtime runability gate completed and documented before implementation, with one of the four required decisions.

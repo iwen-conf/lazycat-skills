@@ -1,6 +1,6 @@
 ---
 name: "lazycat:developer-expert"
-description: 懒猫微服(Lazycat MicroServer)应用开发的终极总控指南。当用户提出任何与懒猫微服应用开发、打包(lpk)、路由配置、部署参数、认证体系(OIDC)或应用上架相关的需求时触发。
+description: Master entry point and router for Lazycat MicroServer app development. Use when a request spans multiple areas (packaging, routing, deploy params, auth/OIDC, store listing) or the right vertical skill is unclear; it classifies the requirement and delegates to the matching skill. Prefer a specific vertical skill when the domain is obvious. 懒猫微服应用开发总控入口、需求分诊、lpk/路由/部署/OIDC/上架。
 ---
 
 # Lazycat MicroServer Application Development Master Guide
@@ -11,6 +11,8 @@ You are the Chief Architect and Development Expert for Lazycat MicroServer. This
 Lazycat MicroServer uses a unique `lpk` package format for application distribution. The core configuration files are `package.yml` (Static Metadata), `lzc-build.yml` (Build Config), and `lzc-manifest.yml` (Runtime Config).
 
 For image-based migrations, final pullable image refs belong in the source manifest during porting or update preparation. Do not redesign `make install` to own `docker push`, `copy-image`, or manifest backfill responsibilities. If the user explicitly wants the full release closure, build or use a separate release target such as `release-build` / `release-install` that runs `build image -> push public image -> lzc-cli appstore copy-image -> backwrite the returned registry.lazycat.cloud address into the source manifest (and any manifest templates used for packaging) -> build lpk -> install lpk`.
+
+File selection integration is mandatory for apps with file open/save/upload/download flows. For migrated apps, use non-invasive `application.injects` to auto-intercept browser file entry points and route users to "local filesystem / Lazycat MicroServer" choices; do not edit upstream business frontend solely for this. For original apps, build the Lazycat file picker capability into the application UI/code instead of relying on post-build inject. Official reference: https://developer.lazycat.cloud/lazycat-file-picker-auto-intercept.html.
 
 ## Porting Context Boundary Inheritance
 
@@ -34,7 +36,7 @@ When a user presents a requirement, strictly follow the classification below and
 **Action:** Delegate to `lazycat:advanced-routing` and read `references/advanced-routing.md` only as a pointer to the canonical skill.
 
 ### 3. Dynamic Deployment and Script Injection (Dynamic & Injects)
-**Scenario:** Needing a popup for user-defined parameters during installation (`lzc-deploy-params.yml`), or forcibly injecting JS scripts into third-party web pages (`application.injects`) for features like auto-login.
+**Scenario:** Needing a popup for user-defined parameters during installation (`lzc-deploy-params.yml`), or forcibly injecting JS scripts into third-party web pages (`application.injects`) for features like auto-login or Lazycat file picker auto-intercept in migrated apps.
 **Action:** Delegate to `lazycat:dynamic-deploy` and read `references/dynamic-deploy.md` only as a pointer to the canonical skill.
 
 ### 4. Authentication and Permission Systems (Auth & OIDC)

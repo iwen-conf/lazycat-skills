@@ -1,11 +1,11 @@
 ---
 name: "lazycat:dynamic-deploy"
-description: 处理懒猫微服(Lazycat MicroServer)应用的动态部署参数配置(lzc-deploy-params.yml)、清单文件 Go 模板渲染以及利用 application.injects 实现免密登录（三阶段联动）和前端页面脚本注入的专业指南。
+description: Configure dynamic deploy params (lzc-deploy-params.yml) and Go-template manifest rendering, and use application.injects to inject frontend scripts non-invasively — passwordless login (three-stage flow) and file-picker auto-intercept for migrated apps. 动态部署参数、清单模板渲染、application.injects免密登录、文件选择器自动拦截、脚本注入。
 ---
 
 # 懒猫微服动态部署与免密注入指南
 
-你是一个专业的懒猫微服应用架构师。当开发者需要向用户索要自定义配置（如密码、远程 IP 等），或者需要在不修改原应用代码的情况下，强行向应用的前端页面注入 JavaScript 脚本（特别是实现 **免密登录**）时，请严格遵循本指南。
+你是一个专业的懒猫微服应用架构师。当开发者需要向用户索要自定义配置（如密码、远程 IP 等），或者需要在不修改原应用代码的情况下，强行向应用的前端页面注入 JavaScript 脚本（特别是实现 **免密登录** 或 **文件选择器自动拦截**）时，请严格遵循本指南。
 
 ## 1. 动态部署参数与模板渲染 (v1.3.8+)
 懒猫微服支持在安装应用前，弹出一个 UI 界面让用户填写参数，然后利用这些参数动态渲染 `lzc-manifest.yml`。
@@ -94,6 +94,54 @@ application:
             password: '{{ stable_secret "app_admin_pass" }}'
             autoSubmit: true
 ```
+
+## 3. 文件选择器自动拦截 (`lzc-file-chooser-inject.js`)
+当迁移应用已经有浏览器原生文件能力，但没有接入懒猫网盘时，必须优先使用官方文件选择器自动拦截 inject，而不是修改上游前端业务代码。官方依据：https://developer.lazycat.cloud/lazycat-file-picker-auto-intercept.html。
+
+### 强制适用条件
+
+1. **迁移应用必须走 inject**：只要页面存在打开、保存、上传、下载、`showOpenFilePicker()`、`showSaveFilePicker()` 或 `<input type="file">` 等文件入口，就在 `application.injects` 中注入 `lzc-file-chooser-inject.js`，让用户选择“本地文件系统 / 懒猫微服”。
+2. **原创应用必须内置**：如果是从零开发或可控业务源码的原创应用，应在应用 UI/代码中直接接入懒猫文件选择能力；不要把 inject 当作原创应用的默认实现。
+3. **无文件入口则记录不适用**：如果应用没有文件打开、保存、上传或下载入口，在移植说明或提审自检中写明“不适用：无文件入口”，不要硬塞 inject。
+4. **不得把参数写进脚本文件名**：`diskRoot`、`fallbackMime`、`locale`、`text`、`hooks` 必须写在 `do[].params` 下。
+
+### Manifest 模板
+
+```yaml
+application:
+  injects:
+    - id: open-save-chooser
+      on: browser
+      when:
+        - /*
+      do:
+        - src: file:///lzcapp/pkg/content/lazycat-injects/lzc-file-chooser-inject.js
+          params:
+            diskRoot: /_lzc/files/home
+            fallbackMime: application/octet-stream
+            locale: auto
+            hooks:
+              fileSystemAccess: true
+              fileInput: true
+```
+
+如果应用还需要声明文件关联，同时配置 `application.file_handler`，例如：
+
+```yaml
+application:
+  file_handler:
+    mime:
+      - x-lzc-extension/example
+    actions:
+      open: /?fileUrl=/%u
+```
+
+### 验证要求
+
+1. 打开应用并触发一次打开/上传入口，确认出现“本地文件系统 / 懒猫微服”选择弹窗。
+2. 选择“懒猫微服”，确认能打开懒猫文件选择器并把文件交还给原页面流程。
+3. 触发一次保存/下载入口（如果应用支持），确认能选择保存到本地或懒猫微服。
+4. 如果 inject 不生效，先核对 `on: browser`、`when` 命中路径、脚本是否被打进 `contentdir`、目标盒子的 inject 语法代际，再进入排障。
 
 ## 平台特定的规则与护栏 (Guardrails)
 1. **不要在 request/response 的 `when` 里写 Hash 路由**：服务端看不见 `#` 后面的内容。`/#login` 只能用在 `browser` 阶段（通常是 `when` 或省略 `on` 默认浏览器阶段）。

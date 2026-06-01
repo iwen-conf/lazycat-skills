@@ -1,6 +1,6 @@
 ---
 name: "lazycat:troubleshoot"
-description: 懒猫微服(Lazycat MicroServer)应用排障技能。当用户提到应用白屏、容器起不来、路由 404、inject 不生效、OIDC 回调失败、manifest 校验报错、healthcheck 失败、安装后打不开、日志报错、Permission denied、启动超时等问题时触发。
+description: "Diagnose runtime failures of an installed Lazycat MicroServer app: blank page, container won't start, 404/502, inject not firing, OIDC callback failure, manifest validation errors, healthcheck failure, permission denied, startup timeout. Stays within non-invasive wrapper/runtime fixes; never edits upstream business code. 排障、白屏、容器起不来、路由404、inject不生效、OIDC回调失败、healthcheck失败、启动超时。"
 ---
 
 # Lazycat MicroServer Application Troubleshooting

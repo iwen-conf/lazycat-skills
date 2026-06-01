@@ -1,6 +1,6 @@
 ---
 name: lazycat:ship-app
-description: 面向懒猫应用上架的端到端交付 skill。当用户需要将已开发完成的应用推进到"打包、提审、发布、发布后验证"状态时触发。覆盖 lpk 打包上传、商店元数据与截图准备、自测安装验证、提审与审核跟进、发布后可见性检查。不负责项目创建（用 create-app）、移植选型（用 port-app）、后台 UI 收敛（用 admin-ui）或图标生成（用 prepare-icon）。
+description: "End-to-end delivery of a finished Lazycat app: lpk packaging/upload, store metadata and screenshots, self-test install verification, submission and review follow-up, post-release visibility check. Use when advancing a ready app to \"submitted, published, verified\". Not for project creation (use lazycat:create-app), porting selection (lazycat:port-app), admin UI (lazycat:admin-ui), or icons (lazycat:prepare-icon). 懒猫应用上架、打包、提审、发布、发布后验证。"
 compatibility:
   tools:
     - shell
@@ -111,7 +111,7 @@ Don't just say "I'll take a look." Let the user know you are advancing a specifi
 7. When the user wants the whole release closure, prefer a dedicated release target such as `release-build` / `release-install` that runs build image, push, copy-image, manifest backwrite, LPK build, and installation as one explicit pipeline.
 8. For cash incentives, prioritize original, high-quality, real-world apps; inform the user early if a type is not rewarded.
 9. Apps requiring login must ensure users can obtain credentials (registration, OIDC, or public test accounts).
-10. For tool apps, prioritize disk file association; for account-based apps, prioritize OIDC.
+10. For tool apps, prioritize disk file association and file picker selection; for account-based apps, prioritize OIDC.
 11. Do not mix environment variables: `lazycat_account` is for the MicroServer; `lazycat_developer_center_account` is for the Dev Center; app-level tests use specific variables like `lazycat_gitea_account`.
 12. Admin apps must pass `lazycat:admin-ui` quality gates before screenshots and submission; do not use default templates.
 13. Standard business web apps with AI use the `BaseURL` scheme; do not add AI Pod structures unless required.
@@ -170,6 +170,7 @@ Confirm store visibility and searchability. Verify that the installed version fr
 - Incentive targets meet official rules (not an excluded type).
 - Account-based apps have registration or test credentials.
 - OIDC or file association implemented if applicable.
+- File picker selection verified: migrated apps use `application.injects` file chooser interception for file open/save/upload/download flows; original apps implement Lazycat file picker selection in the application UI/code.
 - AI products follow the correct route (`BaseURL` vs. AI Pod) and verified entries.
 
 ## Red Flags
@@ -187,7 +188,7 @@ Confirm store visibility and searchability. Verify that the installed version fr
 - Targeting incentives with excluded types (web games, tutorial sites, etc.).
 - Missing registration or test credentials for account-based apps.
 - Mixed credentials causing test path divergence from real users.
-- Missing OIDC or file association for suitable apps.
+- Missing OIDC, file association, or file picker selection for suitable apps.
 - AI products without a clear route judgment.
 
 ## Bundled References

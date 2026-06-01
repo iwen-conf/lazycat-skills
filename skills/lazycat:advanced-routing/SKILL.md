@@ -1,6 +1,6 @@
 ---
 name: "lazycat:advanced-routing"
-description: 处理懒猫微服(Lazycat MicroServer)应用的高级路由、多域名配置、TCP/UDP四层转发(ingress)、跨域处理以及使用 app-proxy 进行复杂代理规则配置的专业指南。
+description: "Configure advanced routing for a Lazycat MicroServer app: multi-domain (secondary_domains), TCP/UDP layer-4 forwarding (ingress), cross-origin handling, and complex proxy rules via app-proxy. 高级路由、多域名、四层转发(ingress)、跨域、app-proxy代理规则。"
 ---
 
 # Lazycat MicroServer Advanced Routing and Network Configuration Guide

@@ -1,6 +1,6 @@
 ---
 name: lazycat:ui-ux-pro-max
-description: 面向 Lazycat Web 应用的 React UI/UX 设计知识库。默认且仅服务 `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion` 这一套前端基线，不提供任何其他实现分支。
+description: "React UI/UX design knowledge base for Lazycat web apps — design systems, color palettes, typography, and UX patterns. Owns the standard frontend stack referenced by other skills: React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion (no other implementation branch). 前端UI/UX设计、配色、排版、组件规范、React技术栈基线。"
 ---
 # ui-ux-pro-max
 

@@ -1,6 +1,6 @@
 ---
 name: lazycat:update-app
-description: 面向已上架 Lazycat 应用的版本更新、镜像升级、LPK 重构与开发者中心重新提交的 skill。当用户提到更新应用、升级版本、更新镜像、make update、修改 manifest 镜像、重新打包 LPK、提交新版本到开发者中心等请求时，必须使用此 skill。负责从镜像同步（copy-image）、manifest 修改、LPK 构建到开发者中心提审的完整更新闭环。
+description: Update an already-published Lazycat app to a new version. Use for image sync (copy-image), manifest image/version bump, LPK rebuild, and Developer Center re-submission. Covers the full update loop from image to re-review; for first-time listing use lazycat:ship-app. 更新已上架应用、升级版本、更新镜像、make update、重打LPK、开发者中心重新提交。
 ---
 
 # Lazycat App Update and Upgrade

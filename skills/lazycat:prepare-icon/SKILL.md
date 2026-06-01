@@ -1,6 +1,6 @@
 ---
 name: lazycat:prepare-icon
-description: 面向 Lazycat 应用图标准备与外部 AI 图像生成交接的 skill。只要用户提到 app icon、应用图标、商店 icon、PNG 图标、给其他 AI 生成图标、Apple 风格图标、iOS/macOS 图标、图标提示词、图标 brief 等请求，就必须使用此 skill。负责从项目名称和项目功能出发，整理图标语义、检查是否已到素材阶段，并输出一份可直接交给外部图像模型生成 1024x1024 PNG 的英文 prompt。
+description: "Prepare a Lazycat app store icon and hand off to an external image model. Use for app/store icon requests: extract icon semantics from the project name and function, confirm the project is at asset stage, and output a ready-to-use English prompt for generating a 1024x1024 Apple-style PNG. 应用图标、商店icon、PNG图标、图标提示词、交给外部AI生成。"
 ---
 
 # Lazycat Project Icon Handover

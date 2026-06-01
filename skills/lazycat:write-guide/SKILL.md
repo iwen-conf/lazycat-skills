@@ -1,6 +1,6 @@
 ---
 name: lazycat:write-guide
-description: 面向 Lazycat 应用攻略与文章创作的 skill。只要用户提到写攻略、写文章、创作教程、应用指南、接入说明、按懒猫激励规则写内容、介绍如何对接 Lazycat 能力、advanced-route、OIDC、file_handler、懒猫算力仓、AI应用、AI 浏览器插件、应用上手指南等请求，就必须使用此 skill。负责围绕真实应用和真实场景，写出符合 Lazycat 创作激励口径的高质量文章，而不是浅层按钮说明。
+description: Write Lazycat app guides and articles that meet the official creation-incentive bar. Use for tutorials, usage guides, porting retrospectives, and integration write-ups (OIDC, advanced routing, file_handler, AI Pod, AI App, browser extensions) — grounded in real apps and real scenarios, not shallow button walkthroughs. 写攻略、写文章、教程、应用指南、接入说明、激励口径内容。
 ---
 
 # Lazycat Guides and Article Creation

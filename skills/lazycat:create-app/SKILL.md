@@ -1,6 +1,6 @@
 ---
 name: lazycat:create-app
-description: 面向 Lazycat 新项目创建和项目基线统一的 skill。只要用户提到从 0 创建懒猫应用、初始化项目、脚手架、项目标准、Go 后端、React、Vite、Tailwind、shadcn/ui、Zustand、TanStack Query、React Router、React Hook Form、Zod、Framer Motion、前端配色、低饱和配色、后台管理、Admin、管理台、登录、注册、JWT、access_token、refresh_token、无感刷新、认证改造、现金激励、对接微服账户系统、网盘右键菜单、需求分析文档、API 设计文档、原创应用如何融入 Lazycat 原生系统、AI 配置面板、模型配置、懒猫算力仓、AI 应用、AI 浏览器插件等请求，就必须使用此 skill。负责把项目创建阶段收敛到统一规范：第一步先建立 `docs/` 文档树，再落 Go 后端 + `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion` 前端基线，默认具备登录、注册、双 token 和无感刷新；普通业务型 Web 应用接 AI 时默认走 `BaseURL` 配置方案，只有明确做懒猫算力仓 / `AI应用` / AI 浏览器插件时才走官方 AI Pod 路线；若项目包含后台管理面，则进一步把它接到 `lazycat:admin-ui` 的高质量管理 UI 质量链路，并在用户以现金激励为目标时优先满足官方激励门槛。
+description: "Create a new Lazycat app from scratch and lock its baseline. Use for project init/scaffolding: docs/ tree first, then Go backend + the standard React frontend stack (see lazycat:ui-ux-pro-max), with login/register, dual-token auth and silent refresh by default. Standard web apps reach AI via a BaseURL config panel; only explicit AI Pod / AI App / browser-extension goals take the official AI Pod route. Hands off admin screens to lazycat:admin-ui and delivery to lazycat:ship-app. 从零创建懒猫应用、初始化、脚手架、项目基线、登录注册、双token、AI配置面板。"
 ---
 
 # Lazycat Project Creation Baseline
@@ -20,6 +20,7 @@ This skill is used for creating new projects or aligning existing projects with 
 - Authentication uses `access_token + refresh_token`.
 - The frontend supports "silent refresh" (seamless token renewal) by default.
 - Original applications must evaluate how to integrate with Lazycat's native capabilities rather than being isolated web pages.
+- Original applications with file open/save/upload/download flows must build Lazycat file picker selection into the application UI/code. Do not rely on post-build inject for original apps; inject is the default path for migrated third-party apps.
 - If the business is naturally suited for AI, a unified AI configuration page is reserved by default, containing at least `API BaseURL`, protocol, model fetching, model selection, and configuration saving.
 - For standard business web applications, AI is treated as a component of business capability; do not automatically switch to the AI Pod route.
 - Only when the user explicitly targets Lazycat Computing Power Cabin (AI Pod), `AI App`, or AI Browser Extensions should the official AI Pod route be evaluated.
@@ -120,7 +121,7 @@ Upon execution, provide a brief summary of:
 8. Establish the `docs/` tree before coding; do not leave requirements and API design for later.
 9. Projects must provide executable entry points; at minimum `build.sh` and `Makefile`.
 10. Admin interfaces must use `lazycat:admin-ui` standards; templates are scaffolds, not final deliverables.
-11. Original apps must justify their Lazycat native value; evaluate OIDC, file association, and local workflows.
+11. Original apps must justify their Lazycat native value; evaluate OIDC, file association, local workflows, and built-in Lazycat file picker selection for any file flows.
 12. If AI scenarios exist, provide a unified AI config panel; minimal fields: `API BaseURL`, protocol type, fetch models, model selector, save config.
 13. Standard business web apps use the `BaseURL` scheme; do not automatically require `ai-pod-service`, `caddy-aipod`, or `extension.zip`.
 14. AI Pod routes are only evaluated when explicitly targeting AI Pod, `AI App`, or AI Browser Extensions.
@@ -148,7 +149,7 @@ All projects must include:
 For incentive goals, determine originality and native value. Avoid excluded app types. Prioritize account/file integration for tools and OIDC for existing account systems.
 
 ### 5. Native System Integration
-For original apps, answer "why install this in Lazycat?" Prioritize OIDC, `file_handler`, and local workflows. Mark weak integration points as risks.
+For original apps, answer "why install this in Lazycat?" Prioritize OIDC, `file_handler`, local workflows, and built-in Lazycat file picker selection for file open/save/upload/download flows. Mark weak integration points as risks.
 
 ### 6. Solidify Technical Baseline
 Backend: Go. Frontend: use `React + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router + React Hook Form + Zod + Framer Motion`, and implement one approved low-saturation palette via shadcn CSS variables. Keep state management and auth in a single store (Zustand slice). Define anonymous vs. authenticated route boundaries.
@@ -158,7 +159,7 @@ Required: Login/Register pages, state persistence, `access_token`, `refresh_toke
 
 ### 8. Design Minimal APIs and Pages
 APIs: `POST /auth/register`, `/login`, `/refresh`, `/logout`, `GET /auth/me`.
-Pages: Login/Register forms, route guards, state recovery, 401 retry, OIDC integration (if applicable), file open entry (for tools).
+Pages: Login/Register forms, route guards, state recovery, 401 retry, OIDC integration (if applicable), built-in Lazycat file picker entry for tools or any file-capable workflow.
 
 ### 9. AI Capability and Config Panel
 If AI is involved: Default to `BaseURL` for standard web apps. AI must be a core process. Config panel: `API BaseURL`, protocol (OpenAI/Anthropic), model fetching, model selector, save button. Use standard templates from [references/ai-settings-template.md](./references/ai-settings-template.md).
@@ -167,7 +168,7 @@ If AI is involved: Default to `BaseURL` for standard web apps. AI must be a core
 If an admin interface exists: Define dashboard, list, detail, form, and settings views. Use `lazycat:admin-ui` for quality convergence. Admin UI must match the main brand direction.
 
 ### 11. Data, Security, and Additional Integration
-Define minimal user fields. Refresh tokens must be revocable or rotatable. Define auth env vars and secrets. Plan `application.oidc_redirect_path` and `application.file_handler` in the manifest.
+Define minimal user fields. Refresh tokens must be revocable or rotatable. Define auth env vars and secrets. Plan `application.oidc_redirect_path` and `application.file_handler` in the manifest. For original apps with file flows, implement file picker selection in source code/UI and verify Lazycat MicroServer file selection; reserve `application.injects` file chooser interception for migrated third-party apps.
 
 ### 12. Hand over to Release Pipeline
 Once the baseline (dev-ready, login, dual token) is established, hand over to `lazycat:ship-app`. If admin UI is present, hand over to `lazycat:admin-ui` first.
@@ -181,6 +182,7 @@ Once the baseline (dev-ready, login, dual token) is established, hand over to `l
 - `access_token + refresh_token` implemented.
 - Silent refresh and fallback flow verified.
 - Original apps have clear native integration points.
+- Original apps with file flows use built-in Lazycat file picker selection rather than inject-only interception.
 - Minimal APIs, pages, and user data defined.
 - AI-suitable projects have a unified config panel.
 - AI products have a defined route (Standard, AI App, or Browser Ext).
