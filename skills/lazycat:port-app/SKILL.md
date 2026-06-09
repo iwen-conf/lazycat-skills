@@ -12,6 +12,7 @@ You are responsible for progressing a "search for a portable project" to a "port
 This skill is for porting open-source or self-hosted software to Lazycat. Default requirements:
 
 - Search GitHub first to determine upstream project, license, activity, and feature boundaries.
+- GitHub use is read-only by default. Do not create issues, PRs, forks, comments, reviews, discussions, stars, watches, follows, or any other visible interaction using the user's GitHub account unless the user explicitly approves that exact action in the current conversation.
 - Search the Lazycat App Store to confirm if a similar port already exists.
 - If `lazycat_account` and `lazycat_password` exist on the local machine, prioritize using them to log in to the App Store before checking for duplicates. These variables are for MicroServer and App Store access, not the Developer Center or internal app accounts.
 - If a similar port exists with no added value, do not proceed with a duplicate path.
@@ -24,6 +25,7 @@ This skill is for porting open-source or self-hosted software to Lazycat. Defaul
 - If the app requires an in-app account, integrate passwordless login and document the credential contract: account, password, and nickname. Prefer startup-created fixed initial credentials plus three-phase inject for later password changes.
 - If the app has file open/save/upload/download flows, integrate Lazycat file picker selection by `application.injects` with the official file chooser inject; do not modify upstream business frontend for this integration.
 - Must retain upstream address, license, and porting notes.
+- In `package.yml`, set `author` from the GitHub owner segment in `homepage`; for example, `homepage: https://github.com/Makisuo/maple` maps to `author: Makisuo`.
 
 For tool-based apps or those requiring unified login, evaluate `file_handler` and Microservice OIDC. If the project is AI-native, determine if it should be ported as a Computing Power Cabin `AI App` or AI Browser Extension.
 
@@ -93,22 +95,23 @@ Upon execution, provide a brief summary of:
 ## The Iron Law
 
 1. Perform GitHub search and App Store de-duplication before porting. Do not write code before checking duplicates.
-2. If local `lazycat_account` and `lazycat_password` exist, prioritize using an interactive `zsh` to read them and log in to the App Store for checking. Do not assume lack of credentials in non-interactive shells.
-3. If a duplicate exists in the App Store without differentiation, do not proceed with the incentive path.
-4. Every port must include upstream address, license, and porting notes.
-5. Every port must provide `build.sh`, `Makefile`, `make build`, and `make install`.
-6. After migration is selected, you must finish the repo's `Makefile` yourself. Do not hand off with "please add a Makefile later" or leave placeholder targets unimplemented.
-7. Prioritize OIDC, `file_handler`, and mandatory file picker selection for suitable projects, as they affect incentives and UX.
-8. For AI-native projects, determine if they fit better as standard apps, `AI Apps`, or AI Browser Extensions.
-9. If a ported project needs a static homepage, the priority must be: `Connection Entry`, `Status Check`, `Actions`, `Feedback`. Do not put "Why use it" or "Roadmap" in running pages; use `README` or store assets.
-10. **Zero Modification to Original Business Code**: Absolutely DO NOT modify original source files for frontend pages, backend handlers, domain logic, auth logic, database schema/migrations, or tests during a port. Allowed scope is packaging/runtime wrapper files only: `package.yml`, `lzc-build.yml`, `lzc-manifest.yml`, `lzc-deploy-params.yml`, `Makefile`, `build.sh`, Docker wrapper files, startup/seed scripts, config templates, icons, store assets, and docs.
+2. Treat GitHub research as read-only. Public issue/PR status may be read for activity assessment, but creating issues, PRs, forks, comments, reviews, discussions, stars, watches, follows, or any other account-visible operation is forbidden without explicit user approval for that exact action.
+3. If local `lazycat_account` and `lazycat_password` exist, prioritize using an interactive `zsh` to read them and log in to the App Store for checking. Do not assume lack of credentials in non-interactive shells.
+4. If a duplicate exists in the App Store without differentiation, do not proceed with the incentive path.
+5. Every port must include upstream address, license, and porting notes.
+6. Every port must provide `build.sh`, `Makefile`, `make build`, and `make install`.
+7. After migration is selected, you must finish the repo's `Makefile` yourself. Do not hand off with "please add a Makefile later" or leave placeholder targets unimplemented.
+8. Prioritize OIDC, `file_handler`, and mandatory file picker selection for suitable projects, as they affect incentives and UX.
+9. For AI-native projects, determine if they fit better as standard apps, `AI Apps`, or AI Browser Extensions.
+10. If a ported project needs a static homepage, the priority must be: `Connection Entry`, `Status Check`, `Actions`, `Feedback`. Do not put "Why use it" or "Roadmap" in running pages; use `README` or store assets.
+11. **Zero Modification to Original Business Code**: Absolutely DO NOT modify original source files for frontend pages, backend handlers, domain logic, auth logic, database schema/migrations, or tests during a port. Allowed scope is packaging/runtime wrapper files only: `package.yml`, `lzc-build.yml`, `lzc-manifest.yml`, `lzc-deploy-params.yml`, `Makefile`, `build.sh`, Docker wrapper files, startup/seed scripts, config templates, icons, store assets, and docs.
     - Before editing, state the intended write scope and keep it to the allowed wrapper files.
     - If a fix appears to require changing upstream business code, stop and report `Blocked by business-code change requirement`; offer a wrapper/image/config alternative if one exists.
     - Do not treat tests, UI copy, auth handlers, API handlers, migrations, seed data inside upstream app directories, or framework config as "small harmless changes"; they are business-source changes unless they are part of a wrapper directory created for the port.
     - User phrases such as "不要修改业务代码", "只做移植", "不要动上游", "包装一下", or an ordinary porting request mean business-source writes are forbidden.
-11. **Image-Based Porting Flow**: If a project provides a Docker image, use the image directly. If no image exists but a Dockerfile is provided, build the image first. Once an image is available (remote or locally built), use `lzc-cli appstore copy-image <image>` to copy the image to the Lazycat registry.
-12. **Write Back to YML and Build LPK**: After copying the image, the returned `registry.lazycat.cloud/...` address MUST be written back into `lzc-manifest.yml`. Only after this is done, run `make build` and `make install` to build the `.lpk` package.
-13. **Strict Health Check and Startup Order**: You MUST configure `healthcheck` (with `test`, `start_period`, `interval`, `timeout`, `retries`) for all dependencies (like MySQL, Redis, etc.) and map `depends_on` with `condition: service_healthy`. Business containers must wait for infrastructure containers to be fully healthy to avoid startup crashes.
+12. **Image-Based Porting Flow**: If a project provides a Docker image, use the image directly. If no image exists but a Dockerfile is provided, build the image first. Once an image is available (remote or locally built), use `lzc-cli appstore copy-image <image>` to copy the image to the Lazycat registry.
+13. **Write Back to YML and Build LPK**: After copying the image, the returned `registry.lazycat.cloud/...` address MUST be written back into `lzc-manifest.yml`. Only after this is done, run `make build` and `make install` to build the `.lpk` package.
+14. **Strict Health Check and Startup Order**: You MUST configure `healthcheck` (with `test`, `start_period`, `interval`, `timeout`, `retries`) for all dependencies (like MySQL, Redis, etc.) and map `depends_on` with `condition: service_healthy`. Business containers must wait for infrastructure containers to be fully healthy to avoid startup crashes.
     - **Auto-Translation for `docker-compose.yml`**:
       - `ports: ["8080:80"]` -> Convert to `routes` in `lzc-manifest.yml` (e.g., `- /=http://service_name:80`). Do not leave `${lzcapp_appid}` or shell-style placeholders in a plain manifest.
       - `volumes: ["./data:/app/data"]` -> Convert to `binds` mapping to `/lzcapp/var/` (e.g., `- /lzcapp/var/data:/app/data`).
@@ -116,13 +119,13 @@ Upon execution, provide a brief summary of:
       - `healthcheck` -> **MANDATORY FOR DEPENDENCIES**. If a service is depended upon, you MUST define a `healthcheck` with a robust `test` command (like `curl` or `mysqladmin ping`), and generous `start_period`, `interval`, `timeout`, and `retries`. Without health checks, `service_healthy` conditions will fail and dependents will hang forever.
     - Before writing the manifest, draw the service layers: infra -> middleware -> seed/migration -> business. If this graph is unclear, inspect upstream Compose, docs, env examples, and startup logs first.
     - Treat route health as end-to-end readiness. Lazycat can wait for route upstream ports, but it cannot make a business service survive a database race, missing schema, bad generated config, or absent initial account.
-14. **Default Platform Declaration**: In `package.yml`, add `unsupported_platforms: [android, ios, tvos]` for normal migrated web/server apps unless you have verified mobile/TV support. Keep `locales` in `package.yml`, not `lzc-manifest.yml`, and use BCP 47 keys such as `zh-CN` and `en-US`.
-15. **Passwordless Login Contract**: If the app has an internal login page, provide a non-invasive passwordless-login path before considering the port complete.
+15. **Default Platform Declaration**: In `package.yml`, add `unsupported_platforms: [android, ios, tvos]` for normal migrated web/server apps unless you have verified mobile/TV support. Keep `locales` in `package.yml`, not `lzc-manifest.yml`, and use BCP 47 keys such as `zh-CN` and `en-US`.
+16. **Passwordless Login Contract**: If the app has an internal login page, provide a non-invasive passwordless-login path before considering the port complete.
     - Create a fixed initial user at startup using documented CLI/CMD/env/admin API, `setup_script`, wrapper `entrypoint`/`command`, or a one-shot seed service. Do not edit business auth code.
     - Document the initial credentials in README/store usage/locales: `账号`, `密码`, `昵称`.
     - Use official three-phase inject for modifiable credentials: request captures login/init/change-password credentials into `ctx.flow`; response writes `ctx.persist` only on 2xx; browser fills login and current-password fields with `builtin://simple-inject-password`.
     - Do not invent API paths, payload keys, or selectors. Inspect runtime traffic or ask the user before writing inject YAML.
-16. **Mandatory File Picker Selection for Ports**: If a migrated app has any file open/save/upload/download entry, provide Lazycat file picker selection before considering the port complete.
+17. **Mandatory File Picker Selection for Ports**: If a migrated app has any file open/save/upload/download entry, provide Lazycat file picker selection before considering the port complete.
     - Use `application.injects` with `lzc-file-chooser-inject.js` to intercept browser file entry points, including `showOpenFilePicker()`, `showSaveFilePicker()`, and `<input type="file">`.
     - Keep this non-invasive. Do not edit upstream pages/components/routes/state just to add Lazycat file selection.
     - Put inject parameters under `do[].params`, including `diskRoot`, `fallbackMime`, `locale`, optional `text`, and `hooks.fileSystemAccess` / `hooks.fileInput`.
@@ -134,8 +137,9 @@ Upon execution, provide a brief summary of:
 
 ### 1. Search GitHub Candidates
 - Use GitHub to find candidate projects.
+- This step is read-only. Do not use the user's GitHub account for any visible upstream action without explicit approval.
 - Check license for distribution and modification. Ensure the license explicitly permits commercial use; do not port projects with non-commercial licenses.
-- Check activity, issue status, README completeness, and deployment complexity.
+- Check activity, public issue/PR status, README completeness, and deployment complexity.
 - Record repository name, upstream address, license, and core features.
 
 ### 2. Check App Store Duplicates

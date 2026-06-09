@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-06-09
+
+- docs: 新增 GitHub 与第三方仓库操作红线，要求使用用户 GitHub 账号进行 issue、PR、fork、评论、review 等涉及他人的操作前必须得到当前对话中的显式允许。
+- fix: 收紧 `lazycat:port-app` 的 GitHub 调研边界，明确默认只读，不得擅自代表用户对上游仓库发起可见互动。
+- fix: 移除本地 `store-rule.md` 中鼓励 Fork/红包激励的操作性内容，并将 OIDC 示例中的真实微服域名替换为占位符。
+- docs: 移除运行时中文 UI 作为上架硬性门槛的规则，将 `zh-CN` UI 改为按产品目标和用户群体决定的本地化建议。
+
+## 2026-06-07
+
+- docs: 补充 Lazycat `package.yml.author` 规则，要求 GitHub 项目从 `homepage` 的 owner 段推导作者，例如 `https://github.com/Makisuo/maple` 对应 `author: Makisuo`。
+
 ## 2026-06-01
 
 - docs: 重写全部 15 个技能的 `description`，改为简洁英文摘要加少量中文触发词，去除冗长关键词堆砌；标准 React 前端技术栈串只在 `ui-ux-pro-max` 保留一次，其余技能改为引用，并补充技能间的衔接提示（create-app/port-app → admin-ui/lpk-builder/ship-app），同步更新 README 技能列表。

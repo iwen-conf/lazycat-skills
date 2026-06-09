@@ -281,12 +281,11 @@ Before delivering UI code, verify these items:
 - [ ] Color is not the only indicator
 - [ ] `prefers-reduced-motion` respected
 
-### Internationalization (zh-CN — Lazycat Store Hard Requirement)
-- [ ] All user-facing text routed through i18n (`t('key')`), not hardcoded JSX literals
-- [ ] `zh-CN` translation pack is complete — no missing keys falling back to English
-- [ ] Chinese typography verified: line-height comfortable for Han characters (≥ 1.6), no awkward CJK breaks mid-word, font stack includes a CJK family (`PingFang SC`, `Microsoft YaHei`, `Noto Sans SC`)
-- [ ] Layout holds with Chinese strings: buttons don't overflow, table headers don't wrap into 4 lines, sidebar labels don't truncate (Chinese is often shorter than English but punctuation and dense glyphs shift line metrics)
-- [ ] Form labels, placeholders, validation errors, empty states, toast/notification, and confirm dialogs all translated
-- [ ] Mixed CJK + ASCII spacing checked (e.g. `保存 5 项` not `保存5项` when numbers are user data)
-- [ ] Date/time/number formatting localized (e.g., `2026年5月21日` vs `May 21, 2026`)
-- [ ] Screenshots for store submission taken with the zh-CN UI active, not the English UI
+### Internationalization
+- [ ] If multi-language UI is in scope, user-facing text is routed through i18n (`t('key')`) rather than hardcoded JSX literals.
+- [ ] Locale packs needed by the product scope are complete, with a deliberate fallback strategy.
+- [ ] Chinese typography is verified when `zh-CN` UI is provided: comfortable line-height for Han characters, sensible CJK breaks, and a CJK-capable font stack (`PingFang SC`, `Microsoft YaHei`, `Noto Sans SC`).
+- [ ] Layout holds with the longest supported locale strings: buttons don't overflow, table headers remain readable, and sidebar labels don't truncate important text.
+- [ ] Form labels, placeholders, validation errors, empty states, toast/notification, and confirm dialogs are covered for the supported locales.
+- [ ] Mixed CJK + ASCII spacing is checked when Chinese copy is present (e.g. `保存 5 项` not `保存5项` when numbers are user data).
+- [ ] Date/time/number formatting follows the active locale.

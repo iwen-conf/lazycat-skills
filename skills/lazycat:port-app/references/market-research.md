@@ -3,6 +3,9 @@
 Before starting a porting project, perform two types of searches:
 
 ## 1. GitHub Search
+
+GitHub search is read-only by default. You may inspect public repositories, README files, releases, licenses, and public issue/PR status for activity signals. Do not create issues, PRs, forks, comments, reviews, discussions, stars, watches, follows, or any other visible action using the user's GitHub account unless the user explicitly approves that exact action in the current conversation.
+
 Record at least:
 - Repository Name
 - Upstream URL

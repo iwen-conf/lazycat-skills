@@ -59,9 +59,8 @@ Before submitting, ensure all the following conditions are met:
 ### 1. Completeness of App Information
 - `package.yml` must be complete with `package`, `version` (strictly `x.x.x` format), `name`, `description`, `author`, and `license`.
 - App Icon and screenshots must be provided in the Developer Center.
-- **Two-layer Chinese (zh-CN) requirement — both are mandatory and audited separately:**
-  1. **Metadata layer (`package.yml.locales`)**: The name, description, and usage instructions **must** provide a `zh-CN` entry (alongside any other languages). Language key specifications follow the [BCP 47 standard](https://en.wikipedia.org/wiki/IETF_language_tag).
-  2. **Runtime UI layer (i18n)**: The app's actual user interface **must** render in Chinese — buttons, menus, prompts, empty states, error messages, all user-facing strings extracted through an i18n framework with a complete zh-CN translation pack. Translating only the metadata while shipping an English-only UI **will fail review**. For ported third-party apps, the zh-CN UI work must be done on a dedicated localization branch, never on the upstream default branch.
+- If `package.yml.locales` is provided, language key specifications follow the [BCP 47 standard](https://en.wikipedia.org/wiki/IETF_language_tag). Prefer complete name, description, and usage text for the app's primary audience.
+- Runtime Chinese (`zh-CN`) UI is optional. Add or improve runtime i18n when it serves the product and target users, but do not block submission solely because the app UI is English-only.
 
 ### 2. Installability and Loadability
 - The app must install and load normally.

@@ -19,6 +19,7 @@ Also classify file selection. If the packaged or migrated app exposes open/save/
 Define the application's identity, version (must strictly be `x.x.x` format), and localization.
 - For field definitions and BCP 47 localization rules, read `references/package-spec.md`.
 - For migrated web/server apps, default to declaring unsupported mobile/TV platforms unless the app has been verified there: `android`, `ios`, `tvos`.
+- For GitHub-hosted projects, set `package.yml.author` to the GitHub owner segment from `homepage`, not the repository name. Example: `homepage: https://github.com/Makisuo/maple` means `author: Makisuo`.
 - `locales` must follow Lazycat package rules and BCP 47 language tags. Prefer at least `zh-CN` and `en-US` for `name`, `description`, and `usage` when preparing store-facing packages.
 
 **Standard Template:**
@@ -27,8 +28,9 @@ package: com.example.myapp
 version: 1.0.0
 name: My App
 description: High-performance Lazycat application.
-author: Developer Name
+author: GitHubOwner
 license: MIT
+homepage: https://github.com/GitHubOwner/myapp
 unsupported_platforms:
   - android
   - ios
