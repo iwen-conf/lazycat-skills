@@ -22,6 +22,7 @@ description: "Third gate for migrating a GitHub project to Lazycat: estimate whe
 4. 如果风险来自必须修改业务代码，返回边界门禁，不用工作量掩盖。
 5. 工作量大时要明确建议：继续、先 POC、换项目或停止。
 6. 输出必须能指导下一步执行，不写泛泛的“中等难度”。
+7. 不把迁移项目的上游前端、移动端、桌面端或小程序客户端改造为默认平台栈；默认栈只用于新增的包装层、管理台、审核辅助页或原创配套前端面，并交给 `arc:frontend`。
 
 ## 分级
 
@@ -38,6 +39,7 @@ description: "Third gate for migrating a GitHub project to Lazycat: estimate whe
 - 初始化：数据库迁移、管理员创建、密钥生成、首启向导。
 - 登录：无登录、固定账号、OIDC、inject、复杂二次验证。
 - 文件能力：无文件流程、上传下载、文件选择器、文件关联。
+- 前端边界：上游前端/客户端是否可保持不动；是否需要新增独立前端面；新增前端面是否按 `arc:frontend` 平台默认栈处理。
 - 外部要求：域名、邮件、对象存储、第三方 API、GPU、特权能力。
 - 上架成本：图标、截图、描述、测试账号、复现步骤、版本来源。
 
@@ -57,6 +59,7 @@ Evidence
 - Runtime complexity:
 - Login and init:
 - File flows:
+- Frontend boundary:
 - Store readiness:
 
 Estimated Work

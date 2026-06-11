@@ -7,6 +7,7 @@
 ### 原创
 
 - `lazycat:original-app`：原创应用从想法或已有项目进入懒猫工程基线，补齐交付文件、登录、文件能力和上架前结构。
+- 原创应用如包含 Web、移动端、桌面端或多厂家小程序前端，除非用户明确指定其他技术，默认联动 `arc:frontend`：Web 使用 React 19 + TypeScript + Vite + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + TanStack Router + React Hook Form + Zod；移动端使用 React Native + Expo + TypeScript + NativeWind + Zustand + TanStack Query + Expo Router；桌面端使用 Tauri 2 + React Web 栈；多厂家小程序使用 Taro 4 + React + TypeScript + Zustand。
 
 ### 迁移
 
@@ -15,6 +16,8 @@
 1. `lazycat:migration-license`：搜索 Web/Agent 候选项目，筛选“有页面 + 有后端”的 GitHub 项目，对比懒猫应用商店和开发者中心待审列表，再判断许可证是否允许商业使用和再分发。
 2. `lazycat:migration-boundary`：判断能否不修改上游业务代码，只通过包装层和运行时适配完成迁移。
 3. `lazycat:migration-workload`：判断迁移工作量大不大，给出继续、先 POC、换项目或停止的建议。
+
+迁移项目默认保留上游业务前端/客户端栈；不得为了统一默认栈而改写上游 React/Vue/Svelte/Angular/静态前端、移动端、桌面端或小程序客户端。只有新建包装层、管理台、审核辅助页或原创配套前端面时，才调用 `arc:frontend` 的平台默认栈。
 
 ### 上架
 
@@ -65,4 +68,5 @@ npx skills add iwen-conf/lazycat-skills
 - 根目录不放测试工程、临时目录或与技能包无关的构建文件。
 - 不新增技能入口，除非用户明确要求改变“原创 / 迁移三关 / 上架”的强约束。
 - 技能主文档只保留可执行流程；详细事实和规范放在各自 `references/` 目录中。
+- 不在 Lazycat 技能中重新定义另一套前端或跨端技术选型；需要 Web、移动、桌面或多端小程序前端时引用 `arc:frontend`，迁移项目仍以“不修改上游业务代码”为最高优先级。
 - 修改技能内容后同步更新 `CHANGELOG.md`。

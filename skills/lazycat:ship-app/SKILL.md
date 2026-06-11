@@ -26,7 +26,8 @@ description: "List a ready Lazycat app: build LPK, install-test, prepare metadat
 6. 镜像型项目必须先完成 `copy-image` 并把返回的 `registry.lazycat.cloud/...` 写回 manifest，再构建 `.lpk`。
 7. 提交资料不得包含真实密码、Token、内部地址或真实微服域名；测试账号只能使用明确可公开给审核的凭据。
 8. 色情、赌博、毒品、空投、破解软件、违法内容，直接拒绝上架。
-9. 不再分流到旧的 UI、图标、攻略、更新、排障等独立技能；这些都是当前上架任务内的必要检查项。
+9. 原创或新增独立 Web、移动端、桌面端、多厂家小程序前端必须继承 `arc:frontend` 平台默认栈，除非用户明确指定其他技术；迁移项目仍不得为了默认栈改上游业务前端/客户端。
+10. 不再分流到旧的 UI、图标、攻略、更新、排障等独立技能；这些都是当前上架任务内的必要检查项。
 
 ## 上架前检查
 
@@ -37,6 +38,7 @@ description: "List a ready Lazycat app: build LPK, install-test, prepare metadat
 - 迁移项目保留上游地址、应用商店查重结论、开发者中心待审列表查重结论、许可证结论、非侵入边界结论和工作量结论。
 - 有账号的应用提供注册、OIDC、公开测试账号或明确初始化说明。
 - 有文件能力的应用完成文件选择或文件关联验证。
+- 原创前端或新增独立前端面记录 `arc:frontend` 平台默认栈验证；迁移项目记录上游前端/客户端保持不动。
 - 图标、截图、描述来自真实运行版本，不使用模板占位或调试数据。
 
 ## 工作流
@@ -73,6 +75,7 @@ Preflight
 - Metadata:
 - Build entries:
 - Migration gates:
+- Frontend stack boundary:
 - Blockers:
 
 Verification

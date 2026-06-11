@@ -31,6 +31,8 @@ description: "Second gate for migrating a GitHub project to Lazycat: decide whet
 5. 用户只说“修好”“跑起来”“尽快上架”“可以处理问题”不构成业务代码修改授权；必须按迁移阻塞处理。
 6. 登录、初始化、路径、健康检查、文件选择必须优先用环境变量、命令行参数、配置模板、启动脚本、seed 服务、OIDC、inject 或反向代理解决。
 7. 文件打开/保存/上传/下载流程属于迁移能力门禁；迁移项目用 `application.injects` 接入文件选择，不改上游 UI。
+8. 默认前端/跨端栈不适用于迁移项目的上游业务代码；不得为了统一到 React Web、React Native + Expo、Tauri 2 或 Taro 4 而重写上游前端、移动端、桌面端或小程序客户端。
+9. 只有新增包装层、配置向导、审核辅助页、独立管理台或原创配套客户端等非上游业务前端时，才联动 `arc:frontend` 使用平台默认栈。
 
 ## 必查项
 
@@ -42,6 +44,7 @@ description: "Second gate for migrating a GitHub project to Lazycat: decide whet
 - 登录是否可以 OIDC、固定初始凭据、inject 或反向代理处理。
 - 文件能力是否可用 inject 非侵入接入。
 - 是否依赖特权容器、宿主机服务、外部 SaaS、不可分发二进制或手工安装步骤。
+- 是否存在新增非业务包装前端面；如存在，交给 `arc:frontend`，不得混入上游业务前端/客户端修改。
 
 ## 决策
 
@@ -72,6 +75,11 @@ Runtime Model
 
 Business-Code Risks
 - ...
+
+Frontend Stack Boundary
+- Upstream frontend/client preserved:
+- New wrapper/admin/client surface:
+- arc:frontend handoff:
 
 Next
 - Proceed to lazycat:migration-workload / Stop
