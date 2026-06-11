@@ -43,15 +43,15 @@ description: 一句话描述（用于触发匹配，务必精准）
 4. **中文优先**：本技能包面向中文开发者，所有文档使用中文编写
 
 ### 知识源与本地检索规则
-- 懒猫官方事实优先来自仓库内的本地 Markdown：`skills/lazycat:developer-expert/references/docs/INDEX.md`、`skills/lazycat:developer-expert/references/docs/`，以及各技能 `references/`。
-- 任何涉及 `lpk`、`manifest`、`package.yml`、`lzc-build.yml`、路由、OIDC、API、inject、部署参数、AI Pod、商店规则等官方事实的问题，都必须先检索并阅读本地文档，不要凭记忆回答。
-- 默认检索方式使用本地文件读取、`rg`、`fd` 或编辑器/Agent 提供的本地搜索能力；搜索范围应限制在本仓库、`references/docs/` 或相关垂直技能 `references/`，不要扫描整个 Home 目录。
+- 懒猫官方事实优先来自仓库内的本地 Markdown：`skills/lazycat:ship-app/references/docs/INDEX.md`、`skills/lazycat:ship-app/references/docs/`，以及各技能 `references/`。
+- 任何涉及 `lpk`、`manifest`、`package.yml`、`lzc-build.yml`、路由、OIDC、API、inject、部署参数、商店规则等官方事实的问题，都必须先检索并阅读本地文档，不要凭记忆回答。
+- 默认检索方式优先使用 `.ai-code-index/search.sh`、`.ai-code-index/struct-search.sh` 和 `.ai-code-index/symbols.sh`；索引缺失或结果不足时，再使用本地文件读取、`rg`、`fd` 或编辑器/Agent 提供的本地搜索能力。搜索范围应限制在本仓库、`references/docs/` 或相关垂直技能 `references/`，不要扫描整个 Home 目录。
 - 不要把远程语义索引、外部长期记忆、云端向量库、付费索引服务或自动持久化记忆写成默认工作流。只有用户明确要求，且已说明成本与隐私影响时，才可引入外部服务。
 - 如果本地文档缺失或明显可能过期，优先查询官方公开线上文档并在回复中说明依据；不要用第三方资料替代官方规范。
 
 ### 修改技能时的同步规则
-- 以下文档的**单一源**位于 `lazycat:lpk-builder/references/`：`manifest-spec.md`、`build-spec.md`、`package-spec.md`、`store-publish.md`、`troubleshooting.md`。`lazycat:developer-expert/references/` 下的同名文件仅为引用指针，**修改时只改 lpk-builder 下的源文件**。
-- `references/` 下的其他共享文件（如 `aipod-playbook.md`、`cash-incentive.md`、`command-conventions.md`）如果在多个技能中被引用，修改时必须同步所有引用方的路径。
+- 以下文档的**单一源**位于 `lazycat:ship-app/references/lpk/`：`manifest-spec.md`、`build-spec.md`、`package-spec.md`、`store-publish.md`、`troubleshooting.md`、`runtime-model.md`。修改时只改该目录下的源文件。
+- `references/` 下的其他共享文件如果在多个技能中被引用，修改时必须同步所有引用方的路径。
 
 ## 4. 敏感信息约束（红线）
 
@@ -114,7 +114,7 @@ description: 一句话描述（用于触发匹配，务必精准）
 4. **不要随意新增技能** — 新增技能前应与用户确认需求和定位
 5. **不要在技能中提及社区激励/红包奖励信息**
 6. **不要将 SDK 相关内容加回来** — SDK 技能已被有意移除
-7. **迁移型技能禁止修改上游项目业务代码** — 普通懒猫移植只允许修改包装层和运行时适配层：`package.yml`、`lzc-build.yml`、`lzc-manifest.yml`、`lzc-deploy-params.yml`、`Makefile`、`build.sh`、Docker 包装层、启动脚本、运行时初始化脚本、seed/setup 脚本、配置模板、图标、商店素材和文档。禁止为了启动、登录、健康检查、路由、审核或“尽快跑起来”去修改上游前端页面/组件/路由/状态、后端 handler/service/domain/auth 逻辑、数据库 schema/migration/model、测试/fixture 或任何业务源文件。用户说“不要修改业务代码”“只做移植”“不要动上游”“包装一下”时，该禁令绝对生效。若唯一可行方案必须改业务代码，必须停止并报告阻塞原因，只有在用户明确把任务改为产品功能开发并点名允许修改的业务范围后，才可动这些文件。
+7. **迁移型技能禁止修改上游项目业务代码** — 除非用户在当前任务中明确说明“允许/需要修改业务代码”并点名允许修改的业务范围，否则迁移任务一律禁止修改业务代码。普通懒猫移植只允许修改包装层和运行时适配层：`package.yml`、`lzc-build.yml`、`lzc-manifest.yml`、`lzc-deploy-params.yml`、`Makefile`、`build.sh`、Docker 包装层、启动脚本、运行时初始化脚本、seed/setup 脚本、配置模板、图标、商店素材和文档。禁止为了启动、登录、健康检查、路由、审核或“尽快跑起来”去修改上游前端页面/组件/路由/状态、后端 handler/service/domain/auth 逻辑、数据库 schema/migration/model、测试/fixture 或任何业务源文件。用户说“不要修改业务代码”“只做移植”“不要动上游”“包装一下”时，该禁令绝对生效；用户只说“修好”“跑起来”“可以处理问题”不构成业务代码修改授权。若唯一可行方案必须改业务代码，必须停止并报告阻塞原因。
 8. **不要擅自代表用户在 GitHub 上与他人互动** — 禁止乱提 issue、乱提 PR、乱 fork、乱评论或使用用户账号做任何涉及他人的可见操作；必须先得到用户显式允许。
 
 ## 8. 需要主动做的事情

@@ -1,63 +1,57 @@
 # Lazycat Skills
 
-面向 LazyCat MicroServer 平台的 AI 技能包仓库。安装后，AI 可以围绕懒猫应用的创建、移植、打包、路由、认证、后台管理和上架交付提供稳定的工程化能力。
+面向 LazyCat MicroServer 平台的 AI 技能包仓库。安装后，AI 只围绕原创应用、迁移评估和上架交付这三类工作提供能力。
+
+## 技能入口
+
+### 原创
+
+- `lazycat:original-app`：原创应用从想法或已有项目进入懒猫工程基线，补齐交付文件、登录、文件能力和上架前结构。
+
+### 迁移
+
+迁移必须按顺序通过三关：
+
+1. `lazycat:migration-license`：搜索 Web/Agent 候选项目，筛选“有页面 + 有后端”的 GitHub 项目，对比懒猫应用商店和开发者中心待审列表，再判断许可证是否允许商业使用和再分发。
+2. `lazycat:migration-boundary`：判断能否不修改上游业务代码，只通过包装层和运行时适配完成迁移。
+3. `lazycat:migration-workload`：判断迁移工作量大不大，给出继续、先 POC、换项目或停止的建议。
+
+### 上架
+
+- `lazycat:ship-app`：接收已准备好的原创应用，或已通过迁移三关的迁移项目，执行打包、安装验证、商店资料、提审和发布后检查。
 
 ## 本地知识库
 
-本仓库内置离线懒猫开发文档与工程经验文档。AI 回答 `lpk`、`manifest`、`package.yml`、`lzc-build.yml`、路由、OIDC、inject、部署参数、AI Pod、商店提审等事实型问题时，必须优先读取本仓库内的本地 Markdown，不默认依赖远程语义索引、外部长期记忆、云端向量库或付费索引服务。
+事实型问题优先读取仓库内本地 Markdown，不默认依赖远程语义索引、外部长期记忆、云端向量库或付费索引服务。
 
 主要本地来源：
 
-- `skills/lazycat:developer-expert/references/docs/INDEX.md`：官方开发文档 URL 到本地文件的索引。
-- `skills/lazycat:developer-expert/references/docs/`：拆分后的官方开发文档 Markdown。
-- 各技能目录下的 `references/`：面向具体工作流的工程经验、清单和约束。
-- `skills/lazycat:lpk-builder/references/runtime-model.md`：迁移前判断懒猫运行机理、入口、存储、依赖、初始化和登录风险的核心参考。
+- `skills/lazycat:ship-app/references/docs/INDEX.md`：官方开发文档 URL 到本地文件的索引。
+- `skills/lazycat:ship-app/references/docs/`：拆分后的官方开发文档 Markdown。
+- `skills/lazycat:ship-app/references/lpk/`：`manifest`、`build`、`package`、上架和运行模型规范。
+- 各保留技能目录下的 `references/`：迁移许可证、非侵入边界和工作量评估清单。
 
 推荐检索顺序：
 
-1. 先按 URL 或主题读取 `references/docs/INDEX.md` 与对应本地文档。
-2. 找不到明确文件时，用 `rg` 在 `skills/lazycat:developer-expert/references/docs/` 和相关技能 `references/` 内做有范围的关键词搜索。
-3. 再按场景加载垂直技能文档，避免一次性读取无关大文件。
-4. 只有本地文档缺失、规则明显可能过期，或用户明确要求联网核验时，才查询官方线上文档，并说明本地快照与线上信息的关系。
-
-## 技能分组
-
-### 生命周期
-- `lazycat:ship-app`：覆盖从立项、打包、自测、提审到发布后的完整交付流程。
-- `lazycat:create-app`：统一新项目基线，包括文档树、技术栈、认证方案和 AI 配置面板。
-- `lazycat:update-app`：处理已上架应用的版本升级、镜像同步和重新提审。
-- `lazycat:port-app`：负责开源项目移植、选型、查重、构建入口和上架落地。
-
-### 开发与打包
-- `lazycat:developer-expert`：Lazycat 微服开发总控技能。
-- `lazycat:lpk-builder`：负责 `.lpk` 打包规范和构建细节。
-- `lazycat:advanced-routing`：处理多域名、四层转发和复杂代理规则。
-- `lazycat:auth-integration`：处理 OIDC、用户身份透传和 API 鉴权。
-- `lazycat:aipod-developer`：处理 AI Pod 应用、算力舱能力和浏览器插件打包。
-- `lazycat:dynamic-deploy`：处理动态部署参数、模板渲染和脚本注入。
-- `lazycat:troubleshoot`：应用排障，覆盖容器启动失败、路由异常、inject 不生效、OIDC 回调失败等常见问题。
-
-### 资产与文档
-- `lazycat:admin-ui`：收敛后台管理界面质量。
-- `lazycat:prepare-icon`：生成应用图标设计提示词。
-- `lazycat:write-guide`：生成应用攻略和官方风格文档。
-- `lazycat:ui-ux-pro-max`：React UI/UX 设计知识库，并维护各技能共享引用的标准前端技术栈基线。
+1. 优先使用 `.ai-code-index/search.sh "query"` 做本地索引检索。
+2. 查语法形态时使用 `.ai-code-index/struct-search.sh <language> '<pattern>'`。
+3. 查符号时使用 `.ai-code-index/symbols.sh "SymbolName"`。
+4. 索引缺失或结果不足时，再对 `skills/` 下相关目录做有范围的本地文本检索。
+5. 只有本地文档缺失、规则明显可能过期，或用户明确要求联网核验时，才查询官方线上文档。
 
 ## 仓库结构
-
-GitHub 根目录只保留仓库说明和约束文件，所有技能统一收拢到 `skills/`，避免根目录堆满技能目录或出现重复副本。
 
 ```text
 lazycat-skills/
 ├── README.md
 ├── AGENTS.md
-├── .gitignore
+├── CHANGELOG.md
 └── skills/
-    ├── lazycat:create-app/
-    │   ├── SKILL.md
-    │   └── references/
-    ├── lazycat:ship-app/
-    └── ... 其他技能目录
+    ├── lazycat:original-app/
+    ├── lazycat:migration-license/
+    ├── lazycat:migration-boundary/
+    ├── lazycat:migration-workload/
+    └── lazycat:ship-app/
 ```
 
 ## 安装
@@ -66,13 +60,9 @@ lazycat-skills/
 npx skills add iwen-conf/lazycat-skills
 ```
 
-安装后，AI 会自动发现这些技能。常见入口包括：
-- “帮我把这个 Docker 项目打包成懒猫应用”
-- “帮我给懒猫项目补一个高质量后台管理界面”
-- “帮我整理应用上架需要的截图、图标和提审材料”
-
 ## 贡献约定
 
 - 根目录不放测试工程、临时目录或与技能包无关的构建文件。
-- 技能主文档保留核心流程，详细说明放在各自的 `references/` 目录中。
-- 修改共享参考文档时，需要同步受影响的其他技能副本。
+- 不新增技能入口，除非用户明确要求改变“原创 / 迁移三关 / 上架”的强约束。
+- 技能主文档只保留可执行流程；详细事实和规范放在各自 `references/` 目录中。
+- 修改技能内容后同步更新 `CHANGELOG.md`。

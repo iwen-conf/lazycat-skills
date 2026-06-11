@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-06-11
+
+- docs: 精简 Lazycat 技能入口，仅保留原创、迁移许可证、迁移非侵入边界、迁移工作量和上架 5 个 SKILL，并删除旧的拆散技能入口。
+- docs: 将官方文档和 LPK 规范迁移到 `lazycat:ship-app/references/`，同步更新 README 与 AGENTS 中的本地知识库路径。
+- docs: 强化迁移业务代码红线，明确除非用户在当前任务说明允许或需要修改业务代码并点名范围，否则迁移、上架和排障都禁止修改上游业务源码。
+- docs: 扩展 `lazycat:migration-license` 为迁移候选发现入口，要求搜索 Web/Agent 且有页面和后端的 GitHub 项目，并同时对比懒猫应用商店和开发者中心待审列表。
+
 ## 2026-06-09
 
 - docs: 新增 GitHub 与第三方仓库操作红线，要求使用用户 GitHub 账号进行 issue、PR、fork、评论、review 等涉及他人的操作前必须得到当前对话中的显式允许。
