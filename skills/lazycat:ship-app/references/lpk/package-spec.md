@@ -12,7 +12,7 @@ The following fields are mandatory or recommended for inclusion in `package.yml`
 | `version` | `string` | **Mandatory**. Semantic versioning. The format MUST strictly follow `x.x.x` (e.g., `1.0.0`). |
 | `name` | `string` | **Mandatory**. Application display name. |
 | `description` | `string` | **Mandatory**. Brief application description. |
-| `author` | `string` | **Mandatory**. Author or organization name. For ported apps, this MUST exactly match the original project's author. |
+| `author` | `string` | **Mandatory**. Author or organization name. If `homepage` is a GitHub repository URL in the form `https://github.com/<owner>/<repo>`, this MUST exactly equal the `<owner>` segment character-for-character, including case and symbols. Example: `homepage: https://github.com/Sliverkiss/mimocode2api` requires `author: Sliverkiss`; `sliverkiss`, `SliverKiss`, or any other mismatch will be rejected. For non-GitHub ported apps, this MUST exactly match the original project's author. |
 | `license` | `string` | **Mandatory**. Software license (e.g., `MIT`, `GPL-3.0`). |
 | `homepage` | `string` | **Optional**. Official website or repository URL. |
 | `locales` | `map` | **Optional**. Localization for name, description, and usage. |

@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-06-13
+
+- docs: 强化 `package.yml.author` 规则，要求 GitHub `homepage` 的 owner 段与 `author` 逐字符一致，大小写和符号错误都会导致审核打回。
+
 ## 2026-06-11
 
 - docs: 将 Lazycat 原创/上架前端联动中的小程序默认栈统一为 Taro 4，不再限定为多厂家小程序。

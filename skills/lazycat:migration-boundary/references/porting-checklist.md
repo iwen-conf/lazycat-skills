@@ -53,6 +53,6 @@
 - [ ] Required deploy parameters were installed through the setup wizard and rendered config/env values were inspected inside the container. Missing config or `need setup deploy params` is resolved before route/healthcheck tuning.
 ## 4. Workload and Listing Handoff
 - [ ] Original/Porting path clarified.
-- [ ] Prepared upstream attribution (for ports) and ensured the `author` field strictly matches the original project's author.
+- [ ] Prepared upstream attribution (for ports). If `package.yml.homepage` is a GitHub repository URL, set `author` to the URL owner segment exactly, preserving case and symbols (for example, `https://github.com/Sliverkiss/mimocode2api` requires `author: Sliverkiss`); mismatches are review-blocking.
 - [ ] Planned OIDC or `file_handler` if applicable.
 - [ ] Planned to verify core capabilities by installing and opening the app within Lazycat OS.

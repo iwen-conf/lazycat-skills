@@ -32,6 +32,7 @@ description: "List a ready Lazycat app: build LPK, install-test, prepare metadat
 ## 上架前检查
 
 - `package.yml` 包含 `package`、`version`、`name`、`description`、`author`、`license`、`locales`。
+- 如果 `package.yml.homepage` 是 GitHub 仓库 URL，`package.yml.author` 必须逐字符等于 URL 中的 owner 段，大小写和符号都不能变化；例如 `https://github.com/Sliverkiss/mimocode2api` 只能写 `author: Sliverkiss`，否则会被审核打回。
 - `version` 是严格 `x.x.x`。
 - `lzc-manifest.yml` 的服务、路由、持久化、健康检查、环境变量完整。
 - `build.sh` 和 `Makefile` 可执行，至少包含 `build`、`install`、`verify` 或等价目标。
