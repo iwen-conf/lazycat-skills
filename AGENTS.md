@@ -53,6 +53,9 @@ description: 一句话描述（用于触发匹配，务必精准）
 - 以下文档的**单一源**位于 `lazycat:ship-app/references/lpk/`：`manifest-spec.md`、`build-spec.md`、`package-spec.md`、`store-publish.md`、`troubleshooting.md`、`runtime-model.md`。修改时只改该目录下的源文件。
 - `references/` 下的其他共享文件如果在多个技能中被引用，修改时必须同步所有引用方的路径。
 
+### 上架信息完整性规则
+- 上架、提审、发布相关技能必须要求开发者中心资料填写完整，不得留下空字段、占位文案或待补信息；提交前必须包含最终 `.lpk` 的 LPK 信息（例如 `lzc-cli lpk info <file.lpk>` 的输出摘要或等价字段），且 LPK 信息必须来自实际提审包。
+
 ## 4. 敏感信息约束（红线）
 
 ### 绝对禁止出现的内容

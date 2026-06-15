@@ -24,10 +24,11 @@ description: "List a ready Lazycat app: build LPK, install-test, prepare metadat
 4. 不把截图、网页表单或本地开发环境当作真实验证；必须安装到懒猫微服并验证核心流程，除非明确说明环境阻塞。
 5. 上架信息以本地项目文件为源头：`package.yml`、`lzc-manifest.yml`、`lzc-build.yml`、`README`、`docs/release-prep/`。
 6. 镜像型项目必须先完成 `copy-image` 并把返回的 `registry.lazycat.cloud/...` 写回 manifest，再构建 `.lpk`。
-7. 提交资料不得包含真实密码、Token、内部地址或真实微服域名；测试账号只能使用明确可公开给审核的凭据。
-8. 色情、赌博、毒品、空投、破解软件、违法内容，直接拒绝上架。
-9. 原创或新增独立 Web、移动端、桌面端、小程序前端必须继承 `arc:frontend` 平台默认栈，除非用户明确指定其他技术；迁移项目仍不得为了默认栈改上游业务前端/客户端。
-10. 不再分流到旧的 UI、图标、攻略、更新、排障等独立技能；这些都是当前上架任务内的必要检查项。
+7. 开发者中心上架资料必须填写完整，不得留下空字段、占位文案或待补信息；提交前必须包含最终 `.lpk` 的 LPK 信息，信息来源必须是实际提审包。
+8. 提交资料不得包含真实密码、Token、内部地址或真实微服域名；测试账号只能使用明确可公开给审核的凭据。
+9. 色情、赌博、毒品、空投、破解软件、违法内容，直接拒绝上架。
+10. 原创或新增独立 Web、移动端、桌面端、小程序前端必须继承 `arc:frontend` 平台默认栈，除非用户明确指定其他技术；迁移项目仍不得为了默认栈改上游业务前端/客户端。
+11. 不再分流到旧的 UI、图标、攻略、更新、排障等独立技能；这些都是当前上架任务内的必要检查项。
 
 ## 上架前检查
 
@@ -41,6 +42,7 @@ description: "List a ready Lazycat app: build LPK, install-test, prepare metadat
 - 有文件能力的应用完成文件选择或文件关联验证。
 - 原创前端或新增独立前端面记录 `arc:frontend` 平台默认栈验证；迁移项目记录上游前端/客户端保持不动。
 - 图标、截图、描述来自真实运行版本，不使用模板占位或调试数据。
+- 开发者中心所需资料全部填写完成；最终 `.lpk` 已执行 `lzc-cli lpk info <file.lpk>` 或等价检查，并把 LPK 信息随提审资料记录。
 
 ## 工作流
 
@@ -48,11 +50,12 @@ description: "List a ready Lazycat app: build LPK, install-test, prepare metadat
 2. 读取本地项目文件，修正 metadata、版本、作者、许可证、locales 和 reviewer instructions。
 3. 构建或同步镜像，确保 manifest 中使用最终可拉取镜像。
 4. 运行 `make build` 或项目等价命令生成 `.lpk`。
-5. 运行 `make install` 或 `lzc-cli app install <lpk>` 安装到懒猫微服。
-6. 验证启动、登录、核心流程、持久化、文件能力、卸载/升级风险。
-7. 准备截图、图标、描述、测试账号、复现步骤、限制说明。
-8. 提交开发者中心；记录版本、时间、状态、截图或页面证据。
-9. 审核通过后验证商店可见性和安装版本；审核失败则按问题归类修复。
+5. 运行 `lzc-cli lpk info <lpk>` 或等价命令记录最终提审包的 LPK 信息。
+6. 运行 `make install` 或 `lzc-cli app install <lpk>` 安装到懒猫微服。
+7. 验证启动、登录、核心流程、持久化、文件能力、卸载/升级风险。
+8. 准备截图、图标、描述、测试账号、复现步骤、限制说明，并确认开发者中心所有字段已填写完成。
+9. 提交开发者中心；记录版本、LPK 信息、时间、状态、截图或页面证据。
+10. 审核通过后验证商店可见性和安装版本；审核失败则按问题归类修复。
 
 ## 审核失败归类
 
@@ -81,6 +84,7 @@ Preflight
 
 Verification
 - Build:
+- LPK info:
 - Install:
 - Core flow:
 - Screenshots/assets:
