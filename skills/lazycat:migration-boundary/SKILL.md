@@ -1,89 +1,139 @@
 ---
 name: lazycat:migration-boundary
-description: "Second gate for migrating a GitHub project to Lazycat: decide whether it can be migrated without modifying upstream business code. 迁移第二关、不改业务代码、非侵入迁移."
+description: "Non-invasive migration feasibility and workload gate for Lazycat. Use after migration-license to decide allowed write scope, runtime mapping, LPK/image boundary, workload level, and whether to proceed, POC, or stop. 迁移可行性、不改业务代码、运行适配、工作量评估、是否继续."
 ---
 
-# Lazycat Migration Boundary Gate
+# Lazycat Migration Feasibility and Workload Gate
 
-本技能是迁移第二关，只判断一个已通过许可证筛选的项目，能否在不修改上游业务代码的前提下迁移到懒猫。
+## 职责范围
 
-## 使用场景
+只评估已通过 `lazycat:migration-license` 的候选能否在不修改上游业务代码的前提下迁移到懒猫，并给出工作量等级和下一步决策。它不做候选搜索、不做许可证结论、不实施完整打包、不提审。
 
-- 项目已通过 `lazycat:migration-license`。
-- 用户问“能不能不改业务代码迁移”“能不能只包装一下”“能不能不动上游”。
-- 需要在开始打包前判断是否会被登录、路径、数据库、初始化、端口、文件能力卡住。
+通过后交给 `lazycat:ship-app`；风险较大时先做 POC。
 
-## 强约束
+## 输入
 
-1. 迁移默认零业务代码修改。除非用户在当前任务明确说明“允许/需要修改业务代码”并点名允许范围，否则一律禁止修改业务代码。
-2. 只允许修改包装层和运行时适配层：
-   - `package.yml`
-   - `lzc-build.yml`
-   - `lzc-manifest.yml`
-   - `lzc-deploy-params.yml`
-   - `Makefile`
-   - `build.sh`
-   - Docker wrapper 文件
-   - 启动脚本、seed/setup 脚本、配置模板
-   - 图标、商店素材、迁移文档
-3. 禁止修改上游前端页面/组件/路由/状态、后端 handler/service/domain/auth、数据库 schema/migration/model、测试、fixture。
-4. 如果唯一可行方案必须改业务代码，立即输出 `Blocked by business-code change requirement`，不要继续包装。
-5. 用户只说“修好”“跑起来”“尽快上架”“可以处理问题”不构成业务代码修改授权；必须按迁移阻塞处理。
-6. 登录、初始化、路径、健康检查、文件选择必须优先用环境变量、命令行参数、配置模板、启动脚本、seed 服务、OIDC、inject 或反向代理解决。
-7. 文件打开/保存/上传/下载流程属于迁移能力门禁；迁移项目用 `application.injects` 接入文件选择，不改上游 UI。
-8. 默认前端/跨端栈不适用于迁移项目的上游业务代码；不得为了统一到 React Web、React Native + Expo、Tauri 2 或 Taro 4 而重写上游前端、移动端、桌面端或小程序客户端。
-9. 只有新增包装层、配置向导、审核辅助页、独立管理台或原创配套客户端等非上游业务前端时，才联动 `arc:frontend` 使用平台默认栈。
-10. 普通迁移必须能产出小于或等于 12 MB（`12,000,000` bytes）的 `.lpk`，且不得内嵌镜像；需要镜像时必须走远程镜像桥接或现成可拉取镜像。
+- `lazycat:migration-license` 输出的候选记录。
+- 仓库路径或只读 clone 结果。
+- README、Dockerfile、Compose、镜像、配置样例、启动方式和部署文档。
+- 用户明确授权的业务代码修改范围；没有授权时视为零业务代码修改。
+
+## 输出
+
+- 非侵入迁移结论。
+- 允许修改的包装层范围。
+- 运行模型映射：镜像、服务、路由、持久化、依赖、初始化、登录、文件能力。
+- LPK 包体和远程镜像桥接方案。
+- 工作量等级、主要风险和下一步建议。
+
+## 前置条件
+
+1. 候选已通过 `lazycat:migration-license`，许可证为 `Pass` 或 `Pass with Obligations`。
+2. 应用商店和开发者中心查重为 `Clear`，或用户明确接受差异化理由。
+3. 已读取仓库的运行文档、Docker/Compose 证据和关键配置。
+4. 如需查看懒猫官方事实，优先读取 `lazycat:ship-app/references/lpk/` 和相关本地文档。
+
+## 允许执行
+
+- 读取和分析上游源码、配置、Dockerfile、Compose、README、release 和部署文档。
+- 修改或规划包装层文件：`package.yml`、`lzc-build.yml`、`lzc-manifest.yml`、`lzc-deploy-params.yml`、`Makefile`、`build.sh`。
+- 修改或规划 Docker wrapper、启动脚本、seed/setup 脚本、配置模板、图标、商店素材和迁移文档。
+- 构建或试运行用于 POC 的包装层和镜像，前提是不修改上游业务代码。
+- 调用 `arc:frontend` 仅处理新增包装层、配置向导、审核辅助页或独立管理台。
+
+## 禁止执行
+
+- 未经当前任务明确授权，不修改上游业务前端页面/组件/路由/状态、后端 handler/service/domain/auth、数据库 schema/migration/model、测试或 fixture。
+- 不为了启动、登录、健康检查、路由、审核或“尽快跑起来”修改业务源文件。
+- 不把上游前端、移动端、桌面端或小程序客户端重写成默认平台栈。
+- 不使用 `lzc-build.yml.images`、`embed:<alias>`、包内 `images/` 或 `images.lock`。
+- 不把“能构建镜像”当作“能上架”；必须覆盖安装、启动、登录、持久化、核心流程和商店资料。
+- 不处理许可证不明或查重未通过的项目；退回 `lazycat:migration-license`。
 
 ## 必查项
 
-- 是否有官方 Docker image、Dockerfile 或 Compose。
-- 是否能避免 `lzc-build.yml.images`、`embed:<alias>`、包内 `images/` 和 `images.lock`，并保持最终 `.lpk` 不超过 12 MB。
-- 进程是否长期运行，是否监听固定端口。
-- 数据和配置是否能映射到 `/lzcapp/var`。
-- 依赖服务是否能用健康检查和 `depends_on.condition: service_healthy` 排序。
-- 首次初始化是否可用 CLI、环境变量、配置文件、seed 服务完成。
-- 登录是否可以 OIDC、固定初始凭据、inject 或反向代理处理。
-- 文件能力是否可用 inject 非侵入接入。
-- 是否依赖特权容器、宿主机服务、外部 SaaS、不可分发二进制或手工安装步骤。
-- 是否存在新增非业务包装前端面；如存在，交给 `arc:frontend`，不得混入上游业务前端/客户端修改。
+- 镜像路径：官方镜像、公开镜像、Dockerfile、自建镜像、源码构建。
+- LPK 边界：最终 `.lpk` 是否可保持 `<= 12,000,000` bytes，且不内嵌镜像。
+- 服务模型：长期进程、固定端口、健康检查、依赖排序。
+- 持久化：数据目录、配置目录、权限、缓存策略。
+- 初始化：数据库迁移、管理员创建、密钥生成、首启向导。
+- 登录：无登录、固定账号、OIDC、inject、反向代理、二次验证。
+- 文件能力：无文件流程、上传下载、文件选择器、文件关联。
+- 外部依赖：域名、邮件、对象存储、第三方 API、GPU、宿主机能力、特权容器。
+- 上架成本：图标、截图、描述、测试账号、复现步骤、版本来源。
 
 ## 决策
 
+非侵入迁移结论：
+
 - `Can migrate non-invasively`: 可以只改包装层完成迁移。
-- `Can migrate with wrapper risk`: 大体可行，但有启动、登录、文件或依赖风险，需要在工作量评估中放大。
-- `Cannot determine yet`: 关键事实缺失，需要先运行或补充文档。
-- `Blocked by business-code change requirement`: 必须改上游业务代码，不进入普通迁移。
+- `Can migrate with wrapper risk`: 可以包装，但启动、登录、文件、依赖或数据风险较高。
+- `Cannot determine yet`: 关键事实缺失，需要补证据或 POC。
+- `Blocked by business-code change requirement`: 必须修改上游业务代码，停止普通迁移。
+
+工作量等级：
+
+- `Small`: 单服务或简单 Compose，官方/公开镜像可用，持久化清晰，通常 1 天内。
+- `Medium`: 2-4 个服务，需要健康检查、初始化脚本、固定凭据或 inject，通常 1-3 天。
+- `Large`: 多服务、复杂初始化、登录或文件流程、外部依赖多、镜像需自建，通常 3-7 天，先 POC。
+- `Too Large`: 非侵入不可控、依赖特权/不可替代外部服务、关键二进制或许可证缺失，停止。
+
+建议：
+
+- `Proceed`: 进入 `lazycat:ship-app`。
+- `POC first`: 先做最小包装验证。
+- `Switch project`: 候选可做但性价比低，换项目。
+- `Stop`: 被业务代码、许可证、运行模型或包体门禁阻塞。
+
+## 参考资料
+
+- `references/porting-checklist.md`
+- `references/s2i-strategy.md`
+- `references/command-conventions.md`
+
+## 后置条件
+
+- 输出允许写入范围和禁止写入范围。
+- 输出运行模型、LPK/镜像边界、工作量等级和下一步建议。
+- 如果进入上架，必须带上许可证结论、查重结论、非侵入结论和工作量结论。
+- 如果阻塞，必须给出唯一阻塞原因或证据缺口。
 
 ## 输出格式
 
 ```text
-Phase: Migration Boundary Gate
+Phase: Migration Feasibility and Workload Gate
 Repository: <owner/repo>
 
-Decision: Can migrate non-invasively / Can migrate with wrapper risk / Cannot determine yet / Blocked by business-code change requirement
+Inputs
+- License gate:
+- Duplicate checks:
+- Source evidence:
 
 Allowed Write Scope
-- ...
+- Packaging:
+- Runtime:
+- Assets/docs:
 
 Runtime Model
-- Delivery:
+- Image:
 - LPK size/embed boundary:
-- Entry:
+- Services/routes:
 - Persistence:
 - Dependencies:
 - Initialization:
 - Login:
 - File flows:
+- External requirements:
 
-Business-Code Risks
-- ...
+Decision
+- Feasibility: Can migrate non-invasively / Can migrate with wrapper risk / Cannot determine yet / Blocked by business-code change requirement
+- Workload: Small / Medium / Large / Too Large
+- Recommendation: Proceed / POC first / Switch project / Stop
 
-Frontend Stack Boundary
-- Upstream frontend/client preserved:
-- New wrapper/admin/client surface:
-- arc:frontend handoff:
+Risks
+- Business-code risks:
+- Data risks:
+- Store readiness:
 
-Next
-- Proceed to lazycat:migration-workload / Stop
+Next: lazycat:ship-app / POC / Stop
 ```

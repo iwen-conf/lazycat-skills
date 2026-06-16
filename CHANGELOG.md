@@ -2,6 +2,8 @@
 
 ## 2026-06-16
 
+- docs: 重构 Lazycat Skill 架构，合并 `lazycat:unlisted-candidate-audit` 到 `lazycat:migration-license`，合并 `lazycat:migration-workload` 到 `lazycat:migration-boundary`，并统一保留 5 个单一职责入口。
+- docs: 新增 `lazycat:update-installed-app`，用于通过 LPK Inspector 下载已安装应用包，对比 GitHub 最新版本和镜像，执行 `copy-image`、manifest 回写、重打包和安装验证。
 - docs: 新增 `lazycat:unlisted-candidate-audit`，用于盘点开发者中心未上架且非待审核应用，对比应用商店和本地项目目录，并对缺失的 GitHub 项目做许可证与非侵入上架可行性审查。
 - docs: 新增 LPK 包体强约束，要求所有构建产物不超过 12 MB（`12,000,000` bytes），并禁止 `lzc-build.yml.images`、`embed:<alias>` 和包内 `images/` / `images.lock` 内嵌镜像。
 
