@@ -2,6 +2,7 @@
 
 ## 2026-06-16
 
+- docs: 新增 `lazycat:unlisted-candidate-audit`，用于盘点开发者中心未上架且非待审核应用，对比应用商店和本地项目目录，并对缺失的 GitHub 项目做许可证与非侵入上架可行性审查。
 - docs: 新增 LPK 包体强约束，要求所有构建产物不超过 12 MB（`12,000,000` bytes），并禁止 `lzc-build.yml.images`、`embed:<alias>` 和包内 `images/` / `images.lock` 内嵌镜像。
 
 ## 2026-06-13

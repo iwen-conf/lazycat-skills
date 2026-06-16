@@ -11,8 +11,9 @@
 
 ### 迁移
 
-迁移必须按顺序通过三关：
+迁移候选可以先从开发者中心盘点进入，再按顺序通过三关：
 
+0. `lazycat:unlisted-candidate-audit`：对比开发者中心、应用商店和本地项目目录，找到未上架且非待审核的应用；对缺失的公开 GitHub 项目只读 clone，并进入许可证和非侵入上架可行性审查。
 1. `lazycat:migration-license`：搜索 Web/Agent 候选项目，筛选“有页面 + 有后端”的 GitHub 项目，对比懒猫应用商店和开发者中心待审列表，再判断许可证是否允许商业使用和再分发。
 2. `lazycat:migration-boundary`：判断能否不修改上游业务代码，只通过包装层和运行时适配完成迁移。
 3. `lazycat:migration-workload`：判断迁移工作量大不大，给出继续、先 POC、换项目或停止的建议。
@@ -53,6 +54,7 @@ lazycat-skills/
 ├── CHANGELOG.md
 └── skills/
     ├── lazycat:original-app/
+    ├── lazycat:unlisted-candidate-audit/
     ├── lazycat:migration-license/
     ├── lazycat:migration-boundary/
     ├── lazycat:migration-workload/
