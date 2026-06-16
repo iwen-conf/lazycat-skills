@@ -4,6 +4,12 @@
 
 `lzc-build.yml` is the configuration file used to define application build settings. This document describes its structure and the meaning of each field.
 
+Repository hard constraints:
+
+1. Every generated `.lpk` must be less than or equal to 12 MB. In this repository, the enforceable limit is `12,000,000` bytes.
+2. Embedded images are forbidden. Do not use a top-level `images` build configuration, do not reference `embed:<alias>` in the manifest, and do not ship `images/` or `images.lock` inside the final `.lpk`.
+3. If an app needs a container image, use a pullable image reference and, before store submission, sync it with `lzc-cli appstore copy-image` and backwrite the returned `registry.lazycat.cloud/...` image into the source manifest.
+
 ## II. Top-Level Data Structure `BuildConfig`
 
 ### 2.1 Basic Information {#basic-config}

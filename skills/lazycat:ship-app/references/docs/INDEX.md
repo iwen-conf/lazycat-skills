@@ -2,6 +2,12 @@
 
 When a user asks about any of the following topics or URLs, read the corresponding local file to get the full context.
 
+Repository override:
+
+1. These files include upstream documentation snapshots. If they mention LPK v2 embedded images, `lzc-build.yml.images`, `embed:<alias>`, `images/`, or `images.lock`, treat those as upstream capability descriptions only.
+2. This skill repository forbids embedded images. All generated `.lpk` files must be less than or equal to `12,000,000` bytes and must not contain embedded image artifacts.
+3. For image-based apps, use a pullable remote image and `lzc-cli appstore copy-image`, then write the returned `registry.lazycat.cloud/...` image into the source manifest before packaging.
+
 | URL | Local File |
 |---|---|
 | `https://developer.lazycat.cloud/getting-started/hello-world-fast.md` | `references/docs/getting-started_hello-world-fast.md` |

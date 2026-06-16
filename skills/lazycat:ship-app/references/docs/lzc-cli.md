@@ -135,9 +135,9 @@ envs:
 
 补充说明：
 
-1. `images` 只决定哪些 embed image 会被打包进当前 LPK。
-2. dev 和 release 可以使用相同 alias，也可以使用不同 alias。
-3. dev 可以使用 embed image，release 也可以改成普通 remote image。
+1. 上游 `images` 机制用于决定哪些 embed image 会被打包进当前 LPK；本仓库禁用该机制。
+2. dev 和 release 都不得使用 `lzc-build.yml.images` 或 `embed:<alias>`。
+3. dev 和 release 都应使用普通 remote image，或留空使用系统默认镜像。
 4. 若 release 配置了 `contentdir`，dev 可通过空 `contentdir:` 覆盖它，避免误打包本地未构建产物。
 5. request inject 等开发态行为由 manifest build 预处理阶段决定是否进入最终包。
 

@@ -2,6 +2,8 @@
 
 # LPK 如何工作：精简机制与最小规范 {#lpk-how-it-works}
 
+本仓库覆盖规则：最终 `.lpk` 必须小于或等于 `12,000,000` bytes，且禁止内嵌镜像。上游文档中出现的 `images/`、`images.lock`、`lzc-build.yml.images` 和 `embed:<alias>` 只作为格式能力背景，不作为本技能包可用交付路径。
+
 ## 为什么需要 LPK {#why-lpk}
 
 先看传统 Docker/Compose 交付链路：

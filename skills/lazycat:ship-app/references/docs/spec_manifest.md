@@ -2,6 +2,8 @@
 
 # lzc-manifest.yml 规范文档
 
+本仓库覆盖规则：最终 `.lpk` 必须小于或等于 `12,000,000` bytes，且禁止内嵌镜像。`image` 字段只能使用合法远程镜像引用或留空使用系统默认镜像，不得使用 `embed:<alias>`。
+
 ## 一、 概述
 
 `lzc-manifest.yml` 是用于定义应用运行结构与部署相关配置的文件。 本文档将详细描述其结构和各字段的含义。
@@ -44,7 +46,7 @@
 
 | 字段名 | 类型 | 描述 |
 | ---- | ---- | ---- |
-| `image` | `string` | 应用镜像，支持合法镜像引用，也支持 `embed:<alias>`（alias 由 `lzc-build.yml.images` 定义）；若无特殊要求请留空使用系统默认镜像(alpine3.21) |
+| `image` | `string` | 应用镜像；本仓库只允许合法远程镜像引用或留空使用系统默认镜像(alpine3.21)，不得使用 `embed:<alias>` |
 | `subdomain` | `string` | 本应用的入站子域名，应用打开默认使用此子域名 |
 | `multi_instance` | `bool` | 是否以多实例形式部署 |
 | `usb_accel` | `bool` | 挂载相关设备到所有服务容器内的 `/dev/bus/usb` |
@@ -146,7 +148,7 @@
 
 | 字段名 | 类型 | 描述 |
 | ---- | ---- | ---- |
-| `image` | `string` | 对应容器的 docker 镜像，支持合法镜像引用，也支持 `embed:<alias>`（alias 由 `lzc-build.yml.images` 定义） |
+| `image` | `string` | 对应容器的 docker 镜像；本仓库只允许合法远程镜像引用，不得使用 `embed:<alias>` |
 | `environment` | `map[string]string \| []string` | 对应容器的环境变量，支持 map 或 list 形式 |
 | `entrypoint` | `*string` | 对应容器的 entrypoint， 可选 |
 | `command` | `*string` | 对应容器的 command， 可选 |

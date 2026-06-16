@@ -147,7 +147,7 @@ services:
 
 ### image拉不下来怎么办
 
-由于一些原因，可能 docker image 不能成功拉下来。如果只是自己用，可以考虑使用 `lzc-build.yml` 的 `images` 构建机制将镜像内嵌到 LPK，详见 [lzc-build.yml 镜像构建](./build.md#images)。如果考虑公用，则需要自行建立 registry。
+由于一些原因，可能 docker image 不能成功拉下来。本仓库禁止内嵌镜像，不能使用 `lzc-build.yml.images` 把镜像塞进 LPK。应先把镜像推送到公网可拉取 registry，再通过 `lzc-cli appstore copy-image` 同步并写回 `lzc-manifest.yml`。
 
 ## 社区移植工具
 

@@ -23,6 +23,7 @@ description: "Third gate for migrating a GitHub project to Lazycat: estimate whe
 5. 工作量大时要明确建议：继续、先 POC、换项目或停止。
 6. 输出必须能指导下一步执行，不写泛泛的“中等难度”。
 7. 不把迁移项目的上游前端、移动端、桌面端或小程序客户端改造为默认平台栈；默认栈只用于新增的包装层、管理台、审核辅助页或原创配套前端面，并交给 `arc:frontend`。
+8. 工作量评估必须包含 `.lpk` 包体和镜像交付边界；最终 `.lpk` 必须 `<= 12,000,000` bytes，且不得内嵌镜像。
 
 ## 分级
 
@@ -34,6 +35,7 @@ description: "Third gate for migrating a GitHub project to Lazycat: estimate whe
 ## 评估维度
 
 - 镜像路径：官方镜像、Dockerfile、自建镜像、源码构建。
+- LPK 包体：是否能只打包 manifest、runtime、图标和必要静态资源；是否存在超过 12 MB 或必须内嵌镜像的风险。
 - Compose 复杂度：服务数量、依赖顺序、健康检查、网络和端口。
 - 持久化：数据目录、权限、缓存、配置生成。
 - 初始化：数据库迁移、管理员创建、密钥生成、首启向导。
@@ -57,6 +59,7 @@ Evidence
 - Duplicate checks:
 - Boundary gate:
 - Runtime complexity:
+- LPK size/embed boundary:
 - Login and init:
 - File flows:
 - Frontend boundary:

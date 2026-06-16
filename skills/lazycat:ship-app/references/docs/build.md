@@ -2,6 +2,8 @@
 
 # lzc-build.yml 规范文档
 
+本仓库覆盖规则：最终 `.lpk` 必须小于或等于 `12,000,000` bytes，且禁止内嵌镜像。不得使用顶层 `images` 配置、`embed:<alias>` 引用，最终包内不得包含 `images/` 或 `images.lock`。需要镜像时使用可拉取远程镜像，并在提审前通过 `lzc-cli appstore copy-image` 写回 `registry.lazycat.cloud/...`。
+
 ## 一、概述
 
 构建配置只分为两个层次：
@@ -39,7 +41,7 @@
 | `icon` | `string` | 指定 lpk 包 icon 的路径，如果不指定将会警告，目前仅允许 png 后缀的文件 |
 | `package_override` | `map[string]any` | 可选；按顶层字段整体覆盖最终 `package.yml`，不做递归 merge；顶层写空值表示清空对应字段；其中 `package_override.package` 会参与最终 LPK 文件名与包名校验 |
 | `envs` | `[]string` | 可选；构建期变量列表，支持 `KEY=VALUE` 字符串数组 |
-| `images` | `map[string]ImageBuildConfig` | Dockerfile 镜像构建配置，用于产出 `embed:<alias>` 镜像引用 |
+| `images` | `map[string]ImageBuildConfig` | 上游 LPK v2 内嵌镜像能力；本仓库禁用，不得用于最终 `.lpk` |
 | `compose_override` | `ComposeOverrideConfig` | 高级 compose override 配置，**需要更新 lzc-os 版本 >= v1.3.0** |
 
 ### 2.2 文件组织约定 {#file-layout}
@@ -160,9 +162,9 @@ application:
 
 ## 五、镜像构建 `ImageBuildConfig` {#images}
 
-`images` 用于在打包阶段通过 Dockerfile 构建镜像，并生成 LPK v2 所需的 `images/` 与 `images.lock`。
+`images` 是上游 LPK v2 的内嵌镜像能力；本仓库禁用该字段，不得用它生成最终 `.lpk`。
 
-`images` 的 key 是镜像别名（alias），可在 `lzc-manifest.yml` 中通过 `embed:<alias>` 引用。
+需要镜像定制时，改用远程镜像桥接：本地构建并推送公开镜像，执行 `lzc-cli appstore copy-image`，然后将返回的 `registry.lazycat.cloud/...` 地址写入 `lzc-manifest.yml`。
 
 | 字段名 | 类型 | 描述 |
 | ---- | ---- | ---- |

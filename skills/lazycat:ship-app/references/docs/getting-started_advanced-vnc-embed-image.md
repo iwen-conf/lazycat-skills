@@ -2,6 +2,8 @@
 
 # 高级实战：内嵌镜像与上游定制 {#advanced-vnc-embed-image}
 
+本仓库覆盖规则：本页是上游内嵌镜像能力说明，但本技能包禁止采用该路径。最终 `.lpk` 必须小于或等于 `12,000,000` bytes，且不得使用 `lzc-build.yml.images`、`embed:<alias>`、包内 `images/` 或 `images.lock`。需要上游定制时，改用远程镜像桥接：构建镜像、推送公开 registry、执行 `lzc-cli appstore copy-image`、写回 `registry.lazycat.cloud/...`。
+
 ## 目标 {#goal}
 
 完成本篇后，你可以明确区分并验证这 3 件事：

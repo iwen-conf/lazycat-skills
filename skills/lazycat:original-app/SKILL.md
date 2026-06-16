@@ -24,7 +24,9 @@ description: "Build or align an original Lazycat app. Use for 原创应用、从
 5. 原创应用包含 Web、移动端、桌面端或小程序前端时，除非用户明确指定其他技术，必须联动 `arc:frontend` 并使用对应平台默认栈。
 6. 不在 Lazycat 技能内另起一套前端或跨端默认选型；业务是文件工具、Agent、Dashboard、管理台、内容应用、移动客户端或桌面客户端都不改变平台默认栈。
 7. 不引入无关技能主题：不单独展开高级路由、图标、后台 UI、攻略、更新、排障等旧入口；这些都只作为当前项目内的必要实现细节。
-8. 不写真实微服域名、真实密码、API Key、Token 或内部未公开地址。
+8. 交付设计必须保证最终 `.lpk` 小于或等于 12 MB（`12,000,000` bytes），且不得内嵌镜像。
+9. 需要镜像时使用可拉取远程镜像地址；不得使用 `lzc-build.yml.images`、`embed:<alias>`、包内 `images/` 或 `images.lock`。
+10. 不写真实微服域名、真实密码、API Key、Token 或内部未公开地址。
 
 ## 工作流
 
@@ -34,7 +36,7 @@ description: "Build or align an original Lazycat app. Use for 原创应用、从
 4. 如果包含 Web、移动端、桌面端或小程序前端，调用 `arc:frontend` 确认平台默认栈、页面、状态分层、路由、表单和 token 方案；只有用户明确指定时才记录例外栈。
 5. 实现或校准核心业务入口，不做无关页面和装饰性内容。
 6. 补齐登录/注册、初始化数据、持久化目录、健康检查和文件选择能力。
-7. 本地构建并验证安装路径；满足后交给 `lazycat:ship-app`。
+7. 本地构建并检查 `.lpk` 包体 `<= 12,000,000` bytes 且无内嵌镜像产物；满足后交给 `lazycat:ship-app`。
 
 ## 质量门禁
 
@@ -44,6 +46,7 @@ description: "Build or align an original Lazycat app. Use for 原创应用、从
 - `package.yml` 的 `package`、`version`、`name`、`description`、`author`、`license`、`locales` 完整。
 - `version` 使用严格 `x.x.x` 格式。
 - 没有真实设备名、真实凭据或敏感地址。
+- 最终 `.lpk` 包体 `<= 12,000,000` bytes，且不包含内嵌镜像。
 - 交付前至少运行一次项目内可用的构建或检查命令；无法运行时说明阻塞原因。
 
 ## 输出格式

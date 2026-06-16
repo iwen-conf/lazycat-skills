@@ -24,11 +24,13 @@ description: "List a ready Lazycat app: build LPK, install-test, prepare metadat
 4. 不把截图、网页表单或本地开发环境当作真实验证；必须安装到懒猫微服并验证核心流程，除非明确说明环境阻塞。
 5. 上架信息以本地项目文件为源头：`package.yml`、`lzc-manifest.yml`、`lzc-build.yml`、`README`、`docs/release-prep/`。
 6. 镜像型项目必须先完成 `copy-image` 并把返回的 `registry.lazycat.cloud/...` 写回 manifest，再构建 `.lpk`。
-7. 开发者中心上架资料必须填写完整，不得留下空字段、占位文案或待补信息；提交前必须包含最终 `.lpk` 的 LPK 信息，信息来源必须是实际提审包。
-8. 提交资料不得包含真实密码、Token、内部地址或真实微服域名；测试账号只能使用明确可公开给审核的凭据。
-9. 色情、赌博、毒品、空投、破解软件、违法内容，直接拒绝上架。
-10. 原创或新增独立 Web、移动端、桌面端、小程序前端必须继承 `arc:frontend` 平台默认栈，除非用户明确指定其他技术；迁移项目仍不得为了默认栈改上游业务前端/客户端。
-11. 不再分流到旧的 UI、图标、攻略、更新、排障等独立技能；这些都是当前上架任务内的必要检查项。
+7. 所有构建产出的 `.lpk` 必须小于或等于 12 MB；按 `12,000,000` bytes 检查，超过即停止交付。
+8. 禁止内嵌镜像：不得使用 `lzc-build.yml.images`、`embed:<alias>`，最终 `.lpk` 不得包含 `images/` 或 `images.lock`。
+9. 开发者中心上架资料必须填写完整，不得留下空字段、占位文案或待补信息；提交前必须包含最终 `.lpk` 的 LPK 信息，信息来源必须是实际提审包。
+10. 提交资料不得包含真实密码、Token、内部地址或真实微服域名；测试账号只能使用明确可公开给审核的凭据。
+11. 色情、赌博、毒品、空投、破解软件、违法内容，直接拒绝上架。
+12. 原创或新增独立 Web、移动端、桌面端、小程序前端必须继承 `arc:frontend` 平台默认栈，除非用户明确指定其他技术；迁移项目仍不得为了默认栈改上游业务前端/客户端。
+13. 不再分流到旧的 UI、图标、攻略、更新、排障等独立技能；这些都是当前上架任务内的必要检查项。
 
 ## 上架前检查
 
@@ -37,6 +39,8 @@ description: "List a ready Lazycat app: build LPK, install-test, prepare metadat
 - `version` 是严格 `x.x.x`。
 - `lzc-manifest.yml` 的服务、路由、持久化、健康检查、环境变量完整。
 - `build.sh` 和 `Makefile` 可执行，至少包含 `build`、`install`、`verify` 或等价目标。
+- `Makefile` 或等价构建流程包含 `.lpk` 大小检查和内嵌镜像检查；包体必须 `<= 12,000,000` bytes。
+- `lzc-build.yml` 不包含顶层 `images`；`lzc-manifest.yml` 不包含 `embed:<alias>`；最终 `.lpk` 不包含 `images/` 或 `images.lock`。
 - 迁移项目保留上游地址、应用商店查重结论、开发者中心待审列表查重结论、许可证结论、非侵入边界结论和工作量结论。
 - 有账号的应用提供注册、OIDC、公开测试账号或明确初始化说明。
 - 有文件能力的应用完成文件选择或文件关联验证。
@@ -50,12 +54,13 @@ description: "List a ready Lazycat app: build LPK, install-test, prepare metadat
 2. 读取本地项目文件，修正 metadata、版本、作者、许可证、locales 和 reviewer instructions。
 3. 构建或同步镜像，确保 manifest 中使用最终可拉取镜像。
 4. 运行 `make build` 或项目等价命令生成 `.lpk`。
-5. 运行 `lzc-cli lpk info <lpk>` 或等价命令记录最终提审包的 LPK 信息。
-6. 运行 `make install` 或 `lzc-cli app install <lpk>` 安装到懒猫微服。
-7. 验证启动、登录、核心流程、持久化、文件能力、卸载/升级风险。
-8. 准备截图、图标、描述、测试账号、复现步骤、限制说明，并确认开发者中心所有字段已填写完成。
-9. 提交开发者中心；记录版本、LPK 信息、时间、状态、截图或页面证据。
-10. 审核通过后验证商店可见性和安装版本；审核失败则按问题归类修复。
+5. 检查 `.lpk` 包体大小 `<= 12,000,000` bytes，并确认归档内没有 `images/` 或 `images.lock`。
+6. 运行 `lzc-cli lpk info <lpk>` 或等价命令记录最终提审包的 LPK 信息。
+7. 运行 `make install` 或 `lzc-cli app install <lpk>` 安装到懒猫微服。
+8. 验证启动、登录、核心流程、持久化、文件能力、卸载/升级风险。
+9. 准备截图、图标、描述、测试账号、复现步骤、限制说明，并确认开发者中心所有字段已填写完成。
+10. 提交开发者中心；记录版本、LPK 信息、时间、状态、截图或页面证据。
+11. 审核通过后验证商店可见性和安装版本；审核失败则按问题归类修复。
 
 ## 审核失败归类
 
@@ -84,6 +89,7 @@ Preflight
 
 Verification
 - Build:
+- LPK size/embed check:
 - LPK info:
 - Install:
 - Core flow:

@@ -2,6 +2,14 @@
 
 ## I. Submission Process
 
+### 0. LPK Package Hard Gate
+Every final `.lpk` submitted or installed through this workflow must pass both checks:
+
+1. File size is less than or equal to 12 MB. Use `12,000,000` bytes as the exact limit.
+2. No embedded image artifacts exist. The source project must not use `lzc-build.yml.images` or `embed:<alias>`, and the final `.lpk` must not contain `images/` or `images.lock`.
+
+If either check fails, stop publishing and switch to package slimming or remote image bridging before continuing.
+
 ### 1. Developer Registration
 1. Register an account on the [Lazycat Community](https://lazycat.cloud/login?redirect=https://developer.lazycat.cloud/).
 2. Visit the [Developer Center](https://developer.lazycat.cloud/manage) and follow the prompts to submit a developer review application.
@@ -40,7 +48,7 @@ Rules for this path:
 1. `copy-image` must receive a registry address that the server can pull. A local-only image tag is invalid.
 2. Prefer Docker Hub for the public handoff unless the user explicitly provides another public registry.
 3. After `copy-image` succeeds, backwrite `services.<name>.image` in the source `lzc-manifest.yml` with the returned `registry.lazycat.cloud/...` value. If the repo packages from manifest templates or staged manifests, backwrite those source files too.
-4. The `lpk` should only retain manifests, runtime scripts, icons, and static assets. Do **not** try to embed the application image itself into the package.
+4. The `lpk` should only retain manifests, runtime scripts, icons, and static assets, and must stay within `12,000,000` bytes. Do **not** embed the application image itself into the package.
 5. If the user wants the full release closure, prefer a dedicated release target such as `release-build` / `release-install` that runs build image -> push public image -> `copy-image` -> backwrite source manifest -> build `.lpk` -> install `.lpk`.
 
 After uploading, you **must manually update the image address in the source `lzc-manifest.yml`** to the official `registry.lazycat.cloud/...` address returned before packaging or publishing.
@@ -54,6 +62,8 @@ lzc-cli appstore publish ./your-app.lpk
 ```
 
 Before publishing, every required Developer Center field must be completed. Do not submit with empty fields, placeholder text, or "to be filled later" notes. The submission record must include LPK information from the actual final `.lpk` package, such as the summary returned by `lzc-cli lpk info ./your-app.lpk`.
+
+Also record the final `.lpk` byte size and the no-embedded-image check result with the submission evidence.
 
 ## II. App Store Review Guidelines (7 Red Line Rules)
 

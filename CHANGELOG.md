@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-06-16
+
+- docs: 新增 LPK 包体强约束，要求所有构建产物不超过 12 MB（`12,000,000` bytes），并禁止 `lzc-build.yml.images`、`embed:<alias>` 和包内 `images/` / `images.lock` 内嵌镜像。
+
 ## 2026-06-13
 
 - docs: 强化上架信息完整性要求，提交前必须填写完开发者中心资料，并记录来自最终提审包的 LPK 信息。

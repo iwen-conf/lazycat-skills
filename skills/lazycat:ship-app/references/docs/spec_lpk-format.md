@@ -2,6 +2,8 @@
 
 # LPK 格式说明
 
+本仓库覆盖规则：最终 `.lpk` 必须小于或等于 `12,000,000` bytes，且禁止内嵌镜像。下文中 `images/`、`images.lock` 和 `embed:<alias>` 是上游格式能力说明；本技能包交付时不得使用，最终包内也不得出现这些产物。
+
 本文描述当前 LPK v1 / v2 的文件组织、字段边界与兼容规则。
 
 说明：
@@ -18,8 +20,6 @@
 ├── manifest.yml
 ├── package.yml
 ├── content.tar | content.tar.gz
-├── images/
-├── images.lock
 └── META/
 ```
 
@@ -31,9 +31,7 @@
    * 静态包元数据。
 3. `content.tar` / `content.tar.gz`
    * 可选的内容归档；如果未配置 `contentdir`，可以不存在。
-4. `images/` 与 `images.lock`
-   * LPK v2 的 embed image 数据。
-5. `META/`
+4. `META/`
    * 归档元信息。
 
 ## 2. `manifest.yml`
@@ -100,17 +98,17 @@ unsupported_platforms:
 
 1. 只有配置了非空 `contentdir`，或构建 hook 实际写入内容时，才会生成内容归档。
 2. 如果 release 是 image-only 包，可以完全不带 `content.tar*`。
-3. tar-based LPK v2 若同时存在 `images/`，内容归档可能被压缩为 `content.tar.gz`。
+3. 本仓库禁止内嵌镜像，因此最终包内不得出现 `images/` 或 `images.lock`。
 
 ## 5. `images/` 与 `images.lock`
 
-这部分用于 LPK v2 的 embed image 分发。
+这部分是上游 LPK v2 的 embed image 分发能力说明；本仓库禁用。
 
 规则：
 
-1. `images/` 保存 OCI layout。
-2. `images.lock` 记录 alias、最终 digest 以及 upstream 信息。
-3. `manifest.yml` 中的 `embed:<alias>@sha256:<digest>` 必须与 `images.lock` 对应记录一致。
+1. 上游格式中 `images/` 保存 OCI layout。
+2. 上游格式中 `images.lock` 记录 alias、最终 digest 以及 upstream 信息。
+3. 本仓库最终 `.lpk` 不得包含 `images/` 或 `images.lock`，manifest 也不得引用 `embed:<alias>`。
 
 ## 6. 兼容性
 

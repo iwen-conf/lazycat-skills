@@ -33,10 +33,12 @@ description: "Second gate for migrating a GitHub project to Lazycat: decide whet
 7. 文件打开/保存/上传/下载流程属于迁移能力门禁；迁移项目用 `application.injects` 接入文件选择，不改上游 UI。
 8. 默认前端/跨端栈不适用于迁移项目的上游业务代码；不得为了统一到 React Web、React Native + Expo、Tauri 2 或 Taro 4 而重写上游前端、移动端、桌面端或小程序客户端。
 9. 只有新增包装层、配置向导、审核辅助页、独立管理台或原创配套客户端等非上游业务前端时，才联动 `arc:frontend` 使用平台默认栈。
+10. 普通迁移必须能产出小于或等于 12 MB（`12,000,000` bytes）的 `.lpk`，且不得内嵌镜像；需要镜像时必须走远程镜像桥接或现成可拉取镜像。
 
 ## 必查项
 
 - 是否有官方 Docker image、Dockerfile 或 Compose。
+- 是否能避免 `lzc-build.yml.images`、`embed:<alias>`、包内 `images/` 和 `images.lock`，并保持最终 `.lpk` 不超过 12 MB。
 - 进程是否长期运行，是否监听固定端口。
 - 数据和配置是否能映射到 `/lzcapp/var`。
 - 依赖服务是否能用健康检查和 `depends_on.condition: service_healthy` 排序。
@@ -66,6 +68,7 @@ Allowed Write Scope
 
 Runtime Model
 - Delivery:
+- LPK size/embed boundary:
 - Entry:
 - Persistence:
 - Dependencies:

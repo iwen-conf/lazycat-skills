@@ -14,7 +14,7 @@
 - `build.sh`：不要构建应用主镜像，只处理 `runtime/`、静态资源和 `lpk` 交付内容。
 - `Makefile`：负责 `docker-build`、`docker-push`、`copy-image`、`update`、`build`、`install`，但职责必须分层：`copy-image` / manifest 回填属于迁移或更新阶段；`build` / `install` 只面向已经准备好的镜像引用和 `lpk` 交付物，不负责源码级构建。
 - `lzc-manifest.yml`：正式发布时只保留 `registry.lazycat.cloud/...` 镜像地址。
-- `lpk`：只保留 manifest、runtime、图标、静态资源，不内嵌应用主镜像。
+- `lpk`：只保留 manifest、runtime、图标、静态资源；包体必须 `<= 12,000,000` bytes，且不得内嵌应用主镜像或任何 `images/`、`images.lock` 产物。
 
 ## 2. 标准 Makefile 模板
 
@@ -22,12 +22,13 @@
 .RECIPEPREFIX := >
 
 LPK_FILE ?= app.lpk
+LPK_MAX_BYTES ?= 12000000
 IMAGE_REPO ?= your-hub-user/app-name
 IMAGE_TAG ?= v1.0.0
 PUBLIC_IMAGE := $(IMAGE_REPO):$(IMAGE_TAG)
 COPIED_IMAGE_FILE := .lazycat-image-ref
 
-.PHONY: all doctor docker-login-check docker-build docker-push copy-image build install update backend-test ui-test ui-build ui-e2e capture-screenshots verify release-prep
+.PHONY: all doctor docker-login-check docker-build docker-push copy-image check-lpk build install update backend-test ui-test ui-build ui-e2e capture-screenshots verify release-prep
 
 all: install
 
@@ -83,9 +84,23 @@ verify: backend-test ui-test ui-build ui-e2e
 release-prep: verify capture-screenshots
 > @echo "Submission assets generated"
 
+check-lpk:
+> @test -f "$(LPK_FILE)" || (echo "Error: LPK not found: $(LPK_FILE)" && exit 1)
+> @SIZE=$$(wc -c < "$(LPK_FILE)" | tr -d ' '); \
+> test "$$SIZE" -le "$(LPK_MAX_BYTES)" || (echo "Error: $(LPK_FILE) is $$SIZE bytes, exceeds $(LPK_MAX_BYTES)" && exit 1); \
+> echo "LPK size OK: $$SIZE bytes"
+> @TMP_FILE=$$(mktemp); \
+> if tar -tf "$(LPK_FILE)" > $$TMP_FILE 2>/dev/null; then :; \
+> elif unzip -Z1 "$(LPK_FILE)" > $$TMP_FILE 2>/dev/null; then :; \
+> else echo "Error: cannot list LPK archive contents" && rm -f $$TMP_FILE && exit 1; fi; \
+> ! grep -Eq '(^|/)images/|(^|/)images.lock$$' $$TMP_FILE || (echo "Error: embedded image artifacts found in $(LPK_FILE)" && rm -f $$TMP_FILE && exit 1); \
+> rm -f $$TMP_FILE; \
+> echo "LPK embed-image check OK"
+
 build:
 > @echo "Packaging current image-level release inputs into LPK..."
 > lzc-cli project build -o $(LPK_FILE)
+> @$(MAKE) check-lpk
 
 install: build
 > @echo "Installing current LPK into Lazycat MicroServer..."
@@ -97,6 +112,7 @@ update: copy-image
 > @NEW_IMAGE=$$(cat $(COPIED_IMAGE_FILE)); \
 > perl -0pi -e 's#(^\s*image:\s*).*$#$$1'"$$NEW_IMAGE"'#m' lzc-manifest.yml
 > lzc-cli project build -o $(LPK_FILE)
+> @$(MAKE) check-lpk
 ```
 
 ## 2.1 远程镜像桥接的 `build.sh` 模板
@@ -125,7 +141,7 @@ fi
 
 ## 3. 核心目标说明
 
-- `make build`：只负责把当前已经准备好的 `package.yml`、`lzc-build.yml`、`lzc-manifest.yml`、runtime/静态资源等交付物打成 `lpk`；不要在这里做源码编译、业务镜像构建、`docker push` 或 `copy-image`。
+- `make build`：只负责把当前已经准备好的 `package.yml`、`lzc-build.yml`、`lzc-manifest.yml`、runtime/静态资源等交付物打成 `lpk`；不要在这里做源码编译、业务镜像构建、`docker push` 或 `copy-image`。构建后必须检查包体 `<= 12,000,000` bytes，且没有 `images/` 或 `images.lock`。
 - `make install`：通过依赖 `make build` 先生成一次当前 `lpk`，再执行 `lzc-cli app install $(LPK_FILE)` 安装到当前 Lazycat 环境；提审前必须真实执行，且不要在这个目标里偷偷做 `docker push`、`copy-image` 或 `lzc-manifest.yml` 回填。
 - `make update`：适用于镜像升级或同步上游，负责 `copy-image`、回填 `lzc-manifest.yml`、重新打包。
 - `make release-prep`：提审前的最终步骤，包含测试、截图和交付证据整理。
@@ -141,6 +157,7 @@ fi
 3. 将返回的 `registry.lazycat.cloud/...` 地址写回 `lzc-manifest.yml`。
 4. `make update` 应自动化或半自动完成上述流程。
 5. 在进入 `make build` / `make install` 之前，manifest 中的镜像地址必须已经是最终可拉取地址；不要把这一步延期到安装阶段。
+6. 不得使用 `lzc-build.yml.images` 或 `embed:<alias>` 绕过远程镜像桥接；最终 `.lpk` 必须保持在 12 MB 上限内。
 
 如果需要一次同步多个镜像，优先使用原生 CLI 包装器，不要依赖 `npx` 常驻进程。仓库内提供了一个 Go 参考实现：
 

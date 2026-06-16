@@ -4,6 +4,8 @@
 
 本栏目面向第一次开发懒猫微服应用的开发者，目标是用最短路径完成一次真实部署：
 
+本仓库覆盖规则：虽然上游文档介绍了 LPK v2 内嵌镜像能力，但本技能包禁止使用 `lzc-build.yml.images`、`embed:<alias>`、包内 `images/` 和 `images.lock`。所有最终 `.lpk` 必须小于或等于 `12,000,000` bytes；需要镜像定制时走远程镜像桥接和 `copy-image`。
+
 说明：
 
 * 本栏目默认以 `lzcos v1.5.0+` 为前提。
@@ -29,7 +31,7 @@
 | 3 | [开发流程总览](./dev-workflow.md) | 理解 `lzc-build.dev.yml`、请求分流脚本（`request inject`）和 `project sync --watch` 如何组成完整开发流程 |
 | 4 | [有后端时如何通过 HTTP 路由对接](./http-route-backend.md) | 理解 `application.routes`（请求该转到哪里）与后端联调边界 |
 | 5 | [LPK 如何工作：精简机制与最小规范](./lpk-how-it-works.md) | 形成构建、安装、运行的整体心智模型 |
-| 6 | [高级实战：内嵌镜像与上游定制](./advanced-vnc-embed-image.md) | 基于 `gui-vnc` 模板，用 `images` + `embed:<alias>` 定制并打包自己的镜像 |
+| 6 | 远程镜像桥接与上游定制 | 本仓库禁用内嵌镜像；基于 Dockerfile 定制镜像后推送到公开 registry，再用 `copy-image` 写回 manifest |
 
 ## 你需要准备什么 {#what-to-prepare}
 
@@ -46,5 +48,5 @@
 3. 理解前端开发如何通过请求分流脚本转到开发机，后端开发如何通过 `project sync --watch` 落到真实运行环境。
 4. 在客户端和浏览器两条路径都能验证应用可用。
 5. 在需要后端时，正确配置 HTTP 路由。
-6. 在需要镜像定制时，使用内嵌镜像机制，而不是手工推送镜像。
+6. 在需要镜像定制时，使用远程镜像桥接和 `copy-image`，不要使用内嵌镜像机制。
 7. 使用 `lzc-cli project release` 产出可分发的 `.lpk` 发布包。

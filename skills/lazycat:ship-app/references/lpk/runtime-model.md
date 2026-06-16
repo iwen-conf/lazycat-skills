@@ -4,14 +4,14 @@
 
 ## 1. 运作模型
 
-懒猫应用不是“把 docker-compose 原样丢给用户运行”。LPK 把应用身份、静态元数据、运行清单、静态内容、图标和可选镜像一起封装，安装后由微服平台负责标准化运行。
+懒猫应用不是“把 docker-compose 原样丢给用户运行”。LPK 把应用身份、静态元数据、运行清单、静态内容和图标一起封装，安装后由微服平台负责标准化运行。本技能包强制禁止内嵌镜像；需要镜像时必须使用可拉取的远程镜像地址。
 
 关键边界：
 
 - `package.yml`：静态元数据。包括包名、版本、名称、描述、作者、许可证、`unsupported_platforms`、`locales`。
 - `lzc-build.yml`：构建阶段配方。只在打包时生效，安装和运行时不会读取开发目录里的这个文件。
 - `lzc-manifest.yml`：运行阶段清单。定义 `application`、`services`、路由、入口、环境变量、持久化目录、健康检查和初始化脚本。
-- `.lpk`：构建后的交付物。安装后系统读取 LPK 内部的 `manifest.yml`、`package.yml`、`content.tar`、可选 `images/` 等产物。
+- `.lpk`：构建后的交付物。安装后系统读取 LPK 内部的 `manifest.yml`、`package.yml`、`content.tar` 等产物；本技能包要求最终包体 `<= 12,000,000` bytes，且不得包含 `images/` 或 `images.lock`。
 
 HTTP 访问路径：
 
@@ -34,7 +34,7 @@ TCP/UDP 访问路径：
 
 - 有官方镜像：优先直接使用官方镜像，迁移范围保持在 manifest/package/build/运行脚本。
 - 有 `docker-compose.yml`：按 Compose 的服务、端口、卷、环境变量、依赖关系转换到 manifest。
-- 只有 `Dockerfile`：构建 `linux/amd64` 镜像，再同步到 Lazycat 可拉取的 registry。
+- 只有 `Dockerfile`：构建 `linux/amd64` 镜像，再同步到 Lazycat 可拉取的 registry；禁止把镜像内嵌进 `.lpk`。
 - 只有源码且无 Docker 化方案：先评估能否非侵入地补 Docker 包装层；不要默认改业务代码。如果必须改业务代码才能启动，应输出阻塞结论或请求明确的产品开发授权。
 - 需要 GPU、KVM、dockerd、systemd、FUSE、特权能力：先标记为高级能力或普通迁移阻塞；不要纳入默认迁移路径。
 
@@ -90,6 +90,7 @@ TCP/UDP 访问路径：
 - 镜像架构是否匹配目标环境；迁移构建默认应产出 `linux/amd64` 可用镜像，除非目标能力明确支持其他架构。
 - 镜像是否依赖宿主机目录、宿主 Docker socket、固定容器名、host network、特权设备或本机二进制。
 - 如果镜像无法公开拉取，是否能通过测试 registry 或 `lzc-cli appstore copy-image` 转为 Lazycat 可拉取地址。
+- 是否能在不使用内嵌镜像的前提下交付；`lzc-build.yml.images`、`embed:<alias>`、最终包内 `images/` 和 `images.lock` 都不允许。
 
 判定：
 
@@ -197,6 +198,7 @@ TCP/UDP 访问路径：
 - 把 ingress 的 `service not ready` 当成 ingress 配置错误，而不是先查目标 service 和依赖链。
 - 认为 `depends_on` 表示“等数据库可用”；列表式依赖通常只表示启动顺序，不等于 readiness。
 - 把需要构建进镜像的运行时代码放进 LPK 内容目录，然后让预构建镜像去调用它。
+- 使用内嵌镜像或让 `.lpk` 超过 12 MB；正确做法是瘦身包内容并使用远程镜像桥接。
 - 在 `make install` 中偷偷执行镜像构建、推送、`copy-image` 和 manifest 回写，导致安装入口不可预测。
 - 为了迁移方便直接改上游认证、数据库 schema、前端页面、后端 API、测试或业务代码，而没有先尝试 wrapper、env、setup、seed、OIDC、inject。
 - 用户已经说“不要修改业务代码”或任务只是普通移植时，仍然为了达成健康检查、登录、初始化或审核目标去改上游源码。
@@ -209,6 +211,7 @@ TCP/UDP 访问路径：
 ```text
 Runtime Model
 - Delivery: <official image / compose / dockerfile / source only>
+- LPK Package: <= 12,000,000 bytes, no embedded images
 - Entry: <routes / upstreams / ingress>
 - Persistence: <paths and permission plan>
 - Dependencies: <infra -> seed -> business order>
