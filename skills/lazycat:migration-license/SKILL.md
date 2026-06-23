@@ -14,9 +14,25 @@ description: "Migration candidate intake and license gate for Lazycat. Use for G
 ## 输入
 
 - GitHub 仓库 URL，或候选搜索需求，或开发者中心未上架应用盘点需求。
-- 应用商店访问方式：公开页面、已有登录态或 `lazycat_account` / `lazycat_password`。
-- 开发者中心访问方式：已有登录态或 `lazycat_developer_center_account` / `lazycat_developer_center_password`。
+- 应用商店访问方式：公开页面、已有登录态或 `LAZYCAT_APPSTORE_USERNAME` / `LAZYCAT_APPSTORE_PASSWORD`。
+- 开发者中心访问方式：已有登录态或 `LAZYCAT_DEVELOPMENT_USERNAME` / `LAZYCAT_DEVELOPMENT_PASSWORD`。
 - 本地项目父目录和 clone 目标目录，若任务需要对比或拉取候选。
+
+## 凭据环境变量约定
+
+如流程需要登录懒猫微服、应用商店或开发者中心，优先读取当前进程环境变量；只有变量缺失或为空时才向用户报告缺失项。
+
+- 微服设备：`LAZYCAT_USERNAME` / `LAZYCAT_PASSWORD`
+- 懒猫应用商店：`LAZYCAT_APPSTORE_USERNAME` / `LAZYCAT_APPSTORE_PASSWORD`
+- 懒猫开发者中心：`LAZYCAT_DEVELOPMENT_USERNAME` / `LAZYCAT_DEVELOPMENT_PASSWORD`
+
+使用约束：
+
+1. 只通过环境变量读取凭据，不把值写入仓库文件、报告、截图说明、提交信息或长期记忆。
+2. 不为确认变量而执行 `echo $LAZYCAT_PASSWORD`、`printenv LAZYCAT_PASSWORD` 等会输出明文的命令；只允许用 `test -n "${LAZYCAT_PASSWORD:-}"` 这类方式检查是否存在。
+3. 浏览器自动化登录时直接填入变量值，日志和回复只记录变量名、站点和操作结果，不记录值。
+4. CLI 登录或 `copy-image` 需要凭据时优先复用已有登录态；确需传参时避免把密码放在命令行参数、shell history 或可见输出中。
+5. 凭据只解锁认证，不扩大本技能权限；提交、发布、安装覆盖、远程写操作仍按本技能边界和当前任务授权执行。
 
 ## 输出
 

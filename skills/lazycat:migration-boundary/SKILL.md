@@ -18,6 +18,22 @@ description: "Non-invasive migration feasibility and workload gate for Lazycat. 
 - README、Dockerfile、Compose、镜像、配置样例、启动方式和部署文档。
 - 用户明确授权的业务代码修改范围；没有授权时视为零业务代码修改。
 
+## 凭据环境变量约定
+
+如流程需要登录懒猫微服、应用商店或开发者中心，优先读取当前进程环境变量；只有变量缺失或为空时才向用户报告缺失项。
+
+- 微服设备：`LAZYCAT_USERNAME` / `LAZYCAT_PASSWORD`
+- 懒猫应用商店：`LAZYCAT_APPSTORE_USERNAME` / `LAZYCAT_APPSTORE_PASSWORD`
+- 懒猫开发者中心：`LAZYCAT_DEVELOPMENT_USERNAME` / `LAZYCAT_DEVELOPMENT_PASSWORD`
+
+使用约束：
+
+1. 只通过环境变量读取凭据，不把值写入仓库文件、报告、截图说明、提交信息或长期记忆。
+2. 不为确认变量而执行 `echo $LAZYCAT_PASSWORD`、`printenv LAZYCAT_PASSWORD` 等会输出明文的命令；只允许用 `test -n "${LAZYCAT_PASSWORD:-}"` 这类方式检查是否存在。
+3. 浏览器自动化登录时直接填入变量值，日志和回复只记录变量名、站点和操作结果，不记录值。
+4. CLI 登录或 `copy-image` 需要凭据时优先复用已有登录态；确需传参时避免把密码放在命令行参数、shell history 或可见输出中。
+5. 凭据只解锁认证，不扩大本技能权限；提交、发布、安装覆盖、远程写操作仍按本技能边界和当前任务授权执行。
+
 ## 输出
 
 - 非侵入迁移结论。
