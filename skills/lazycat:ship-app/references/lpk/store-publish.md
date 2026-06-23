@@ -10,6 +10,22 @@ Every final `.lpk` submitted or installed through this workflow must pass both c
 
 If either check fails, stop publishing and switch to package slimming or remote image bridging before continuing.
 
+### 0.1 Platform and Screenshot Gate
+Unless the user explicitly requests another platform and provides real verification evidence, submit the app as desktop-only in the Developer Center.
+
+For LPK v2, platform support metadata belongs in `package.yml`. If a user or older document calls this "manifest platform support", map that requirement to the package/manifest static metadata and make sure the final package records the same unsupported platforms.
+
+Default desktop-only submission metadata:
+
+```yaml
+unsupported_platforms:
+  - ios
+  - tvos
+  - android
+```
+
+Use 2-5 screenshots for Developer Center submission. By default, screenshots must come from the real desktop runtime. Only prepare mobile or TV screenshots when the user explicitly requested those platforms and the app was verified there.
+
 ### 1. Developer Registration
 1. Register an account on the [Lazycat Community](https://lazycat.cloud/login?redirect=https://developer.lazycat.cloud/).
 2. Visit the [Developer Center](https://developer.lazycat.cloud/manage) and follow the prompts to submit a developer review application.
@@ -63,6 +79,8 @@ lzc-cli appstore publish ./your-app.lpk
 
 Before publishing, every required Developer Center field must be completed. Do not submit with empty fields, placeholder text, or "to be filled later" notes. The submission record must include LPK information from the actual final `.lpk` package, such as the summary returned by `lzc-cli lpk info ./your-app.lpk`.
 
+Before publishing, confirm the Developer Center platform selection. Default to desktop-only, confirm `package.yml.unsupported_platforms` declares `ios`, `tvos`, and `android`, and attach 2-5 real desktop screenshots unless the user explicitly requested and verified additional platforms.
+
 For migrated projects, do not select the Developer Center checkbox "应用程序为本人原创开发或本人是源作者". The submission must include the original author's name and the source project or code address, using evidence from the migration license gate or upstream repository. Do not use placeholders or guessed values.
 
 Also record the final `.lpk` byte size and the no-embedded-image check result with the submission evidence.
@@ -73,7 +91,8 @@ Before submitting, ensure all the following conditions are met:
 
 ### 1. Completeness of App Information
 - `package.yml` must be complete with `package`, `version` (strictly `x.x.x` format), `name`, `description`, `author`, and `license`.
-- App Icon and screenshots must be provided in the Developer Center.
+- Unless explicitly requested and verified otherwise, Developer Center platform selection must be desktop-only and `package.yml.unsupported_platforms` must include `ios`, `tvos`, and `android`.
+- App Icon and 2-5 real runtime screenshots must be provided in the Developer Center. By default, use desktop screenshots only.
 - All Developer Center app information fields must be completed before submission; the final `.lpk` package information must be recorded from the actual package being submitted.
 - Migrated projects must leave the originality/source-author checkbox unselected and provide the original author name plus source project or code URL.
 - If `package.yml.locales` is provided, language key specifications follow the [BCP 47 standard](https://en.wikipedia.org/wiki/IETF_language_tag). Prefer complete name, description, and usage text for the app's primary audience.

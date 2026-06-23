@@ -76,7 +76,7 @@ description: "Non-invasive migration feasibility and workload gate for Lazycat. 
 - 登录：无登录、固定账号、OIDC、inject、反向代理、二次验证。
 - 文件能力：无文件流程、上传下载、文件选择器、文件关联。
 - 外部依赖：域名、邮件、对象存储、第三方 API、GPU、宿主机能力、特权容器。
-- 上架成本：图标、截图、描述、测试账号、复现步骤、版本来源。
+- 上架成本：默认桌面端平台选择、2-5 张截图、图标、描述、测试账号、复现步骤、版本来源。
 
 ## 决策
 
@@ -111,6 +111,7 @@ description: "Non-invasive migration feasibility and workload gate for Lazycat. 
 
 - 输出允许写入范围和禁止写入范围。
 - 输出运行模型、LPK/镜像边界、工作量等级和下一步建议。
+- 除非用户明确要求并已验证移动端或智慧屏，进入上架时默认只选择桌面端，并要求静态元数据声明不支持 `ios`、`tvos`、`android`。
 - 如果进入上架，必须带上许可证结论、查重结论、非侵入结论和工作量结论。
 - 如果阻塞，必须给出唯一阻塞原因或证据缺口。
 
@@ -133,6 +134,7 @@ Allowed Write Scope
 Runtime Model
 - Image:
 - LPK size/embed boundary:
+- Store platforms:
 - Services/routes:
 - Persistence:
 - Dependencies:

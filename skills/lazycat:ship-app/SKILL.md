@@ -16,6 +16,7 @@ description: "Ship a ready Lazycat app only: verify metadata, copy-image, build 
   - `lazycat:migration-license`
   - `lazycat:migration-boundary`
 - 项目路径、目标版本、上架资料、截图、测试账号或免密登录说明。
+- 上架平台选择；除非用户明确要求并提供移动端、智慧屏等验证证据，默认只选择桌面端。
 - 如需提审：开发者中心登录态或凭据变量。
 
 ## 凭据环境变量约定
@@ -40,7 +41,7 @@ description: "Ship a ready Lazycat app only: verify metadata, copy-image, build 
 - 镜像同步和 manifest 回写结果。
 - `.lpk` 构建结果、包体大小和内嵌镜像检查结果。
 - `lzc-cli lpk info <file.lpk>` 摘要。
-- 安装验证、核心流程验证、截图/资料状态。
+- 安装验证、核心流程验证、平台选择、截图/资料状态。
 - 提审状态或阻塞原因。
 
 ## 前置条件
@@ -75,6 +76,18 @@ description: "Ship a ready Lazycat app only: verify metadata, copy-image, build 
 
 - `package.yml` 包含 `package`、`version`、`name`、`description`、`author`、`license`、`locales`。
 - `version` 为严格 `x.x.x`。
+- 除非用户明确要求并已验证移动端或智慧屏，开发者中心上架平台默认只选择桌面端。
+- 桌面端默认上架时，`package.yml` 必须声明不支持移动端和智慧屏：
+
+```yaml
+unsupported_platforms:
+  - ios
+  - tvos
+  - android
+```
+
+用户或旧文档称为 manifest 平台字段时，LPK v2 按 `package.yml` 静态元数据处理；只有旧版项目仍使用 manifest 字段时才同步保持一致。
+
 - 如果 `package.yml.homepage` 是 GitHub URL，`package.yml.author` 必须逐字符等于 URL owner 段。
 - `lzc-manifest.yml` 服务、路由、持久化、健康检查、环境变量完整。
 - 镜像型项目已 `copy-image`，manifest 使用最终 `registry.lazycat.cloud/...` 地址。
@@ -82,6 +95,7 @@ description: "Ship a ready Lazycat app only: verify metadata, copy-image, build 
 - 最终 `.lpk` 不包含 `images/` 或 `images.lock`。
 - 有账号的应用提供 OIDC、公开测试账号、固定初始凭据或明确初始化说明。
 - 有文件能力的应用完成文件选择、文件关联、上传下载或对应说明。
+- 开发者中心截图数量为 2-5 张；默认使用真实运行的桌面端截图。移动端或智慧屏截图只有在用户明确要求对应平台并完成验证后才准备。
 - 截图、图标、描述来自真实运行版本。
 - 开发者中心资料完整，最终 `.lpk` 信息来自实际提审包。
 - 迁移项目在开发者中心必须取消勾选“应用程序为本人原创开发或本人是源作者”，并填写原作者名称和源项目或代码地址。
@@ -95,10 +109,11 @@ description: "Ship a ready Lazycat app only: verify metadata, copy-image, build 
 5. 检查包体大小和内嵌镜像产物。
 6. 运行 `lzc-cli lpk info <file.lpk>` 并记录摘要。
 7. 安装到懒猫微服验证启动、登录、核心流程、持久化、文件能力、卸载/升级风险。
-8. 准备截图、图标、描述、测试账号、复现步骤、限制说明和 LPK 信息。
-9. 若项目来源为迁移，提交前确认开发者中心未勾选“应用程序为本人原创开发或本人是源作者”，并已填写原作者名称和源项目或代码地址。
-10. 提交开发者中心；记录版本、时间、状态和证据。
-11. 审核通过后验证商店可见性和安装版本；审核失败按问题归类修复。
+8. 准备上架平台选择、2-5 张截图、图标、描述、测试账号、复现步骤、限制说明和 LPK 信息；默认只选择桌面端。
+9. 桌面端默认上架时，确认 `package.yml.unsupported_platforms` 包含 `ios`、`tvos`、`android`。
+10. 若项目来源为迁移，提交前确认开发者中心未勾选“应用程序为本人原创开发或本人是源作者”，并已填写原作者名称和源项目或代码地址。
+11. 提交开发者中心；记录版本、时间、状态和证据。
+12. 审核通过后验证商店可见性和安装版本；审核失败按问题归类修复。
 
 ## 审核失败处理
 
@@ -128,6 +143,8 @@ Preflight
 - Metadata:
 - Source gates:
 - Image:
+- Store platforms:
+- Screenshots:
 - Store materials:
 - Originality checkbox:
 - Original author:

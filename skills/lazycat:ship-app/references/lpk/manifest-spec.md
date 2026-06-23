@@ -5,6 +5,15 @@
 
 **Note (LPK v2):** Static metadata such as `package`, `version` (strictly `x.x.x`), `name`, `description`, `locales`, `author`, `license`, `homepage`, `min_os_version`, and `unsupported_platforms` are now moved to `package.yml`. `lzc-manifest.yml` focuses solely on runtime execution and service configuration.
 
+When a task says "write desktop platform support into the manifest", treat it as a static package/manifest metadata requirement. For default desktop-only store submission, write this in `package.yml`:
+
+```yaml
+unsupported_platforms:
+  - ios
+  - tvos
+  - android
+```
+
 ## II. Top-Level Data Structure `ManifestConfig`
 
 ### 2.1 Basic Execution Info {#basic-config}

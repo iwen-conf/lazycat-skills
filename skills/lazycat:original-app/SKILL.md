@@ -18,6 +18,7 @@ description: "Create or align an original Lazycat app baseline only. Use for ori
 - 账号模型：无账号、内置账号、注册登录、OIDC 或其他。
 - 文件能力：打开、保存、上传、下载、文件关联或无文件流程。
 - 期望交付范围和可运行验证方式。
+- 上架平台需求；除非用户明确要求移动端、智慧屏或其他平台，上架默认只准备桌面端。
 
 ## 凭据环境变量约定
 
@@ -78,6 +79,7 @@ description: "Create or align an original Lazycat app baseline only. Use for ori
 
 - `package.yml` 包含 `package`、`version`、`name`、`description`、`author`、`license`、`locales`。
 - `version` 为严格 `x.x.x`。
+- 除非用户明确要求并已验证移动端或智慧屏，交给 `lazycat:ship-app` 时按桌面端上架准备，不默认承诺 `ios`、`android` 或 `tvos` 支持。
 - 项目有可执行构建入口和可描述的安装验证路径。
 - 构建或检查失败时明确阻塞原因。
 - 满足门禁后交给 `lazycat:ship-app`，不在本技能内提审。
@@ -91,6 +93,7 @@ Project: <path/name>
 Inputs
 - Scenario:
 - Target platform:
+- Store platform:
 - Account model:
 - File capability:
 

@@ -17,7 +17,7 @@ The following fields are mandatory or recommended for inclusion in `package.yml`
 | `homepage` | `string` | **Optional**. Official website or repository URL. |
 | `locales` | `map` | **Optional**. Localization for name, description, and usage. |
 | `min_os_version` | `string` | **Optional**. Minimum required Lazycat OS version (e.g., `1.3.0`). |
-| `unsupported_platforms`| `[]string`| **Optional**. List of unsupported platforms (e.g., `ios`, `android`). For typical migrated web/server apps that have not been verified on mobile or TV clients, declare `android`, `ios`, and `tvos`. |
+| `unsupported_platforms`| `[]string`| **Optional but required by this skill for default desktop-only store submissions**. List of unsupported platforms. Unless the user explicitly requests and verifies mobile or TV support, declare `ios`, `tvos`, and `android`. |
 
 ## II. Localization (`locales`)
 
@@ -41,9 +41,9 @@ license: MIT
 homepage: https://github.com/lazycat-cloud/demo-app
 min_os_version: 1.3.5
 unsupported_platforms:
-  - android
   - ios
   - tvos
+  - android
 locales:
   zh-CN:
     name: "演示应用"

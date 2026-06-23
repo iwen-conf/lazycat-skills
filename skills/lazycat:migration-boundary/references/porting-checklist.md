@@ -34,13 +34,14 @@
 - [ ] External requirements classified: none, user-configurable, advanced capability, or blocking dependency.
 - [ ] Prepared `lzc-build.yml`.
 - [ ] Prepared `lzc-manifest.yml`.
-- [ ] Prepared `package.yml` with `unsupported_platforms` declaring `android`, `ios`, and `tvos` unless those platforms were verified.
+- [ ] Prepared `package.yml` with `unsupported_platforms` declaring `ios`, `tvos`, and `android` unless those platforms were explicitly requested and verified.
+- [ ] Planned Developer Center platform selection as desktop-only unless the user explicitly requested mobile or TV support and verification evidence exists.
 - [ ] Prepared `package.yml.locales` with BCP 47 keys when localized metadata is needed, including usage text when login credentials need explanation.
 - [ ] If the app uses bridged images, the final pullable image refs have already been written back to `lzc-manifest.yml` before `make install`.
 - [ ] Evaluated OIDC requirement.
 - [ ] Evaluated `file_handler` requirement.
 - [ ] Clarified credential acquisition path for apps requiring login.
-- [ ] Distinguished credential scopes: `lazycat_account` / `lazycat_password` for Lazycat OS and App Store; `lazycat_developer_center_account` / `lazycat_developer_center_password` for the Developer Center. In-app login uses app-level variables.
+- [ ] Distinguished credential scopes: `LAZYCAT_USERNAME` / `LAZYCAT_PASSWORD` for Lazycat OS, `LAZYCAT_APPSTORE_USERNAME` / `LAZYCAT_APPSTORE_PASSWORD` for the App Store, and `LAZYCAT_DEVELOPMENT_USERNAME` / `LAZYCAT_DEVELOPMENT_PASSWORD` for the Developer Center. In-app login uses app-level variables.
 - [ ] Application MUST support passwordless auto-login (免密登录) via OIDC or Inject (`builtin://simple-inject-password`) to provide a seamless user experience.
 - [ ] For apps with an internal login page, a fixed initial account is created non-invasively at startup when supported by upstream CLI/CMD/env/admin API.
 - [ ] Initial passwordless-login credentials are documented: `账号`, `密码`, `昵称`.
