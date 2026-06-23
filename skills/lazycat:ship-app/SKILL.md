@@ -33,7 +33,8 @@ description: "Ship a ready Lazycat app only: verify metadata, copy-image, build 
 2. 迁移项目必须有 `lazycat:migration-license` 和 `lazycat:migration-boundary` 输出。
 3. 迁移项目许可证不得为 `Unclear` 或 `Blocked`。
 4. 迁移项目不得依赖未授权的业务代码修改。
-5. 提交开发者中心前，所有必填资料必须完整，不得有占位符或待补内容。
+5. 迁移项目必须带有原作者名称和源项目或代码地址，且证据来自许可证门禁记录或上游仓库。
+6. 提交开发者中心前，所有必填资料必须完整，不得有占位符或待补内容。
 
 ## 允许执行
 
@@ -67,6 +68,7 @@ description: "Ship a ready Lazycat app only: verify metadata, copy-image, build 
 - 有文件能力的应用完成文件选择、文件关联、上传下载或对应说明。
 - 截图、图标、描述来自真实运行版本。
 - 开发者中心资料完整，最终 `.lpk` 信息来自实际提审包。
+- 迁移项目在开发者中心必须取消勾选“应用程序为本人原创开发或本人是源作者”，并填写原作者名称和源项目或代码地址。
 
 ## 执行规则
 
@@ -78,8 +80,9 @@ description: "Ship a ready Lazycat app only: verify metadata, copy-image, build 
 6. 运行 `lzc-cli lpk info <file.lpk>` 并记录摘要。
 7. 安装到懒猫微服验证启动、登录、核心流程、持久化、文件能力、卸载/升级风险。
 8. 准备截图、图标、描述、测试账号、复现步骤、限制说明和 LPK 信息。
-9. 提交开发者中心；记录版本、时间、状态和证据。
-10. 审核通过后验证商店可见性和安装版本；审核失败按问题归类修复。
+9. 若项目来源为迁移，提交前确认开发者中心未勾选“应用程序为本人原创开发或本人是源作者”，并已填写原作者名称和源项目或代码地址。
+10. 提交开发者中心；记录版本、时间、状态和证据。
+11. 审核通过后验证商店可见性和安装版本；审核失败按问题归类修复。
 
 ## 审核失败处理
 
@@ -110,6 +113,9 @@ Preflight
 - Source gates:
 - Image:
 - Store materials:
+- Originality checkbox:
+- Original author:
+- Source project/code:
 - Blockers:
 
 Verification

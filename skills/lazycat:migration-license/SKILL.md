@@ -26,6 +26,7 @@ description: "Migration candidate intake and license gate for Lazycat. Use for G
 - 本地目录匹配或只读 clone 结果。
 - 许可证证据、资产许可证据、依赖许可风险。
 - 是否允许商业使用、修改、再分发和上架。
+- 上架所需原作者名称和源项目或代码地址。
 
 ## 前置条件
 
@@ -100,6 +101,8 @@ description: "Migration candidate intake and license gate for Lazycat. Use for G
 
 GPL、AGPL、LGPL、MPL 等 copyleft 许可证不是“不可商用”，但必须记录分发、源码和网络服务义务。
 
+迁移项目通过门禁时，必须记录用于开发者中心上架表单的原作者名称和源项目或代码地址。原作者优先来自仓库 owner、项目官网或 LICENSE/NOTICE/README 中明确声明的作者；源地址优先使用上游 GitHub/GitLab 仓库或官方源码页面。不得使用占位符或猜测值。
+
 ## 后置条件
 
 - 所有候选均有来源、查重、许可证和下一步结论。
@@ -130,6 +133,8 @@ License Evidence
 - Dependencies:
 - Commercial use:
 - Obligations:
+- Original author:
+- Source project/code:
 
 Decision: Pass / Pass with Obligations / Unclear / Blocked
 Next: Proceed to lazycat:migration-boundary / Stop / Needs Manual Review

@@ -23,6 +23,7 @@
 - `lazycat:ship-app`：接收已准备好的原创应用，或已通过迁移两关的迁移项目，执行打包、安装验证、商店资料、提审和发布后检查。
 - 所有最终 `.lpk` 必须小于或等于 12 MB（按 `12,000,000` bytes 检查），且禁止内嵌镜像；不得使用 `lzc-build.yml.images`、`embed:<alias>`、包内 `images/` 或 `images.lock`。
 - 镜像型项目必须使用可拉取远程镜像；提审前通过 `lzc-cli appstore copy-image` 同步到 `registry.lazycat.cloud/...` 并写回 manifest 后再打包。
+- 迁移项目提审时必须取消勾选“应用程序为本人原创开发或本人是源作者”，并填写原作者名称和源项目或代码地址。
 
 ### 更新
 

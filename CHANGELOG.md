@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-06-24
+
+- docs: 新增迁移项目上架原创性表单约束，要求提审时取消勾选“应用程序为本人原创开发或本人是源作者”，并填写原作者名称和源项目或代码地址。
+
 ## 2026-06-16
 
 - docs: 重构 Lazycat Skill 架构，合并 `lazycat:unlisted-candidate-audit` 到 `lazycat:migration-license`，合并 `lazycat:migration-workload` 到 `lazycat:migration-boundary`，并统一保留 5 个单一职责入口。
