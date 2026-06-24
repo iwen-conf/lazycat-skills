@@ -26,6 +26,16 @@ unsupported_platforms:
 
 Use 2-5 screenshots for Developer Center submission. By default, screenshots must come from the real desktop runtime. Only prepare mobile or TV screenshots when the user explicitly requested those platforms and the app was verified there.
 
+### 0.2 Developer Center English Description Gate
+If the app runtime UI or primary user-facing copy is English, the Developer Center listing page must include a complete English description before submission.
+
+This is a Developer Center store-listing field requirement, not a manifest/package metadata field. Do not treat `lzc-manifest.yml`, `package.yml.description`, or `package.yml.locales` as sufficient by themselves.
+
+### 0.3 Installation and Business Capability Gate
+Before submitting or publishing, install the final `.lpk` on a real Lazycat MicroServer and verify that installation succeeds, the app opens, startup and login work, and the core business capabilities behave normally.
+
+Core business verification must cover the app's main user-facing workflows, such as create/read/update/delete operations, file operations, persistence, or the equivalent domain-specific actions. If installation fails, the app cannot open, startup/login fails, or any core business capability is unverified or abnormal, stop submission and fix the package first.
+
 ### 1. Developer Registration
 1. Register an account on the [Lazycat Community](https://lazycat.cloud/login?redirect=https://developer.lazycat.cloud/).
 2. Visit the [Developer Center](https://developer.lazycat.cloud/manage) and follow the prompts to submit a developer review application.
@@ -81,6 +91,10 @@ Before publishing, every required Developer Center field must be completed. Do n
 
 Before publishing, confirm the Developer Center platform selection. Default to desktop-only, confirm `package.yml.unsupported_platforms` declares `ios`, `tvos`, and `android`, and attach 2-5 real desktop screenshots unless the user explicitly requested and verified additional platforms.
 
+Before publishing an app whose runtime UI or primary user-facing copy is English, confirm the Developer Center listing page has a complete English description. This cannot be satisfied only by manifest/package metadata.
+
+Before publishing, confirm the final `.lpk` has been installed successfully on a real Lazycat MicroServer and that the app opens, login/startup works, and core business workflows behave normally. Do not publish when installation or business capability verification is missing or failed.
+
 For migrated projects, do not select the Developer Center checkbox "应用程序为本人原创开发或本人是源作者". The submission must include the original author's name and the source project or code address, using evidence from the migration license gate or upstream repository. Do not use placeholders or guessed values.
 
 Also record the final `.lpk` byte size and the no-embedded-image check result with the submission evidence.
@@ -94,6 +108,7 @@ Before submitting, ensure all the following conditions are met:
 - Unless explicitly requested and verified otherwise, Developer Center platform selection must be desktop-only and `package.yml.unsupported_platforms` must include `ios`, `tvos`, and `android`.
 - App Icon and 2-5 real runtime screenshots must be provided in the Developer Center. By default, use desktop screenshots only.
 - All Developer Center app information fields must be completed before submission; the final `.lpk` package information must be recorded from the actual package being submitted.
+- English apps must include a complete English description on the Developer Center listing page. Manifest/package metadata does not replace this field.
 - Migrated projects must leave the originality/source-author checkbox unselected and provide the original author name plus source project or code URL.
 - If `package.yml.locales` is provided, language key specifications follow the [BCP 47 standard](https://en.wikipedia.org/wiki/IETF_language_tag). Prefer complete name, description, and usage text for the app's primary audience.
 - Runtime Chinese (`zh-CN`) UI is optional. Add or improve runtime i18n when it serves the product and target users, but do not block submission solely because the app UI is English-only.
@@ -102,6 +117,7 @@ Before submitting, ensure all the following conditions are met:
 - The app must install and load normally.
 - Apps that fail to install, fail to load after installation, or become unresponsive will **not pass review**.
 - Thoroughly test the installation process and initial loading before submission. **Specifically, verify that dependencies required for installation are accessible.**
+- The app's core business capabilities must work after installation. Missing or failed business-flow verification blocks submission.
 
 ### 3. Stability and Quality
 - Avoid serious crashes or unexpected shutdowns.
